@@ -13,7 +13,6 @@ class secret(commands.Cog):
         self.bot = bot
     pass
 
-
     @commands.command(aliases=["code"])
     @commands.guild_only()
     async def coding(self, ctx):

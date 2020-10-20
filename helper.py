@@ -12,8 +12,6 @@ base_classes = {
     4 : 'Archer',
 }
 
-times_error = 0
-
 prefix = ';'
 
 body_parts = ['skeleton', 'ligaments', 'muscles', 'tendons', 'teeth', 'mouth', 'tongue', 'larynx', 'esophagus', 'stomach', 'small intestine', 'large intestine', 'liver', 'gallbladder', 'mesentery', 'pancreas', 'anus', 'nasal cavity', 'pharynx', 'larynx', 'trachea', 'lungs', 'diaphragm', 'groin', 'kidneys', 'heart', 'spleen', 'thymus', 'brain', 'cerebellum', 'spine', 'eye', 'ear', 'arm', 'leg', 'chest', 'neck', 'toe', 'finger']
@@ -346,6 +344,7 @@ async def genprof(uid, aps):
             total_achievements = num[0] # Self explanatory.
         async with conn.execute(f"select * from users where id = '{uid.id}';") as info:
             user = await info.fetchone()
+
     profile = discord.Embed(title=f"{uid.display_name}'s Profile", colour=discord.Colour(0x6eaf0b), description="")
     profile.set_thumbnail(url=uid.avatar_url)
     ###

@@ -20,9 +20,10 @@ bot = discord.Client()
 bot = commands.Bot(command_prefix=h.prefix, description="Bot", case_insensitive=True, intents=intents)
 bot.remove_command("help")
 
-bot.enabled_channels = []
+bot.banned_channels = []
 bot.registered_users = {}
 bot.notified = []
+bot.servers = []
 bot.users_ap = {}
 bot.users_classes = {}
 bot.version = '0.1.1'
@@ -68,12 +69,13 @@ async def on_ready():
 
     async with aiosqlite.connect('main.db') as conn: # This code makes sure the bot is enabled, then also makes sure that the bot is in an enabled channel
         # This also preloads some of the db.
-        async with conn.execute(f"select bchannels from servers;") as servers:
+        async with conn.execute(f"select * from servers;") as servers:
             servs = await servers.fetchall()
             for serv in servs:
-                banned = serv[0].split('|')
+                bot.servers.append(int(serv[0]))
+                banned = serv[1].split('|')
                 for item in banned:
-                    bot.enabled_channels.append(item)
+                    bot.banned_channels.append(item)
         async with conn.execute(f"select id, class, achievements, ap from users;") as people:
             usrs = await people.fetchall()
             for guy in usrs:
@@ -93,7 +95,7 @@ async def on_ready():
 
     print(f'\nLogged in.')
 
-    await bot.change_presence(activity=discord.Game(f"{h.prefix}start | Version {bot.version}")) # f"{prefix}register"))
+    await bot.change_presence(activity=discord.Game(f"{h.prefix}start | Version {bot.version}")) 
 
     # update = input("\nEnter update text, hit enter if none: ")
     update = None
@@ -155,9 +157,11 @@ async def on_message(message):
         pass
         
     if not message.author.bot:
-        if str(message.channel.id) not in bot.enabled_channels or message.content.lower() == f"{h.prefix}classzone" or message.author.id == 217288785803608074: # Put in-chat things here, as this is where it makes sure the channel is enabled.
-            await bot.process_commands(message) # Run commands.
-            # Random quest encounter chance time!
+        if (str(message.channel.id) not in bot.banned_channels) or message.content.lower() == f"{h.prefix}classzone" or message.author.id == 67217288785803608074: # Put in-chat things here, as this is where it makes sure the channel is enabled.
+            if message.guild.id in bot.servers or message.content.lower() == f"{h.prefix}enablecc":
+                await bot.process_commands(message) # Run commands.
+            elif message.content[0] == ";":
+                await message.channel.send("⚠️ | Hey! Seems like you're trying to run a command. Sadly, the bot hasn't been activated for this server yet! Have the server owner say `;enablecc`")
         if str(message.author.id) in bot.registered_users:
             await h.fetch_random_quest(message, bot)
             await asyncio.sleep(.1)
@@ -166,22 +170,6 @@ async def on_message(message):
             await h.txt_achievement_handler(message.content.lower(), message.author.id, message, bot)
             await asyncio.sleep(.1)
             await h.xp_handler(message, bot)
-
-    """
-    conn = sqlite3.connect('main.db')
-    c = conn.cursor()
-    table = c.execute("select * from users;")
-    in_table = False
-    for usr in table:
-        if (usr[0] == str(message.author.id)):
-            in_table = True
-
-    if not in_table:
-        
-        conn.commit()
-
-    conn.close()
-    """
 
 @bot.command(aliases=['invite'])
 @commands.guild_only()
