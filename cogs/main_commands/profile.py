@@ -6,6 +6,7 @@ import random
 import math
 import os
 import aiohttp
+import time
 import aiosqlite
 
 class profile(commands.Cog):
@@ -61,15 +62,24 @@ class profile(commands.Cog):
                 stuff = await lb.fetchall()
         final = ""
         in_top = False
-        for i in range(5):
+        i = 0
+        timeout = time.time() + 25   # 25 seconds from now
+        while i < 5:
+            if time.time() > timeout:
+                await ctx.send("Timeout error.")
+                print("------------TIMEOUT ERROR ON TOP------------")
+                break
+
             user = self.bot.get_user(int(stuff[i][0]))
-            if user and user.id is not ctx.message.author.id:
+            if user != None and user.id is not ctx.message.author.id:
                 final+=f"#{i+1} - {user.name} - {stuff[i][5]} Coolness\n\n"
-            if user and user.id is ctx.message.author.id:
+                i += 1
+            elif user != None and user.id is ctx.message.author.id:
                 final+=f"**#{i+1} - {user.name} - {stuff[i][5]} Coolness**\n\n"
                 in_top = True
-            else:
-                i+=1
+                i += 1
+            elif user == None:
+                pass
 
         if not in_top:
             rank = 1
@@ -83,7 +93,6 @@ class profile(commands.Cog):
 
             final+=f"**.  .  .\n\n#{rank} - {ctx.message.author.name} - {coolness}**"
         
-
         profile = discord.Embed(title=f"👑 𝒯𝒽𝑒 𝒞𝑜𝑜𝓁𝑒𝓈𝓉 𝒦𝒾𝒹𝓈 👑", colour=discord.Colour.from_rgb(255,255,0), description=final)
         profile.set_thumbnail(url="https://cdn.discordapp.com/attachments/491359456337330198/733460129785184297/Funny-Dog-Wearing-Sunglasses.png")
         
