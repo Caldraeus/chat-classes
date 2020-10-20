@@ -15,8 +15,9 @@ import os
 from datetime import datetime  
 from datetime import timedelta  
 
+intents = discord.Intents.all()
 bot = discord.Client()
-bot = commands.Bot(command_prefix=h.prefix, description="Bot", case_insensitive=True)
+bot = commands.Bot(command_prefix=h.prefix, description="Bot", case_insensitive=True, intents=intents)
 bot.remove_command("help")
 
 bot.enabled_channels = []
@@ -27,6 +28,8 @@ bot.users_classes = {}
 bot.version = '0.1.1'
 bot.server_boosters = []
 bot.tomorrow = bot.tomorrow = datetime.now().replace(hour=0, minute=0, second=0, microsecond=0) + timedelta(days=1)
+
+
 
 if __name__ == '__main__': # Cog loader!
     def load_dir_files(path):
