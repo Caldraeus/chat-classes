@@ -16,6 +16,12 @@ prefix = ';'
 
 body_parts = ['skeleton', 'ligaments', 'muscles', 'tendons', 'teeth', 'mouth', 'tongue', 'larynx', 'esophagus', 'stomach', 'small intestine', 'large intestine', 'liver', 'gallbladder', 'mesentery', 'pancreas', 'anus', 'nasal cavity', 'pharynx', 'larynx', 'trachea', 'lungs', 'diaphragm', 'groin', 'kidneys', 'heart', 'spleen', 'thymus', 'brain', 'cerebellum', 'spine', 'eye', 'ear', 'arm', 'leg', 'chest', 'neck', 'toe', 'finger']
 
+
+async def can_attack(user, target):
+    return True
+
+
+
 def max_xp(lvl):
     return 5 * (lvl ^ 2) + 100 * lvl + 10
 

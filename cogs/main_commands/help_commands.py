@@ -73,7 +73,7 @@ class help_commands(commands.Cog):
             profile.set_thumbnail(url="https://archive-media-0.nyafuu.org/c/image/1531/86/1531863615508.png")
             await ctx.send(embed=profile)
         elif module == "shop":
-            profile.add_field(name=f"shop [type] [page]", value=f"Check the shop for a specific item type. Saying just `{h.prefix}shop` is the same as saying `{prefix}shop consumables 1`.", inline=False)
+            profile.add_field(name=f"shop [type] [page]", value=f"Check the shop for a specific item type. Saying just `{h.prefix}shop` is the same as saying `{h.prefix}shop consumables 1`.", inline=False)
             profile.add_field(name="inventory", value="Display your item inventory.", inline=False)
             profile.add_field(name="use [item]", value="Use an item.", inline=False)
             profile.set_thumbnail(url="https://archive-media-0.nyafuu.org/c/image/1531/86/1531863615508.png")

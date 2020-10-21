@@ -33,14 +33,31 @@ class apprentice(commands.Cog):
             "usr1 fires several fireballs at usr2, striking them in the bdypart."
         ]
         self.hooks_dm = [
-            "usr1 blinds usr2 with magic, then fires a shadowbolt through their bdypart!"
+            "usr1 blinds usr2 with magic, then fires a shadowbolt through their bdypart!",
+            "usr1 stabs usr2 with a ritual dagger, then pulls their blood out using magic.",
+            "usr1 causes usr2's bdypart to slowly decay. It doesn't even kill them, it's just kinda rude.",
+            "usr1 collects some minor souls to haunt usr2. usr2 begs for mercy after a day of haunting, and usr1 steals their soul.",
+            "usr1 contorts usr2's bones, then steals their bdypart.",
+            "usr1 melts usr2's insides, then extracts their bones.",
+            "usr1 teleports usr2 to the seventh layer of hell. Have a good one!",
+            "usr1 extracts usr2's bdypart before turning them into a fine red paste.",
+            "usr1 uses magic to crush usr2's heart, instantly killing them.",
+            "usr1 torments usr2 with shadows before finally tearing out their bdypart.",
+            "usr1 pays a demon to kill usr2. usr2 is last seen entering their home, then never seen again. Thanks, Illxylnth!",
+            "usr1 clouds usr2's mind with horrible images, causing usr2 to jump into the nearest volcano.",
+            "usr1 magically manipulates a needle to pierce usr2's bdypart several times, then lodge into their brain.",
+            "usr1 follows usr2 home, then invades their dream, killing them in their nightmare and in the real world at the same time.",
+            "usr1 tears usr2 apart limb by limb with the help of some imps.",
+            "usr1 causes usr2 to go insane and rip out their own bdypart.",
+            "usr1 inverts usr2. Which, as I'm sure you can imagine, is really, really nasty. And messy.",
+            f"usr1 swaps usr2's bdypart and {random.choice(h.body_parts)} in their sleep. Huh."
         ]
     pass
 
     @commands.command()
     @commands.guild_only()
     async def blast(self, ctx, target: discord.Member = None): # Shoots an arrow at someone.
-        if target and target != ctx.author and target.id != 713506775424565370:
+        if target and target != ctx.author and target.id != 713506775424565370 and await h.can_attack(ctx.author.id, target.id):
             if self.bot.users_classes[str(ctx.author.id)] == "apprentice":
                 ap_works = await h.alter_ap(ctx.message, 1, self.bot)
                 if ap_works:
