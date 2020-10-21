@@ -18,8 +18,17 @@ class hydromancer(commands.Cog):
             "usr1 creates a blade of water, cutting off usr2's bdypart!",
             "usr1 creates tentacles of water, piercing usr2's bdypart. Ew.",
             "usr1 creates a gargantuan wave, engulfing usr2 and drowning them.",
-            "usr2 attacks usr1, but usr2 blocks it with a wall of water, which then collapses in on usr2, killing them!",
-            "usr1 shoots a jet of water through usr2's bdypart! It's super effective!"
+            "usr2 attacks usr1, but usr1 blocks it with a wall of water, which then collapses in on usr2, killing them!",
+            "usr1 shoots a jet of water through usr2's bdypart! It's super effective!",
+            "usr1 slams their hand against usr2's face, then drowns them by creating a constant stream of water! Brutal, man!",
+            "usr1 meets usr2 on a beach. Their goal? To duel.\n\n'You stand no chance. I'm not an apprentice anymore, usr2.'\n\n'Heh. I'm sure.'\n\nusr1 then causes the ocean water to their left to rise up, up, and create a giant fist of water. usr2's eyes go wide, as they realise they have lost. The fist comes down, crushing usr2 to a pulp.",
+            "usr1 shoots usr2 with a squirtgun. Then shoots them with a extremely powerful blast of water, causing their bdypart to fly out.",
+            "usr1 pulls all of the liquid out of usr2, causing them to shrivel up. Ew, but cool!",
+            "usr1 swells usr2's bdypart with water, causing it to burst! usr2 drops, dead.",
+            "usr2 is swimming when all of a sudden the ocean begins to churn. usr1 floats from below the sea, then smiles - evily. usr2 goes wide eyed as the ocean pulls them deep under, drowning them. Spooky!",
+            "usr1 uses a swell of water to push a bunch of debris into usr2, crushing them!",
+            "usr1 shoots three arrows of water into usr2's bdypart, obliterating it.",
+            "usr1 shoots a beam of powerful water at usr2, slicing off their bdypart, leg, arm and finally cutting them in half! Brutal!"
         ]
 
         self.waterlevels = {}
