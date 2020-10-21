@@ -91,47 +91,52 @@ class class_comands(commands.Cog):
         xp = prof[0]
 
         current_lvl = prof[1]
-
         if (user[8]+1) % 10 == 0 and (xp >= h.max_xp(current_lvl) and ((prof[1]+1) % 10 == 0)):
             ###
             user_ach = user[6].split("|")
             clss = user[1].replace("_"," ")
             clss = clss.lower()
             allowed_classes = []
+
             if clss.title() in h.base_classes.values():
                 async with aiosqlite.connect('main.db') as conn:
                     async with conn.execute(f"select * from classes where preclass = '{clss}' or preclass = 'origin';") as cinfo:
                         class_info = await cinfo.fetchall()
-                profile = discord.Embed(title=f"🌟 CLASS-UP! 🌟", colour=discord.Colour.from_rgb(255, 165, 0))
-                for potential_class in class_info:
-                    if potential_class[4] != 0 and str(potential_class[4]) in user_ach: # It's an achievement locked class...
-                        profile.add_field(name=potential_class[0].title(), value=potential_class[1], inline=False)
-                        allowed_classes.append(potential_class[0].lower())
-                    elif potential_class[4] == 0:
-                        profile.add_field(name=potential_class[0].title(), value=potential_class[1], inline=False)
-                        allowed_classes.append(potential_class[0].lower())
-
-                await ctx.send(embed=profile)
-                await ctx.send(f"{ctx.author.mention} which class do you wish to become? Say `none` to cancel.")
-                
-                def check(m: discord.Message):
-                    return m.content and m.channel == ctx.message.channel and m.author == ctx.message.author
-
-                try:
-                    chosen = await self.bot.wait_for('message', check=check, timeout=30)
-                except TimeoutError:
-                    await ctx.send(f"{ctx.author.mention}, you took to long to choose! Please try again.")
-
-                if chosen.content.lower() in allowed_classes:
-                    await ctx.send(f"Alright! Here we go! \n\n*3...*\n\n*<:STEASnothing:517873442381627392>2...*\n\n*<:STEASnothing:517873442381627392><:STEASnothing:517873442381627392>1... and...!*\n\n<:STEASnothing:517873442381627392><:STEASnothing:517873442381627392><:STEASnothing:517873442381627392><:STEASnothing:517873442381627392>☁️ **P O O F !** ☁️\n\n{ctx.author.mention} is now a **{chosen.content.title()}**! Congratulations!")
-                else:
-                    await ctx.send("That isn't an option for you! Did you perhaps make a typo?")
-                        
             else:
                 async with aiosqlite.connect('main.db') as conn:
                     async with conn.execute(f"select * from classes where preclass = '{clss}';") as cinfo:
                         class_info = await cinfo.fetchall()
-                        print(class_info)
+
+            profile = discord.Embed(title=f"🌟 CLASS-UP! 🌟", colour=discord.Colour.from_rgb(255, 165, 0))
+            for potential_class in class_info:
+                if potential_class[4] != 0 and str(potential_class[4]) in user_ach: # It's an achievement locked class...
+                    profile.add_field(name=potential_class[0].title(), value=potential_class[1], inline=False)
+                    allowed_classes.append(potential_class[0].lower())
+                elif potential_class[4] == 0:
+                    profile.add_field(name=potential_class[0].title(), value=potential_class[1], inline=False)
+                    allowed_classes.append(potential_class[0].lower())
+
+            await ctx.send(embed=profile)
+            await ctx.send(f"{ctx.author.mention} which class do you wish to become? Say `none` to cancel.")
+            
+            def check(m: discord.Message):
+                return m.content and m.channel == ctx.message.channel and m.author == ctx.message.author
+
+            try:
+                chosen = await self.bot.wait_for('message', check=check, timeout=30)
+            except:
+                await ctx.send(f"{ctx.author.mention}, you took to long to choose! Please try again.")
+
+            if chosen.content.lower() in allowed_classes:
+                await ctx.send(f"Alright! Here we go! \n\n*3...*\n\n*<:STEASnothing:517873442381627392>2...*\n\n*<:STEASnothing:517873442381627392><:STEASnothing:517873442381627392>1... and...!*\n\n<:STEASnothing:517873442381627392><:STEASnothing:517873442381627392><:STEASnothing:517873442381627392><:STEASnothing:517873442381627392>☁️ **P O O F !** ☁️\n\n{ctx.author.mention} is now a **{chosen.content.title()}**! Congratulations!")
+                # Time to edit.
+                async with aiosqlite.connect('main.db') as conn:
+                    await conn.execute(f"update users set class = '{chosen.content.lower()}', exp = 0, level = {user[8]+1} where id = '{ctx.author.id}'")
+                    await conn.commit()
+
+                self.bot.users_classes[str(ctx.author.id)] = chosen.content.lower()
+            else:
+                await ctx.send("Class-up cancelled! If you didn't mean for this to happen, make sure you spelt the class name correctly!")
         else:
             await ctx.send("Sorry, you can't change classes yet! Come back when you're higher level.")
 
