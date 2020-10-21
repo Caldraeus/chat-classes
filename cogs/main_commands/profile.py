@@ -63,35 +63,42 @@ class profile(commands.Cog):
         final = ""
         in_top = False
         i = 0
-        timeout = time.time() + 25   # 25 seconds from now
-        while i < 5:
+        timeout = time.time() + 5   # 25 seconds from now
+        total = 5
+        amount_skipped = 0 # There's a lot of mumbo jumbo here. Basically, if someone isn't in a server with Chat Classes, we can't find them! So basically, we need to skip over them and get the next guy, so we have to increase the limit by one, the person we're on by one, and count how many we skip so we can make sure the ranks show up normally.
+        while i < total:
             if time.time() > timeout:
                 await ctx.send("Timeout error.")
                 print("------------TIMEOUT ERROR ON TOP------------")
                 break
-
+            
+            
             user = self.bot.get_user(int(stuff[i][0]))
             if user != None and user.id is not ctx.message.author.id:
-                final+=f"#{i+1} - {user.name} - {stuff[i][5]} Coolness\n\n"
+                final+=f"#{i+1 - amount_skipped} - {user.name} - {stuff[i][5]} Coolness\n\n"
                 i += 1
             elif user != None and user.id is ctx.message.author.id:
-                final+=f"**#{i+1} - {user.name} - {stuff[i][5]} Coolness**\n\n"
+                final+=f"**#{i+1 - amount_skipped} - {user.name} - {stuff[i][5]} Coolness**\n\n"
                 in_top = True
                 i += 1
             elif user == None:
-                pass
+                i += 1
+                total += 1
+                amount_skipped += 1
+                continue
 
-        if not in_top:
-            rank = 1
-            coolness = 0
-            for usr in stuff:
-                if usr[0] == str(ctx.message.author.id):
-                    coolness = usr[5]
-                    break
-                else:
-                    rank+=1
+        if user != None:
+            if not in_top:
+                rank = 1 
+                coolness = 0
+                for usr in stuff:
+                    if usr[0] == str(ctx.message.author.id):
+                        coolness = usr[5]
+                        break
+                    else:
+                        rank+=1
 
-            final+=f"**.  .  .\n\n#{rank} - {ctx.message.author.name} - {coolness}**"
+                final+=f"**.  .  .\n\n#{rank} - {ctx.message.author.name} - {coolness}**"
         
         profile = discord.Embed(title=f"👑 𝒯𝒽𝑒 𝒞𝑜𝑜𝓁𝑒𝓈𝓉 𝒦𝒾𝒹𝓈 👑", colour=discord.Colour.from_rgb(255,255,0), description=final)
         profile.set_thumbnail(url="https://cdn.discordapp.com/attachments/491359456337330198/733460129785184297/Funny-Dog-Wearing-Sunglasses.png")

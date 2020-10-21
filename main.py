@@ -144,19 +144,20 @@ async def on_guild_remove(guild):
 
 @bot.event
 async def on_message(message):
-    if datetime.now().replace(hour=0, minute=0, second=0, microsecond=0) == bot.tomorrow:
+    if datetime.now().replace(hour=0, minute=0, second=0, microsecond=0) >= bot.tomorrow:
         bot.tomorrow = datetime.now().replace(hour=0, minute=0, second=0, microsecond=0) + timedelta(days=1) # 3:43 PM
 
-        async with conn.execute(f"select id, class, achievements, ap from users;") as people:
-            usrs = await people.fetchall()
-            for guy in usrs:
-                if int(guy[0]) in bot.server_boosters:
-                    bot.users_ap[guy[0]] = 40
-                else:
-                    bot.users_ap[guy[0]] = 20 # guy[3]
+        async with aiosqlite.connect("main.db") as conn:
+            async with conn.execute(f"select id, class, achievements, ap from users;") as people:
+                usrs = await people.fetchall()
+                for guy in usrs:
+                    if int(guy[0]) in bot.server_boosters:
+                        bot.users_ap[guy[0]] = 40
+                    else:
+                        bot.users_ap[guy[0]] = 20 # guy[3]
 
-                bot.users_classes[guy[0]] = guy[1]
-        print("\n\n\n----------------Daily reset has occurred----------------\n\n\n")
+                    bot.users_classes[guy[0]] = guy[1]
+            print("\n\n\n----------------Daily reset has occurred----------------\n\n\n")
     else:
         pass
         

@@ -47,7 +47,20 @@ class swordsman(commands.Cog):
         ]
 
         self.hooks_s = [
-            "usr1 parries usr2's first attack, then slams their katana into their side."
+            "usr1 parries usr2's first attack, then slams their katana into their side.",
+            "usr1 is locked in battle with usr2. As they clash, usr1 suddenly realises the pattern of attacking usr2 uses. usr1 smiles.\n\n「これで終いだ!」 yells usr1, as they strike usr2 right between their ribs. Blood sprays, and usr2 collapses, dead.",
+            "usr1 charges at usr2, then drops to their knees and slides into usr2 with their sword out, cutting them in half.\n\n「よっしゃー！」 yells usr1, as they raise their katana in victory.",
+            "usr1 rides on horseback, approaching usr2. They hop off and slice usr2 down the back as they land. usr2 drops, dead.",
+            "usr1 stabs usr2 in the neck, then slices them across their stomach. usr2 collapses, and looks up to usr1.\n\n\"Do it. Kill me. I've lost.\"\n\nusr1 scoffs.\n\n「つまらぬ者を斬る気はない。」\n\nusr1 sheaths their sword, and leaves usr2 behind.",
+            "usr1 parries usr2's attack.\n\n「甘い!」 usr1 shouts, before stabbing usr2 straight through the neck. usr2 chokes for a moment, then collapses, life draining from their eyes.",
+            "usr1 parries usr2, then flips them over, their blade against usr2's throat.\n\n「死ね。」\n\nusr1 chops usr2's head off, then walks away.",
+            "usr1 draws a longbow, and fires an arrow straight into usr2's bdypart.",
+            "usr1 slices usr2's leg, causing them to fall to their knees. usr1 hands usr2 a smaller blade. usr2 looks up at usr1, and usr2 nods.\n\nusr2 thrusts the blade into their chest and drops over, dead.\n\n「分をわきまえぬは無礼であろう。」",
+            "usr2 charges at usr1, who quickly dodges and raises their sword, cutting usr2's arm off. usr2 attempts to attack usr1, but without an arm fails, passing out. usr1 finishes the job.",
+            "usr1 charges at usr2, slicing them straight through the stomach. usr2 freezes, then slowly slides apart. Brutal!",
+            "usr1 slams the pommel of their katana into usr2's head, disorienting them. usr1 then slices usr2 across the chest twice, finishing them off by kicking them.",
+            "usr1 slashes usr2's bdypart a thousand times, turning it into small pieces.",
+            "usr1 parries usr2's attack, then smashes the pommel of their katana into usr2's bdypart, causing them to stumble and fall off a cliff."
         ]
     pass
 
