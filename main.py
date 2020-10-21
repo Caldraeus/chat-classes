@@ -33,24 +33,28 @@ bot.tomorrow = bot.tomorrow = datetime.now().replace(hour=0, minute=0, second=0,
 
 
 if __name__ == '__main__': # Cog loader!
-    def load_dir_files(path):
-        print("\n")
+    def load_dir_files(path, dash):
+        #print("\n")
         for item in listdir(path):
-            if os.path.isdir(path) and item != ".DS_Store" and item != "__pycache__" and not item.endswith(".py"):
+            if os.path.isdir(path) and item != ".DS_Store" and item != "__pycache__" and not item.endswith(".py") and not item.endswith(".md"):
                 new_path = path+f"/{item}"
-                load_dir_files(new_path)
+                load_dir_files(new_path, f"{dash}───")
             elif item.endswith(".py"):
                 new_path = path+f"/{item}"
                 new_path = new_path.replace(".py", "")
                 load_path = new_path.replace("/", ".")
-                num = 20
-                for letter in str(item):
+                num = 100
+                for letter in str(item + dash):
                     num -= 1
                 empty = ""
+                if "special_classes" in path:
+                    num += 3
                 for i in range(num): # Makes things look nicer in the console... lol
                     empty += " "
                 try:
-                    print(f"Loading {item}...", end = " ")# print(f"[{path}] : Loading {item}...", end = " ")
+                    if "special_classes" in path:
+                        dash = '├───────'
+                    print(f"{dash} Loading {item}...", end = " ")# print(f"[{path}] : Loading {item}...", end = " ")
                     bot.load_extension(load_path)
                     print(f"{empty}[SUCCESS]")
                 except (discord.ClientException, ModuleNotFoundError):
@@ -58,7 +62,7 @@ if __name__ == '__main__': # Cog loader!
                     print(f'Failed to load extension {item}.\n')
                     traceback.print_exc()
 
-    load_dir_files('cogs')
+    load_dir_files('cogs' ,"├─")
 
 @bot.event
 async def on_ready():

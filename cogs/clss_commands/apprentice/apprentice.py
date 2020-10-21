@@ -32,6 +32,9 @@ class apprentice(commands.Cog):
             "usr1 teleports inside of usr2, then breaks through them. Brutal!",
             "usr1 fires several fireballs at usr2, striking them in the bdypart."
         ]
+        self.hooks_dm = [
+            "usr1 blinds usr2 with magic, then fires a shadowbolt through their bdypart!"
+        ]
     pass
 
     @commands.command()
@@ -44,6 +47,21 @@ class apprentice(commands.Cog):
                     crit_check = random.randint(1,20)
                     body_part = random.choice(h.body_parts)
                     hook = random.choice(self.hooks)
+                    hook = hook.replace("usr1", f"**{ctx.author.display_name}**")
+                    hook = hook.replace("bdypart", body_part)
+                    hook = hook.replace("usr2", f"**{target.display_name}**")
+                    if crit_check != 20:
+                        await ctx.send(hook)
+                    else:
+                        hook = "**✨[CRITICAL]✨** + 100 Coolness | " + hook
+                        await h.add_coolness(ctx.author.id, 100)
+                        await ctx.send(hook)
+            elif self.bot.users_classes[str(ctx.author.id)] == "dark mage":
+                ap_works = await h.alter_ap(ctx.message, 1, self.bot)
+                if ap_works:
+                    crit_check = random.randint(1,20)
+                    body_part = random.choice(h.body_parts)
+                    hook = random.choice(self.hooks_dm)
                     hook = hook.replace("usr1", f"**{ctx.author.display_name}**")
                     hook = hook.replace("bdypart", body_part)
                     hook = hook.replace("usr2", f"**{target.display_name}**")
