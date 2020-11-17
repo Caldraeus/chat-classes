@@ -128,6 +128,8 @@ class class_comands(commands.Cog):
                 await ctx.send(f"{ctx.author.mention}, you took to long to choose! Please try again.")
 
             if chosen.content.lower() in allowed_classes:
+                if ctx.author.id in self.bot.notified:
+                    self.bot.notified.remove(ctx.author.id)
                 await ctx.send(f"Alright! Here we go! \n\n*3...*\n\n*<:STEASnothing:517873442381627392>2...*\n\n*<:STEASnothing:517873442381627392><:STEASnothing:517873442381627392>1... and...!*\n\n<:STEASnothing:517873442381627392><:STEASnothing:517873442381627392><:STEASnothing:517873442381627392><:STEASnothing:517873442381627392>☁️ **P O O F !** ☁️\n\n{ctx.author.mention} is now a **{chosen.content.title()}**! Congratulations!")
                 # Time to edit.
                 async with aiosqlite.connect('main.db') as conn:

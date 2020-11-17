@@ -59,15 +59,14 @@ async def xp_handler(message, bot):
                     await conn.execute(f"update users set exp = {max_xp(current_lvl)} where id = '{message.author.id}'")
                     await conn.commit()
                 if message.author.id not in bot.notified:
-                    pass
-                    """
+                    print("Doin it")
                     bot.notified.append(message.author.id)
                     embed = discord.Embed(title=f"✨ Level up! ✨", colour=discord.Colour.from_rgb(255, 204, 153), description=f'You can now level up to {prof[1]+1}! Good job!')
                     embed.set_thumbnail(url=message.author.avatar_url)
                     embed.set_footer(text=f"A class up is available! Run {prefix}classup when you are ready.", icon_url="https://lh3.googleusercontent.com/proxy/KbtIDDPpLGgzz6LmKyMoyYRtnXpgPHjyvr3Idg30Cff8JDcfXTiVdjl9QjGn_G_ty6ekXk29X2BwNJ8mdz-QfIHhMs7qd7HA")
-                    notif = await message.channel.send(content=f'`message.author.mention` - TEMPORARY DISABLED', embed=embed)
+                    notif = await message.channel.send(content=f'{message.author.mention}', embed=embed)
                     await notif.delete(delay=10)
-                    """
+                
             else:
                 async with aiosqlite.connect('main.db') as conn:
                     await conn.execute(f"update users set exp = {xp} where id = '{message.author.id}'")

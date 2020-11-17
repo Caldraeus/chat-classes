@@ -63,8 +63,8 @@ class rogue(commands.Cog):
                     if crit_check != 20:
                         await ctx.send(hook)
                     else:
-                        hook = "**✨[CRITICAL BACKSTAB]✨** + 200 Coolness | " + hook
-                        await h.add_coolness(ctx.author.id, 200)
+                        hook = "**✨[CRITICAL BACKSTAB]✨** + 125 Coolness | " + hook
+                        await h.add_coolness(ctx.author.id, 125)
                         await ctx.send(hook)
             elif self.bot.users_classes[str(ctx.author.id)] == "criminal":
                 ap_works = await h.alter_ap(ctx.message, 1, self.bot)
