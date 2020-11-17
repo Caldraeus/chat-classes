@@ -21,7 +21,9 @@ class boxer(commands.Cog):
             "usr1 weaves around usr2's attack then smashes them in the face with their bare hands.",
             "usr1 grapples usr2, throwing them to the side and releasing several strong punches.",
             "usr1 catches usr2 off guard, slamming a fist straight through usr2's bdypart, obliterating it in an instant.",
-            "usr1 throws a light jab into usr2, then kicks their knee inward and finishes them with an uppercut."
+            "usr1 throws a light jab into usr2, then kicks their knee inward and finishes them with an uppercut.",
+            "usr1 punches usr2 in the bdypart, then then face, then kicks them into a wall to finish them.",
+            "usr1 tackles usr2 and beats them to death."
         ]
 
     pass

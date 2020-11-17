@@ -16,7 +16,7 @@ class swordsman(commands.Cog):
             "usr1 charges at usr2, impaling usr2 upon their sword.",
             "usr1 stands across from usr2.\n\n'So, it comes to this, does it?'\n\nusr1 smiles. 'I always knew it would.'\n\n'I guess we'll never be able to go on that fishing trip, huh?'\n\n'Yeah, I guess not.'\n\nusr1 raises their sword, and with one decisive strike, removes usr2's bdypart. They fall over, dead. usr1 wipes tears off of their face as they walk away.",
             "usr1 heaves their sword into usr2's bdypart. Damn!",
-            "usr1 blocks usr2's first attack, then flips them over using their shield. usr1 then follows that up with a pluging attack into usr2's bdypart.",
+            "usr1 blocks usr2's first attack, then flips them over using their shield. usr1 then follows that up with a plunging attack into usr2's bdypart.",
             "usr1 shoulder bashes usr2 off a cliff.",
             "usr1 beats usr2 to death with their shield. That's gotta hurt.",
             "usr1 headbuts usr2, then swings their sword into usr2's bdypart. Ouch!",
