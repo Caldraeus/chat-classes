@@ -68,11 +68,12 @@ class help_commands(commands.Cog):
             await ctx.send(embed=profile)
         elif module == "class":
             profile.add_field(name="start", value="Register with the bot to begin using class commands.", inline=False)
+            profile.add_field(name="classup", value="Choose your next class! Only available at levels 9, 19, 29, 39, 49.", inline=False)
             profile.add_field(name="classinfo", value="Show your class specific commands.", inline=False)
             profile.set_thumbnail(url="https://archive-media-0.nyafuu.org/c/image/1531/86/1531863615508.png")
             await ctx.send(embed=profile)
         elif module == "shop":
-            profile.add_field(name=f"shop [type] [page]", value="Check the shop for a specific item type. Saying just `{h.prefix}shop` is the same as saying `{prefix}shop consumables 1`.", inline=False)
+            profile.add_field(name=f"shop [type] [page]", value=f"Check the shop for a specific item type. Saying just `{h.prefix}shop` is the same as saying `{h.prefix}shop consumables 1`.", inline=False)
             profile.add_field(name="inventory", value="Display your item inventory.", inline=False)
             profile.add_field(name="use [item]", value="Use an item.", inline=False)
             profile.set_thumbnail(url="https://archive-media-0.nyafuu.org/c/image/1531/86/1531863615508.png")

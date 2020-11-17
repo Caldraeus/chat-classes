@@ -35,18 +35,51 @@ class archer(commands.Cog):
             "usr1 uses a grappling hook to swing past usr2, firing 3 arrows into their bdypart as they do.",
             f"usr1 takes a deep breath... then, with expert speed and precision, fires {random.randint(10,100)} arrows into usr2's bdypart. A bit overkill, sure, but it works!"
         ]
+
+        self.hooks_h = [
+            "usr1 shoots their crossbow at usr2, impaling their bdypart.",
+            "usr1 quickly fires multiple crossbow bolts into usr2.",
+            "usr1 lays a beartrap for usr2, who steps into it like a fool, making an easy shot for usr1.",
+            "usr1 throws a bola at usr2, trapping them, then finishes usr2 off with a crossbow bolt to the head.",
+            "usr1 throws a glaive at usr2, slicing off their bdypart.",
+            "usr1 stalks usr2, following them home. Once usr2 lets their guard down, usr1 fires several crossbow bolts at them, quickly ending them.",
+            "usr1 follows usr2's footprints in the mud and finally finds them. usr1 and usr2 engage in a battle, but in the end, usr1 is victorious.",
+            "usr1 throws a net over usr2, trapping them. usr1 picks them up and throws the weighted net into a river. Goodbye, usr2!",
+            "usr1 shoots a crossbow bolt into usr2's bdypart, causing it to fly out the back of usr2 and impale itself on a wall.",
+            "usr1 kicks usr2 into a spike pit trap they had previously set up.",
+            "usr1 throws sand into usr2's eyes before kicking them into a pit they had dug earlier.",
+            "usr1 easily subdues usr2 before dragging them away into the forest, never to be seen again.",
+            "usr1 camouflages themself in the underbrush and waits for usr2 to walk by. When usr2 finally does, usr1 jumps up and stabs usr2, before disappearing once more into the forest.",
+            "usr1 tries to sneak up on usr2, but is caught! A battle ensues, and usr2 seems to be winning, when all of a sudden usr2 steps into a net trap set up by usr1. usr1 laughs, then shoots the now hanging usr2 with their crossbow.",
+            "usr1 sets a crossbow bolt on fire, then shoots it into usr2's window, setting their house on fire. Brutal!"
+        ]
     pass
 
     @commands.command()
     @commands.guild_only()
     async def arrow(self, ctx, target: discord.Member = None): # Shoots an arrow at someone.
-        if target and target != ctx.author and target.id != 713506775424565370:
+        if target and target != ctx.author and target.id != 713506775424565370 and await h.can_attack(ctx.author.id, target.id):
             if self.bot.users_classes[str(ctx.author.id)] == "archer":
                 ap_works = await h.alter_ap(ctx.message, 1, self.bot)
                 if ap_works:
                     crit_check = random.randint(1,20)
                     body_part = random.choice(h.body_parts)
                     hook = random.choice(self.hooks)
+                    hook = hook.replace("usr1", f"**{ctx.author.display_name}**")
+                    hook = hook.replace("bdypart", body_part)
+                    hook = hook.replace("usr2", f"**{target.display_name}**")
+                    if crit_check != 20:
+                        await ctx.send(hook)
+                    else:
+                        hook = "**✨[CRITICAL]✨** + 100 Coolness | " + hook
+                        await h.add_coolness(ctx.author.id, 100)
+                        await ctx.send(hook)
+            elif self.bot.users_classes[str(ctx.author.id)] == "hunter":
+                ap_works = await h.alter_ap(ctx.message, 1, self.bot)
+                if ap_works:
+                    crit_check = random.randint(1,20)
+                    body_part = random.choice(h.body_parts)
+                    hook = random.choice(self.hooks_h)
                     hook = hook.replace("usr1", f"**{ctx.author.display_name}**")
                     hook = hook.replace("bdypart", body_part)
                     hook = hook.replace("usr2", f"**{target.display_name}**")

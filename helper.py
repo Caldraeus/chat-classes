@@ -12,14 +12,18 @@ base_classes = {
     4 : 'Archer',
 }
 
-times_error = 0
-
 prefix = ';'
 
-body_parts = ['skeleton', 'ligaments', 'muscles', 'tendons', 'teeth', 'mouth', 'tongue', 'larynx', 'esophagus', 'stomach', 'small intestine', 'large intestine', 'liver', 'gallbladder', 'mesentery', 'pancreas', 'anus', 'nasal cavity', 'pharynx', 'larynx', 'trachea', 'lungs', 'diaphragm', 'groin', 'kidneys', 'heart', 'spleen', 'thymus', 'brain', 'cerebellum', 'spine', 'eye', 'ear', 'arm', 'leg', 'chest', 'neck', 'toe', 'finger']
+body_parts = ['bones', 'hair', 'fingernail', 'thumb', 'middle finger', 'big toe', 'knees', 'kneecap', 'bum', 'cheek', 'bumcheek', 'leg hair', 'skeleton', 'ligaments', 'muscles', 'tendons', 'teeth', 'mouth', 'tongue', 'larynx', 'esophagus', 'stomach', 'small intestine', 'large intestine', 'liver', 'gallbladder', 'mesentery', 'pancreas', 'anus', 'nasal cavity', 'pharynx', 'larynx', 'trachea', 'lungs', 'diaphragm', 'groin', 'kidneys', 'heart', 'spleen', 'thymus', 'brain', 'cerebellum', 'spine', 'eye', 'ear', 'arm', 'leg', 'chest', 'neck', 'toe', 'finger']
+
+
+async def can_attack(user, target): # NOTE: Remember that you can't alter AP of those who have no profile in CC...
+    return True
+
+
 
 def max_xp(lvl):
-    return 5 * (lvl ^ 2) + 50 * lvl + 5
+    return 5 * (lvl ^ 2) + 100 * lvl + 10
 
 async def alter_ap(message, ap, bot):
     if str(message.author.id) in bot.registered_users:
@@ -55,15 +59,14 @@ async def xp_handler(message, bot):
                     await conn.execute(f"update users set exp = {max_xp(current_lvl)} where id = '{message.author.id}'")
                     await conn.commit()
                 if message.author.id not in bot.notified:
-                    pass
-                    """
+                    print("Doin it")
                     bot.notified.append(message.author.id)
                     embed = discord.Embed(title=f"✨ Level up! ✨", colour=discord.Colour.from_rgb(255, 204, 153), description=f'You can now level up to {prof[1]+1}! Good job!')
                     embed.set_thumbnail(url=message.author.avatar_url)
                     embed.set_footer(text=f"A class up is available! Run {prefix}classup when you are ready.", icon_url="https://lh3.googleusercontent.com/proxy/KbtIDDPpLGgzz6LmKyMoyYRtnXpgPHjyvr3Idg30Cff8JDcfXTiVdjl9QjGn_G_ty6ekXk29X2BwNJ8mdz-QfIHhMs7qd7HA")
-                    notif = await message.channel.send(content=f'`message.author.mention` - TEMPORARY DISABLED', embed=embed)
+                    notif = await message.channel.send(content=f'{message.author.mention}', embed=embed)
                     await notif.delete(delay=10)
-                    """
+                
             else:
                 async with aiosqlite.connect('main.db') as conn:
                     await conn.execute(f"update users set exp = {xp} where id = '{message.author.id}'")
@@ -346,6 +349,7 @@ async def genprof(uid, aps):
             total_achievements = num[0] # Self explanatory.
         async with conn.execute(f"select * from users where id = '{uid.id}';") as info:
             user = await info.fetchone()
+
     profile = discord.Embed(title=f"{uid.display_name}'s Profile", colour=discord.Colour(0x6eaf0b), description="")
     profile.set_thumbnail(url=uid.avatar_url)
     ###

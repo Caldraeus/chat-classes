@@ -21,7 +21,7 @@ class cultist(commands.Cog): # self.qualified_name
         if self.bot.users_classes[str(ctx.author.id)] == "cultist goon":
             ap_works = await h.alter_ap(ctx.message, 2, self.bot)
             if ap_works:
-                await ctx.send("Epic")
+                await ctx.send("https://cdn.discordapp.com/avatars/217288785803608074/a_8d6f94a7d7fdf9ba04972ca30b628bff.gif?size=1024")
     
             
 
