@@ -32,7 +32,7 @@ class class_comands(commands.Cog):
                 else:
                     print(f"User {ctx.message.author.id} doesn't exist")
                     ### Add user to database
-                    await conn.execute(f"insert into users values('{ctx.message.author.id}', '{clss.lower()}', 0, 0, 'No skills', 0, '0', 'Nothing', 1, 0, False, 0, 8)")
+                    await conn.execute(f"insert into users values('{ctx.message.author.id}', '{clss.lower()}', 0, 0, 'No skills', 0, '0', '', 1, 0, False, 0, 8)")
                     async with conn.execute(f"select id, class, achievements, ap from users;") as people:
                         usrs = await people.fetchall()
                         for guy in usrs:

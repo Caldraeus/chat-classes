@@ -91,10 +91,12 @@ async def on_ready():
                     
                 bot.registered_users[guy[0]] = unlocked
                 
-                if int(guy[0]) in bot.server_boosters:
+                if int(guy[0]) in bot.server_boosters and int(guy[0]) != 217288785803608074:
                     bot.users_ap[guy[0]] = 40
+                elif int(guy[0]) in bot.server_boosters and int(guy[0]) == 217288785803608074:
+                    bot.users_ap[guy[0]] = 100
                 else:
-                    bot.users_ap[guy[0]] = 20 # guy[3]
+                    bot.users_ap[guy[0]] = 20 
 
                 bot.users_classes[guy[0]] = guy[1]
 
@@ -148,7 +150,7 @@ async def on_message(message):
     difference = bot.tomorrow - datetime.now().replace(minute=0, second=0, microsecond=0)
     difference = int(difference.total_seconds()/3600) # There has to be a better way of doing this.
     if bot.reset_time != difference:
-        await bot.change_presence(activity=discord.Game(f"Daily Reset in {difference} Hours!")) 
+        await bot.change_presence(activity=discord.Game(f"Hours Until Rollover: {difference}")) 
         bot.reset_time = difference
 
 
@@ -166,10 +168,12 @@ async def on_message(message):
             async with conn.execute(f"select id, class, achievements, ap from users;") as people:
                 usrs = await people.fetchall()
                 for guy in usrs:
-                    if int(guy[0]) in bot.server_boosters:
+                    if int(guy[0]) in bot.server_boosters and int(guy[0]) != 217288785803608074:
                         bot.users_ap[guy[0]] = 40
+                    elif int(guy[0]) in bot.server_boosters and int(guy[0]) == 217288785803608074:
+                        bot.users_ap[guy[0]] = 100
                     else:
-                        bot.users_ap[guy[0]] = 20 # guy[3]
+                        bot.users_ap[guy[0]] = 20
 
                     bot.users_classes[guy[0]] = guy[1]
         

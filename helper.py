@@ -20,10 +20,46 @@ body_parts = ['bones', 'hair', 'fingernail', 'thumb', 'middle finger', 'big toe'
 async def can_attack(user, target): # NOTE: Remember that you can't alter AP of those who have no profile in CC...
     return True
 
-
-
 def max_xp(lvl):
-    return 5 * (lvl ^ 2) + 100 * lvl + 10
+    return 10 * (lvl ^ 2) + 100 * lvl + 15
+
+async def alter_items(uid, ctx, bot, item, change, cost = 0):
+    item = item.lower()
+    async with aiosqlite.connect('main.db') as conn:
+        async with conn.execute(f"select inventory, gold from users where id = '{uid}'") as u_info:
+            user_info = await u_info.fetchone()
+
+    inv = user_info[0].split("|")
+    gold = user_info[1]
+    
+    for owned_item in inv:
+        new_guy = owned_item.split(",")
+        inv[inv.index(owned_item)] = new_guy
+
+    items = [item[0] for item in inv] # Array of just the names of the items in the 2D array.
+    end = ""
+
+    if gold - cost < 0:
+        await ctx.send("You cannot afford this item!")
+    else:
+        if item in items:
+            index = items.index(item)
+            inv[index][1] = str(int(inv[index][1]) + 1)
+
+        for sublist in inv:
+            if inv.index(sublist) == len(inv)-1:
+                end += f"{','.join(sublist)}"
+            else:
+                end += f"{','.join(sublist)}|"
+        
+        if item not in items:
+            end+=f"|{item},1"
+            
+        async with aiosqlite.connect('main.db') as conn:
+            await conn.execute(f"update users set gold = {gold - cost}, inventory = '{end}' where id = '{uid}';")
+            await conn.commit()
+        if cost > 0:
+            await ctx.send(f"✅ | Purchase complete! Your gold balance is now {gold-cost}.")
 
 async def alter_ap(message, ap, bot):
     if str(message.author.id) in bot.registered_users:
@@ -33,7 +69,7 @@ async def alter_ap(message, ap, bot):
             bot.users_ap[uid] = balance
             return True
         else:
-            await message.channel.send("You are currently out of AP! Buy some refreshers from the shop, do some quests, or wait until the daily reset!")
+            await message.channel.send("You are currently out of AP! Buy some refreshers from the shop, do some quests, or wait until rollover!")
             return False
 
 async def xp_handler(message, bot):

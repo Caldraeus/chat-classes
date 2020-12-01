@@ -14,7 +14,11 @@ class shop(commands.Cog):
         self.items = {
             "coffee" : 50,
             "monster" : 150,
-            "adrenaline" : 250
+            "adrenaline" : 250,
+        }
+
+        self.hidden_items = {
+            "demon cookie" : 500
         }
 
     @commands.command()
@@ -51,7 +55,7 @@ class shop(commands.Cog):
                 inv.remove(['']) # Temporary workaround.
             items = [item[0] for item in inv] # Array of just the names of the items in the 2D array.
 
-            if item in self.items:
+            if item in self.items or item in self.hidden_items:
                 if item in items:
                     if ctx.author.id in self.bot.server_boosters:
                         max_ap = 40
@@ -65,15 +69,21 @@ class shop(commands.Cog):
                         if new_ap > max_ap:
                             new_ap = max_ap
                         self.bot.users_ap[str(ctx.author.id)] = new_ap
-                    if item == "monster":
+                    elif item == "monster":
                         await ctx.send("<:monster:739176788629913739> | You drink your monster energy... it's energizing! Now you have a bit more energy. (+6 AP).")
                         new_ap = self.bot.users_ap[str(ctx.author.id)] + 6
                         if new_ap > max_ap:
                             new_ap = max_ap
                         self.bot.users_ap[str(ctx.author.id)] = new_ap
-                    if item == "adrenaline":
+                    elif item == "adrenaline":
                         await ctx.send("💉 | You inject a vial of pure adrenaline... WOOO! **NOW YOU HAVE A LOT MORE ENERGY!**. (+10 AP).")
                         new_ap = self.bot.users_ap[str(ctx.author.id)] + 10
+                        if new_ap > max_ap:
+                            new_ap = max_ap
+                        self.bot.users_ap[str(ctx.author.id)] = new_ap
+                    elif item == "demon cookie":
+                        await ctx.send("🍪 | You munch on Lord Greymuul's homemade chocolate chip cookies... Wait a minute, these are raisins! How demonic! You're filled with rage. (+20 AP).")
+                        new_ap = self.bot.users_ap[str(ctx.author.id)] + 20
                         if new_ap > max_ap:
                             new_ap = max_ap
                         self.bot.users_ap[str(ctx.author.id)] = new_ap
@@ -111,45 +121,10 @@ class shop(commands.Cog):
     @commands.guild_only()
     async def buy(self, ctx, *, item: str = None):
         if item:
-            item = item.lower()
-            async with aiosqlite.connect('main.db') as conn:
-                async with conn.execute(f"select inventory, gold from users where id = '{ctx.author.id}'") as u_info:
-                    user_info = await u_info.fetchone()
-
-            inv = user_info[0].split("|")
-            gold = user_info[1]
-            
-            for owned_item in inv:
-                new_guy = owned_item.split(",")
-                inv[inv.index(owned_item)] = new_guy
-            
-            items = [item[0] for item in inv] # Array of just the names of the items in the 2D array.
-            end = ""
-            
             if item in self.items:
-                cost = self.items.get(item)
-                if gold - cost < 0:
-                    await ctx.send("You cannot afford this item!")
-                else:
-                    if item in items:
-                        index = items.index(item)
-                        inv[index][1] = str(int(inv[index][1]) + 1)
-
-                    for sublist in inv:
-                        if inv.index(sublist) == len(inv)-1:
-                            end += f"{','.join(sublist)}"
-                        else:
-                            end += f"{','.join(sublist)}|"
-                    
-                    if item not in items:
-                        end+=f"|{item},1"
-                        
-                    async with aiosqlite.connect('main.db') as conn:
-                        await conn.execute(f"update users set gold = {gold - cost}, inventory = '{end}' where id = '{ctx.author.id}';")
-                        await conn.commit()
-                    await ctx.send(f"✅ | Purchase complete! Your gold balance is now {gold-cost}.")
+                await h.alter_items(ctx.author.id, ctx, self.bot, item.lower(), 1, self.items[item.lower()])
             else:
-                await ctx.send("That item does not exist! Did you make a typo?")
+                await ctx.send("That item doesn't exist. Did you make a typo?")
             
         else:
             await ctx.send("You forgot to specify what you'd like to buy!")
