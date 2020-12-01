@@ -26,8 +26,9 @@ bot.notified = []
 bot.servers = []
 bot.users_ap = {}
 bot.users_classes = {}
-bot.version = '0.1.1'
+bot.version = '0.2.1'
 bot.server_boosters = []
+bot.reset_time = 0
 bot.tomorrow = bot.tomorrow = datetime.now().replace(hour=0, minute=0, second=0, microsecond=0) + timedelta(days=1)
 
 
@@ -99,7 +100,7 @@ async def on_ready():
 
     print(f'\nLogged in.')
 
-    await bot.change_presence(activity=discord.Game(f"{h.prefix}start | Version {bot.version}")) 
+    await bot.change_presence(activity=discord.Game(f"Loading...")) 
 
     # update = input("\nEnter update text, hit enter if none: ")
     update = None
@@ -144,10 +145,24 @@ async def on_guild_remove(guild):
 
 @bot.event
 async def on_message(message):
-    if datetime.now().replace(hour=0, minute=0, second=0, microsecond=0) >= bot.tomorrow:
-        bot.tomorrow = datetime.now().replace(hour=0, minute=0, second=0, microsecond=0) + timedelta(days=1) # 3:43 PM
+    difference = bot.tomorrow - datetime.now().replace(minute=0, second=0, microsecond=0)
+    difference = int(difference.total_seconds()/3600) # There has to be a better way of doing this.
+    if bot.reset_time != difference:
+        await bot.change_presence(activity=discord.Game(f"Daily Reset in {difference} Hours!")) 
+        bot.reset_time = difference
 
-        async with aiosqlite.connect("main.db") as conn:
+
+    if datetime.now().replace(hour=0, minute=0, second=0, microsecond=0) >= bot.tomorrow:
+        bot.tomorrow = datetime.now().replace(hour=0, minute=0, second=0, microsecond=0) + timedelta(days=1) 
+
+        # First, we update our homies.
+        home = bot.get_guild(732632186204979281)
+        homies = home.get_role(739141464570986687)
+        bot.server_boosters = []
+        for homie in homies.members:
+            bot.server_boosters.append(homie.id)
+
+        async with aiosqlite.connect("main.db") as conn: # Second thing we do on a reset is give everyone back their action points
             async with conn.execute(f"select id, class, achievements, ap from users;") as people:
                 usrs = await people.fetchall()
                 for guy in usrs:
@@ -157,7 +172,9 @@ async def on_message(message):
                         bot.users_ap[guy[0]] = 20 # guy[3]
 
                     bot.users_classes[guy[0]] = guy[1]
-            print("\n\n\n----------------Daily reset has occurred----------------\n\n\n")
+        
+        
+        print("\n\n\n----------------Daily reset has occurred----------------\n\n\n")
     else:
         pass
         

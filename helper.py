@@ -59,7 +59,6 @@ async def xp_handler(message, bot):
                     await conn.execute(f"update users set exp = {max_xp(current_lvl)} where id = '{message.author.id}'")
                     await conn.commit()
                 if message.author.id not in bot.notified:
-                    print("Doin it")
                     bot.notified.append(message.author.id)
                     embed = discord.Embed(title=f"✨ Level up! ✨", colour=discord.Colour.from_rgb(255, 204, 153), description=f'You can now level up to {prof[1]+1}! Good job!')
                     embed.set_thumbnail(url=message.author.avatar_url)
@@ -262,6 +261,15 @@ async def add_coolness(uid, amount):
         async with conn.execute(f"select coolness from users where id = '{uid}';") as current_amount:
             coolness = await current_amount.fetchone()
             await conn.execute(f"update users set coolness = '{coolness[0]+amount}' where id = '{uid}';")
+            await conn.commit()
+
+async def add_gold(uid, amount, bot):
+    async with aiosqlite.connect('main.db') as conn:
+        async with conn.execute(f"select gold from users where id = '{uid}';") as current_amount:
+            gold = await current_amount.fetchone()
+            if uid in bot.server_boosters:
+                amount *= 2
+            await conn.execute(f"update users set gold = '{gold[0]+amount}' where id = '{uid}';")
             await conn.commit()
 
 async def award_ach(ach_id, message, bot):

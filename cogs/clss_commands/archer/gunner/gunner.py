@@ -17,7 +17,7 @@ class gunner(commands.Cog):
             "usr1 quickly fires six shots into usr2, striking them in the arm, leg and bdypart.",
             "usr1 shoots usr2 in the back as they run away.",
             "usr1 shoots usr2 in the bdypart.",
-            "usr1 tackles urs2, then throws them into the wall before slowly bringing their gun to usr2's head. Bam!",
+            "usr1 tackles usr2, then throws them into the wall before slowly bringing their gun to usr2's head. Bam!",
             "usr1 throws their gun into usr2's head, knocking them out. Hey, if it works, it works!",
             "usr1 reloads their gun while running at usr2, then slides on their knees while firing multiple shots into usr2.",
             "usr1 ricochets 2 bullets off of the wall and strikes usr2.",
@@ -27,7 +27,7 @@ class gunner(commands.Cog):
             "usr1 kicks usr2 off a cliff, and as usr2 falls, shoots them 3 times.",
             "usr1 pulls out a second revolver and fires blindly at usr2. Needless to say, usr2 has a lot more holes than before.",
             "usr1 shoots usr2 in the bdypart. Which is really rude, actually. usr2 gives them a scowl and hobbles away.",
-            "usr1 kicks urs2 into the wall before firing multiple shots into usr2."
+            "usr1 kicks usr2 into the wall before firing multiple shots into usr2."
         ]
     pass
 

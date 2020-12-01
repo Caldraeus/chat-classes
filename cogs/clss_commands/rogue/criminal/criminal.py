@@ -63,13 +63,11 @@ class criminal(commands.Cog):
 
                     elif goal == 2:
                         gold_gained = random.randint(10,100)
-                        hook+=f"\n\n*Stole {gold_gained} gold!*"
-                        async with aiosqlite.connect('main.db') as conn:
-                            async with conn.execute(f"select gold from users where id = '{ctx.author.id}'") as money:
-                                old_gold = await money.fetchone()
-                                new_gold = old_gold[0] + gold_gained
-                                await conn.execute(f"update users set gold = {new_gold} where id = '{ctx.author.id}';")
-                                await conn.commit() 
+                        if ctx.author.id in self.bot.server_boosters:
+                            hook+=f"\n\n*Stole {gold_gained*2} gold!*"
+                        else:
+                            hook+=f"\n\n*Stole {gold_gained} gold!*"
+                        await h.add_gold(ctx.author.id, gold_gained, self.bot)
                     else:
                         coolness_added = random.randint(50,200)
                         hook+=f"\n\n*Gained {coolness_added} coolness!*"
