@@ -125,7 +125,7 @@ class class_comands(commands.Cog):
             try:
                 chosen = await self.bot.wait_for('message', check=check, timeout=30)
             except:
-                await ctx.send(f"{ctx.author.mention}, you took to long to choose! Please try again.")
+                await ctx.send(f"{ctx.author.mention}, you took too long to choose! Please run the command again when you're ready.")
 
             if chosen.content.lower() in allowed_classes:
                 if ctx.author.id in self.bot.notified:

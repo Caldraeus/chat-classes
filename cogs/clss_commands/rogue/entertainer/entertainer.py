@@ -102,7 +102,7 @@ class entertainer(commands.Cog):
                         else:
                             hook+=f"\n\n*Someone tipped {gold_gained} gold!*"
 
-                        h.add_gold(ctx.author.id, gold_gained, self.bot)
+                        await h.add_gold(ctx.author.id, gold_gained, self.bot)
                     else:
                         coolness_added = random.randint(100,200)
                         hook+=f"\n\n*Someone tipped {coolness_added} coolness!*"

@@ -44,7 +44,10 @@ async def alter_items(uid, ctx, bot, item, change = 1, cost = 0):
     else:
         if item in items:
             index = items.index(item)
-            inv[index][1] = str(int(inv[index][1]) + change)
+            item_amount = int(inv[index][1]) + change
+            inv[index][1] = str(item_amount)
+            if item_amount >= 10:
+                await award_ach(14, ctx.message, bot)
 
         for sublist in inv:
             if inv.index(sublist) == len(inv)-1:
@@ -360,7 +363,7 @@ async def fetch_random_quest(message, bot, uid=None, override=False):
         chance = random.randint(1,100)
         if override:
             chance = 52
-        if chance == 52: # I like 4
+        if chance == 52: 
             async with aiosqlite.connect('main.db') as conn:
                 async with conn.execute(f"select currently_questing from users where id = '{uid}';") as people:
                     usrs = await people.fetchall()
