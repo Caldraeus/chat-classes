@@ -27,14 +27,14 @@ class help_commands(commands.Cog):
     async def rollover(self, ctx):
         difference = self.bot.tomorrow - datetime.now().replace(minute=0, second=0, microsecond=0)
         difference = int(difference.total_seconds()/3600) # There has to be a better way of doing this.
-        await ctx.send(f"**Hours Until Rollover:** {difference}\n\n*What is rollover? Rollover hapens once every 24 hours. It resets all users AP, as well as their daily gold gift. Additionally, all in-progress class related activities reset. For example, ongoing rituals, heists, or a pyromancer's heat level. All of these things reset to their default values once rollover takes place.*")
+        await ctx.send(f"**Hours Until Rollover:** {difference}\n\n*What is rollover? Rollover hapens once every 24 hours. It resets all users AP, as well as their daily gold gift.*")
 
     @commands.command(aliases=['h'])
     @commands.guild_only()
     async def help(self, ctx, module = "modules"):
         pages = 1
         module = module.lower()
-        profile = discord.Embed(title=f"Chat Classes Help", colour=discord.Colour.from_rgb(255,165,0), description="")
+        profile = discord.Embed(title=f"Chat Classes Help Sections", colour=discord.Colour.from_rgb(255,165,0), description="")
         profile.set_footer(text=f"Use {h.prefix}help [section name] to see specific commands!", icon_url="")
         if module == "modules":
             profile.add_field(name="Profile", value='Commands related to your profile.', inline=False)

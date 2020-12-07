@@ -8,13 +8,14 @@ import os
 import aiohttp
 import aiosqlite
 
-class shop(commands.Cog):
+class economy(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
         self.items = {
             "coffee" : 50,
-            "monster" : 150,
-            "adrenaline" : 250,
+            "hot dog" : 75,
+            "monster" : 125,
+            "adrenaline" : 225
         }
 
         self.hidden_items = {
@@ -29,6 +30,7 @@ class shop(commands.Cog):
             # embed.set_footer(text=f"Use {h.prefix}shop {page} page_number to see more!")
             embed.set_thumbnail(url="https://img.icons8.com/cotton/2x/shop--v3.png")
             embed.add_field(name=f"Coffee | {self.items.get('coffee')} G", value=f'A quick boost. Delicious and refreshing! Restores 2 AP.', inline=False)
+            embed.add_field(name=f"Hot Dog | {self.items.get('hot dog')} G", value=f"A delicious hot dog. Restores 4 ap, and gives some coolness.", inline=False)
             embed.add_field(name=f"Monster | {self.items.get('monster')} G", value=f'A monster energy. Great if you ignore the kidney stones! Restores 6 AP.', inline=False)
             embed.add_field(name=f"Adrenaline | {self.items.get('adrenaline')} G", value="A pure vial of adrenaline. Very strong. Restores 10 AP.")
             await ctx.send(embed=embed)
@@ -63,6 +65,7 @@ class shop(commands.Cog):
                         max_ap = 20
                     #### Item handling. This, unfortunately, is going to be a very long if statement mess. Since I plan to add a large variety of items, with many different effects, it has to be this way.
                     ####
+                    
                     if item == "coffee":
                         await ctx.send("☕ | You drink your coffee... it's delicious! Now you have a bit more energy. (+2 AP).")
                         new_ap = self.bot.users_ap[str(ctx.author.id)] + 2
@@ -87,6 +90,13 @@ class shop(commands.Cog):
                         if new_ap > max_ap:
                             new_ap = max_ap
                         self.bot.users_ap[str(ctx.author.id)] = new_ap
+                    elif item == "hot dog":
+                        await ctx.send("🌭 | You eat your delicious hot dog. Ah, just like being at the faire! (+4 AP | +10 Coolness)")
+                        new_ap = self.bot.users_ap[str(ctx.author.id)] + 4
+                        if new_ap > max_ap:
+                            new_ap = max_ap
+                        self.bot.users_ap[str(ctx.author.id)] = new_ap
+                        await h.add_coolness(ctx.author.id, 10)
 
                                 
                     ####
@@ -128,9 +138,24 @@ class shop(commands.Cog):
             
         else:
             await ctx.send("You forgot to specify what you'd like to buy!")
+    
+    @commands.command()
+    @commands.guild_only()
+    async def daily(self, ctx):
+        if ctx.author.id in self.bot.claimed:
+            await ctx.send("❌ | You've already claimed your daily gift this rollover! Use `;rollover` to check when you can claim again.")
+        else:
+            if ctx.author.id in self.bot.server_boosters:
+                await ctx.send("✅ | You gained 200 gold!")
+            else:
+                await ctx.send("✅ | You gained 100 gold!")
+            
+            await h.add_gold(ctx.author.id, 100, self.bot)
+            self.bot.claimed.append(ctx.author.id)
+        
 
         
 
 # A setup function the every cog has
 def setup(bot):
-    bot.add_cog(shop(bot))
+    bot.add_cog(economy(bot))

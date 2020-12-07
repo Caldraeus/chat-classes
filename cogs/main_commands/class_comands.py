@@ -28,7 +28,7 @@ class class_comands(commands.Cog):
             async with conn.execute(f"select id from users where id = '{ctx.message.author.id}';") as person:
                 user = await person.fetchone()
                 if user:
-                    print(f"User {ctx.message.author.id} exists, ignoring command.")
+                    await ctx.send("You already have a profile! Use `;class` to see what you can do!")
                 else:
                     print(f"User {ctx.message.author.id} doesn't exist")
                     ### Add user to database

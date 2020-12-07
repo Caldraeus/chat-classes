@@ -21,9 +21,9 @@ async def can_attack(user, target): # NOTE: Remember that you can't alter AP of 
     return True
 
 def max_xp(lvl):
-    return 10 * (lvl ^ 2) + 100 * lvl + 15
+    return 15 * (lvl ^ 15) + 150 * lvl + 15
 
-async def alter_items(uid, ctx, bot, item, change, cost = 0):
+async def alter_items(uid, ctx, bot, item, change = 1, cost = 0):
     item = item.lower()
     async with aiosqlite.connect('main.db') as conn:
         async with conn.execute(f"select inventory, gold from users where id = '{uid}'") as u_info:
@@ -44,7 +44,7 @@ async def alter_items(uid, ctx, bot, item, change, cost = 0):
     else:
         if item in items:
             index = items.index(item)
-            inv[index][1] = str(int(inv[index][1]) + 1)
+            inv[index][1] = str(int(inv[index][1]) + change)
 
         for sublist in inv:
             if inv.index(sublist) == len(inv)-1:
@@ -53,7 +53,7 @@ async def alter_items(uid, ctx, bot, item, change, cost = 0):
                 end += f"{','.join(sublist)}|"
         
         if item not in items:
-            end+=f"|{item},1"
+            end+=f"|{item},{change}"
             
         async with aiosqlite.connect('main.db') as conn:
             await conn.execute(f"update users set gold = {gold - cost}, inventory = '{end}' where id = '{uid}';")
@@ -303,9 +303,12 @@ async def add_gold(uid, amount, bot):
     async with aiosqlite.connect('main.db') as conn:
         async with conn.execute(f"select gold from users where id = '{uid}';") as current_amount:
             gold = await current_amount.fetchone()
-            if uid in bot.server_boosters:
+            if uid in bot.server_boosters and amount > 0:
                 amount *= 2
-            await conn.execute(f"update users set gold = '{gold[0]+amount}' where id = '{uid}';")
+            final = gold[0]+amount
+            if final < 0:
+                final = 0
+            await conn.execute(f"update users set gold = '{final}' where id = '{uid}';")
             await conn.commit()
 
 async def award_ach(ach_id, message, bot):

@@ -20,6 +20,7 @@ bot = discord.Client()
 bot = commands.Bot(command_prefix=h.prefix, description="Bot", case_insensitive=True, intents=intents)
 bot.remove_command("help")
 
+# Global Variables
 bot.banned_channels = []
 bot.registered_users = {}
 bot.notified = []
@@ -29,6 +30,7 @@ bot.users_classes = {}
 bot.version = '0.2.1'
 bot.server_boosters = []
 bot.reset_time = 0
+bot.claimed = []
 bot.tomorrow = bot.tomorrow = datetime.now().replace(hour=0, minute=0, second=0, microsecond=0) + timedelta(days=1)
 
 
@@ -100,11 +102,7 @@ async def on_ready():
 
                 bot.users_classes[guy[0]] = guy[1]
 
-    print(f'\nLogged in.')
-
-    await bot.change_presence(activity=discord.Game(f"Loading...")) 
-
-    # update = input("\nEnter update text, hit enter if none: ")
+    print(f'\n\nLogged in.')
     update = None
     print("Thanks.")
 
@@ -177,6 +175,9 @@ async def on_message(message):
 
                     bot.users_classes[guy[0]] = guy[1]
         
+        # We reset the daily gift counter.
+        bot.claimed = []
+        
         
         print("\n\n\n----------------Daily reset has occurred----------------\n\n\n")
     else:
@@ -187,7 +188,7 @@ async def on_message(message):
             if message.guild.id in bot.servers or message.content.lower() == f"{h.prefix}enablecc":
                 await bot.process_commands(message) # Run commands.
             elif message.content[0] == ";":
-                await message.channel.send("⚠️ | Hey! Seems like you're trying to run a command. Sadly, the bot hasn't been activated for this server yet! Have the server owner say `;enablecc`")
+                await message.channel.send("⚠️ | Hey! Seems like you're trying to run a command. Sadly, the bot hasn't been activated for this server yet, or I'm still loading! If I'm not enabled, have the server owner say `;enablecc`")
         if str(message.author.id) in bot.registered_users:
             await h.fetch_random_quest(message, bot)
             await asyncio.sleep(.1)
