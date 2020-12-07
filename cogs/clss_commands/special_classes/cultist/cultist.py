@@ -190,9 +190,9 @@ class cultist(commands.Cog): # self.qualified_name
                                 await hook.send(content=f"*What month of the year hassssssss 28 dayssssss...?*", username="Maxeena, The Riddle Demon", avatar_url="https://i.pinimg.com/736x/3e/9e/6f/3e9e6f85b636bb178f7ad4228d9c3b80.jpg")
                             elif riddle_chosen == 3:
                                 await hook.send(content=f"*A man who wassssss outssssside in the rain without an umbrella or hat didn’t get a ssssingle hair on his head wet. Why?*", username="Maxeena, The Riddle Demon", avatar_url="https://i.pinimg.com/736x/3e/9e/6f/3e9e6f85b636bb178f7ad4228d9c3b80.jpg")
-                            elif riddl_chosen == 4: 
+                            elif riddle_chosen == 4: 
                                 await hook.send(content=f"*I sssssshave every day, but my beard sssstaysssss the ssssame. What am I?*", username="Maxeena, The Riddle Demon", avatar_url="https://i.pinimg.com/736x/3e/9e/6f/3e9e6f85b636bb178f7ad4228d9c3b80.jpg")
-                            elif riddl_chosen == 5:
+                            elif riddle_chosen == 5:
                                 await hook.send(content=f"*The perssssson who makesss it hasss no need of it; the person who buyssss it has no usssse for it. The person who usesss it can neither see nor feel it. What issss it?*", username="Maxeena, The Riddle Demon", avatar_url="https://i.pinimg.com/736x/3e/9e/6f/3e9e6f85b636bb178f7ad4228d9c3b80.jpg")
                             
                             
