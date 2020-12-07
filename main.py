@@ -20,14 +20,17 @@ bot = discord.Client()
 bot = commands.Bot(command_prefix=h.prefix, description="Bot", case_insensitive=True, intents=intents)
 bot.remove_command("help")
 
+# Global Variables
 bot.banned_channels = []
 bot.registered_users = {}
 bot.notified = []
 bot.servers = []
 bot.users_ap = {}
 bot.users_classes = {}
-bot.version = '0.1.1'
+bot.version = '0.2.1'
 bot.server_boosters = []
+bot.reset_time = 0
+bot.claimed = []
 bot.tomorrow = bot.tomorrow = datetime.now().replace(hour=0, minute=0, second=0, microsecond=0) + timedelta(days=1)
 
 
@@ -90,18 +93,16 @@ async def on_ready():
                     
                 bot.registered_users[guy[0]] = unlocked
                 
-                if int(guy[0]) in bot.server_boosters:
+                if int(guy[0]) in bot.server_boosters and int(guy[0]) != 217288785803608074:
                     bot.users_ap[guy[0]] = 40
+                elif int(guy[0]) in bot.server_boosters and int(guy[0]) == 217288785803608074:
+                    bot.users_ap[guy[0]] = 100
                 else:
-                    bot.users_ap[guy[0]] = 20 # guy[3]
+                    bot.users_ap[guy[0]] = 20 
 
                 bot.users_classes[guy[0]] = guy[1]
 
-    print(f'\nLogged in.')
-
-    await bot.change_presence(activity=discord.Game(f"{h.prefix}start | Version {bot.version}")) 
-
-    # update = input("\nEnter update text, hit enter if none: ")
+    print(f'\n\nLogged in.')
     update = None
     print("Thanks.")
 
@@ -144,20 +145,41 @@ async def on_guild_remove(guild):
 
 @bot.event
 async def on_message(message):
-    if datetime.now().replace(hour=0, minute=0, second=0, microsecond=0) >= bot.tomorrow:
-        bot.tomorrow = datetime.now().replace(hour=0, minute=0, second=0, microsecond=0) + timedelta(days=1) # 3:43 PM
+    difference = bot.tomorrow - datetime.now().replace(minute=0, second=0, microsecond=0)
+    difference = int(difference.total_seconds()/3600) # There has to be a better way of doing this.
+    if bot.reset_time != difference:
+        await bot.change_presence(activity=discord.Game(f"Hours Until Rollover: {difference}")) 
+        bot.reset_time = difference
 
-        async with aiosqlite.connect("main.db") as conn:
+
+    if datetime.now().replace(hour=0, minute=0, second=0, microsecond=0) >= bot.tomorrow:
+        bot.tomorrow = datetime.now().replace(hour=0, minute=0, second=0, microsecond=0) + timedelta(days=1) 
+
+        # First, we update our homies.
+        home = bot.get_guild(732632186204979281)
+        homies = home.get_role(739141464570986687)
+        bot.server_boosters = []
+        for homie in homies.members:
+            bot.server_boosters.append(homie.id)
+
+        async with aiosqlite.connect("main.db") as conn: # Second thing we do on a reset is give everyone back their action points
             async with conn.execute(f"select id, class, achievements, ap from users;") as people:
                 usrs = await people.fetchall()
                 for guy in usrs:
-                    if int(guy[0]) in bot.server_boosters:
+                    if int(guy[0]) in bot.server_boosters and int(guy[0]) != 217288785803608074:
                         bot.users_ap[guy[0]] = 40
+                    elif int(guy[0]) in bot.server_boosters and int(guy[0]) == 217288785803608074:
+                        bot.users_ap[guy[0]] = 100
                     else:
-                        bot.users_ap[guy[0]] = 20 # guy[3]
+                        bot.users_ap[guy[0]] = 20
 
                     bot.users_classes[guy[0]] = guy[1]
-            print("\n\n\n----------------Daily reset has occurred----------------\n\n\n")
+        
+        # We reset the daily gift counter.
+        bot.claimed = []
+        
+        
+        print("\n\n\n----------------Daily reset has occurred----------------\n\n\n")
     else:
         pass
         
@@ -166,7 +188,7 @@ async def on_message(message):
             if message.guild.id in bot.servers or message.content.lower() == f"{h.prefix}enablecc":
                 await bot.process_commands(message) # Run commands.
             elif message.content[0] == ";":
-                await message.channel.send("⚠️ | Hey! Seems like you're trying to run a command. Sadly, the bot hasn't been activated for this server yet! Have the server owner say `;enablecc`")
+                await message.channel.send("⚠️ | Hey! Seems like you're trying to run a command. Sadly, the bot hasn't been activated for this server yet, or I'm still loading! If I'm not enabled, have the server owner say `;enablecc`")
         if str(message.author.id) in bot.registered_users:
             await h.fetch_random_quest(message, bot)
             await asyncio.sleep(.1)

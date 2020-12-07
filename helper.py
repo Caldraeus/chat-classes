@@ -20,10 +20,49 @@ body_parts = ['bones', 'hair', 'fingernail', 'thumb', 'middle finger', 'big toe'
 async def can_attack(user, target): # NOTE: Remember that you can't alter AP of those who have no profile in CC...
     return True
 
-
-
 def max_xp(lvl):
-    return 5 * (lvl ^ 2) + 100 * lvl + 10
+    return 15 * (lvl ^ 15) + 150 * lvl + 15
+
+async def alter_items(uid, ctx, bot, item, change = 1, cost = 0):
+    item = item.lower()
+    async with aiosqlite.connect('main.db') as conn:
+        async with conn.execute(f"select inventory, gold from users where id = '{uid}'") as u_info:
+            user_info = await u_info.fetchone()
+
+    inv = user_info[0].split("|")
+    gold = user_info[1]
+    
+    for owned_item in inv:
+        new_guy = owned_item.split(",")
+        inv[inv.index(owned_item)] = new_guy
+
+    items = [item[0] for item in inv] # Array of just the names of the items in the 2D array.
+    end = ""
+
+    if gold - cost < 0:
+        await ctx.send("You cannot afford this item!")
+    else:
+        if item in items:
+            index = items.index(item)
+            item_amount = int(inv[index][1]) + change
+            inv[index][1] = str(item_amount)
+            if item_amount >= 10:
+                await award_ach(14, ctx.message, bot)
+
+        for sublist in inv:
+            if inv.index(sublist) == len(inv)-1:
+                end += f"{','.join(sublist)}"
+            else:
+                end += f"{','.join(sublist)}|"
+        
+        if item not in items:
+            end+=f"|{item},{change}"
+            
+        async with aiosqlite.connect('main.db') as conn:
+            await conn.execute(f"update users set gold = {gold - cost}, inventory = '{end}' where id = '{uid}';")
+            await conn.commit()
+        if cost > 0:
+            await ctx.send(f"✅ | Purchase complete! Your gold balance is now {gold-cost}.")
 
 async def alter_ap(message, ap, bot):
     if str(message.author.id) in bot.registered_users:
@@ -33,7 +72,7 @@ async def alter_ap(message, ap, bot):
             bot.users_ap[uid] = balance
             return True
         else:
-            await message.channel.send("You are currently out of AP! Buy some refreshers from the shop, do some quests, or wait until the daily reset!")
+            await message.channel.send("You are currently out of AP! Buy some refreshers from the shop, do some quests, or wait until rollover!")
             return False
 
 async def xp_handler(message, bot):
@@ -59,7 +98,6 @@ async def xp_handler(message, bot):
                     await conn.execute(f"update users set exp = {max_xp(current_lvl)} where id = '{message.author.id}'")
                     await conn.commit()
                 if message.author.id not in bot.notified:
-                    print("Doin it")
                     bot.notified.append(message.author.id)
                     embed = discord.Embed(title=f"✨ Level up! ✨", colour=discord.Colour.from_rgb(255, 204, 153), description=f'You can now level up to {prof[1]+1}! Good job!')
                     embed.set_thumbnail(url=message.author.avatar_url)
@@ -264,6 +302,18 @@ async def add_coolness(uid, amount):
             await conn.execute(f"update users set coolness = '{coolness[0]+amount}' where id = '{uid}';")
             await conn.commit()
 
+async def add_gold(uid, amount, bot):
+    async with aiosqlite.connect('main.db') as conn:
+        async with conn.execute(f"select gold from users where id = '{uid}';") as current_amount:
+            gold = await current_amount.fetchone()
+            if uid in bot.server_boosters and amount > 0:
+                amount *= 2
+            final = gold[0]+amount
+            if final < 0:
+                final = 0
+            await conn.execute(f"update users set gold = '{final}' where id = '{uid}';")
+            await conn.commit()
+
 async def award_ach(ach_id, message, bot):
     uid = message.author.id
     unlocked = bot.registered_users[str(uid)]
@@ -313,7 +363,7 @@ async def fetch_random_quest(message, bot, uid=None, override=False):
         chance = random.randint(1,100)
         if override:
             chance = 52
-        if chance == 52: # I like 4
+        if chance == 52: 
             async with aiosqlite.connect('main.db') as conn:
                 async with conn.execute(f"select currently_questing from users where id = '{uid}';") as people:
                     usrs = await people.fetchall()

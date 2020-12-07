@@ -9,6 +9,8 @@ import aiohttp
 import aiosqlite
 from discord import Webhook, AsyncWebhookAdapter
 import aiohttp
+from datetime import datetime  
+from datetime import timedelta  
 
 class help_commands(commands.Cog):
     def __init__(self, bot):
@@ -22,25 +24,24 @@ class help_commands(commands.Cog):
 
     @commands.command()
     @commands.guild_only()
-    async def roadmap(self, ctx):
-        embed = discord.Embed(title="", colour=discord.Colour(0x2dc3e1), description="")
-
-        embed.set_image(url="https://cdn.discordapp.com/attachments/734108098129821757/736602739190267934/unknown.png")
-        await ctx.send(embed=embed)
+    async def rollover(self, ctx):
+        difference = self.bot.tomorrow - datetime.now().replace(minute=0, second=0, microsecond=0)
+        difference = int(difference.total_seconds()/3600) # There has to be a better way of doing this.
+        await ctx.send(f"**Hours Until Rollover:** {difference}\n\n*What is rollover? Rollover hapens once every 24 hours. It resets all users AP, as well as their daily gold gift.*")
 
     @commands.command(aliases=['h'])
     @commands.guild_only()
     async def help(self, ctx, module = "modules"):
         pages = 1
         module = module.lower()
-        profile = discord.Embed(title=f"Chat Classes Help", colour=discord.Colour.from_rgb(128, 128, 128), description="")
-        profile.set_footer(text=f"Use {h.prefix}help module to see specific commands!", icon_url="")
+        profile = discord.Embed(title=f"Chat Classes Help Sections", colour=discord.Colour.from_rgb(255,165,0), description="")
+        profile.set_footer(text=f"Use {h.prefix}help [section name] to see specific commands!", icon_url="")
         if module == "modules":
-            profile.add_field(name="Profile", value='View commands related to your profile.', inline=False)
-            profile.add_field(name="General", value="View general commands.", inline=False)
-            profile.add_field(name="Server", value="View server management commands.", inline=False)
-            profile.add_field(name="Class", value="View class commands.", inline=False)
-            profile.add_field(name="Shop", value="View shop commands.", inline=False)
+            profile.add_field(name="Profile", value='Commands related to your profile.', inline=False)
+            profile.add_field(name="General", value="General commands.", inline=False)
+            profile.add_field(name="Server", value="Server management commands.", inline=False)
+            profile.add_field(name="Class", value="Class commands.", inline=False)
+            profile.add_field(name="Shop", value="Shop commands.", inline=False)
             profile.set_thumbnail(url="https://archive-media-0.nyafuu.org/c/image/1531/86/1531863615508.png")
             await ctx.send(embed=profile)
         elif module == "profile":
@@ -56,7 +57,7 @@ class help_commands(commands.Cog):
             profile.add_field(name="invite", value="Send the bots invite link.", inline=False)
             profile.add_field(name="help", value="Display the help embed.", inline=False)
             profile.add_field(name="server", value="Send the official Chat Classes server invite.", inline=False)
-            profile.add_field(name="roadmap", value="View the current Chat Classes roadmap.", inline=False)
+            profile.add_field(name="rolover", value="Dislpay rollover timer, as well as some additional information about rollover.", inline=False)
             profile.set_thumbnail(url="https://archive-media-0.nyafuu.org/c/image/1531/86/1531863615508.png")
             await ctx.send(embed=profile)
         elif module == "server":
@@ -69,13 +70,14 @@ class help_commands(commands.Cog):
         elif module == "class":
             profile.add_field(name="start", value="Register with the bot to begin using class commands.", inline=False)
             profile.add_field(name="classup", value="Choose your next class! Only available at levels 9, 19, 29, 39, 49.", inline=False)
-            profile.add_field(name="classinfo", value="Show your class specific commands.", inline=False)
+            profile.add_field(name="classinfo {optional: class name}", value="Show your class specific commands by default, or a specific class's details.", inline=False)
             profile.set_thumbnail(url="https://archive-media-0.nyafuu.org/c/image/1531/86/1531863615508.png")
             await ctx.send(embed=profile)
         elif module == "shop":
             profile.add_field(name=f"shop [type] [page]", value=f"Check the shop for a specific item type. Saying just `{h.prefix}shop` is the same as saying `{h.prefix}shop consumables 1`.", inline=False)
             profile.add_field(name="inventory", value="Display your item inventory.", inline=False)
             profile.add_field(name="use [item]", value="Use an item.", inline=False)
+            profile.add_field(name="buy [item]", value="Buy an item.")
             profile.set_thumbnail(url="https://archive-media-0.nyafuu.org/c/image/1531/86/1531863615508.png")
             await ctx.send(embed=profile)
     

@@ -28,11 +28,11 @@ class class_comands(commands.Cog):
             async with conn.execute(f"select id from users where id = '{ctx.message.author.id}';") as person:
                 user = await person.fetchone()
                 if user:
-                    print(f"User {ctx.message.author.id} exists, ignoring command.")
+                    await ctx.send("You already have a profile! Use `;class` to see what you can do!")
                 else:
                     print(f"User {ctx.message.author.id} doesn't exist")
                     ### Add user to database
-                    await conn.execute(f"insert into users values('{ctx.message.author.id}', '{clss.lower()}', 0, 0, 'No skills', 0, '0', 'Nothing', 1, 0, False, 0, 8)")
+                    await conn.execute(f"insert into users values('{ctx.message.author.id}', '{clss.lower()}', 0, 0, 'No skills', 0, '0', '', 1, 0, False, 0, 8)")
                     async with conn.execute(f"select id, class, achievements, ap from users;") as people:
                         usrs = await people.fetchall()
                         for guy in usrs:
@@ -125,7 +125,7 @@ class class_comands(commands.Cog):
             try:
                 chosen = await self.bot.wait_for('message', check=check, timeout=30)
             except:
-                await ctx.send(f"{ctx.author.mention}, you took to long to choose! Please try again.")
+                await ctx.send(f"{ctx.author.mention}, you took too long to choose! Please run the command again when you're ready.")
 
             if chosen.content.lower() in allowed_classes:
                 if ctx.author.id in self.bot.notified:

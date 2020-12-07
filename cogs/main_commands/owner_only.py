@@ -30,8 +30,8 @@ class owner_only(commands.Cog):
     @commands.guild_only()
     @commands.is_owner()
     async def fquest(self, ctx, target: discord.User = None):
-        if target:
-            await h.fetch_random_quest(ctx.message, self.bot, target, True)
+        if target: # message, bot, uid=None, override=False
+            await h.fetch_random_quest(ctx.message, self.bot, target, override=True)
         else:
             await h.fetch_random_quest(ctx.message, self.bot, override=True)
     
@@ -42,6 +42,16 @@ class owner_only(commands.Cog):
         embed = discord.Embed(title=f"❗ Version {version} Released! ❗", colour=discord.Colour.from_rgb(255,0,0), description=notes)
         mss = await channel.send(content="╱╲╱╲╱╲╱╲╱╲╱╲╱╲╱╲╱╲\n\n<@&738883975954563132>\n\n", embed=embed)
         await mss.publish()
+
+    @commands.command()
+    @commands.is_owner()
+    async def alterclass(self, ctx, *, class_name):
+        class_name = class_name.lower()
+        async with aiosqlite.connect('main.db') as conn:
+            await conn.execute(f"update users set class = '{class_name}' where id = '{ctx.author.id}'")
+            await conn.commit()
+        self.bot.users_classes[str(ctx.author.id)] = class_name
+        await ctx.send("✅ | Class has been altered with [0] issues.")
 
     """
     @commands.command(aliases=['pks'])

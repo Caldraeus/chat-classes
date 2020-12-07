@@ -80,6 +80,11 @@ class profile(commands.Cog):
             elif user != None and user.id is ctx.message.author.id:
                 final+=f"**#{i+1 - amount_skipped} - {user.name} - {stuff[i][5]} Coolness**\n\n"
                 in_top = True
+                if i+1 == 1:
+                    await h.award_ach(13, ctx.message, self.bot)
+                    await h.award_ach(12, ctx.message, self.bot)
+                else:
+                    await h.award_ach(12, ctx.message, self.bot)
                 i += 1
             elif user == None:
                 i += 1

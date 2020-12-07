@@ -23,12 +23,11 @@ class management(commands.Cog):
                     if server_id:
                         await ctx.send(f"Your server ({server_id[0]}) is already enabled!")
                     else:
+                        self.bot.servers.append(ctx.message.guild.id)
                         print("Fresh server")
                         await conn.execute(f"insert into servers values('{ctx.guild.id}', '')")
                         await conn.commit()
                         await ctx.send(f"Chat Classes has been enabled on this server! Use `{h.prefix}safezone` to disable a channel for that bot, and `{h.prefix}classzone` to re-enable a channel.")
-                        # await conn.commit()
-                        # await conn.close() # Necessary? Find out later, rather safe than sorry...
     
     @commands.command()
     @commands.guild_only()
@@ -43,7 +42,7 @@ class management(commands.Cog):
                 banned = banned.split('|')
                 if str(channel.id) not in banned: # This is redundant. But I'm keeping it here JUST IN CASE.
                     banned.append(str(channel.id))
-                    self.bot.enabled_channels.append(str(channel.id))
+                    self.bot.banned_channels.append(str(channel.id))
                     final = '|'.join(banned)
                     await conn.execute(f"update servers set bchannels = '{final}' where id = '{ctx.guild.id}'")
                     await conn.commit()
@@ -65,7 +64,7 @@ class management(commands.Cog):
                 banned = banned.split('|')
                 if str(channel.id) in banned: # This is redundant. But I'm keeping it here JUST IN CASE.
                     banned.pop(banned.index(str(channel.id)))
-                    self.bot.enabled_channels.remove(str(channel.id))
+                    self.bot.banned_channels.remove(str(channel.id))
                     final = '|'.join(banned)
                     await conn.execute(f"update servers set bchannels = '{final}' where id = '{ctx.guild.id}'")
                     await conn.commit()
