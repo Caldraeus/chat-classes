@@ -38,7 +38,7 @@ class hydromancer(commands.Cog):
     @commands.guild_only()
     async def douse(self, ctx, target: discord.Member = None): # Shoots an arrow at someone.
         if target and target != ctx.author and target.id != 713506775424565370:
-            if self.bot.users_classes[str(ctx.author.id)] == "hydromancer" and await h.can_attack(ctx.author.id, target.id):
+            if self.bot.users_classes[str(ctx.author.id)] == "hydromancer" and await h.can_attack(ctx.author.id, target.id, ctx):
                 ap_works = await h.alter_ap(ctx.message, 1, self.bot)
                 if ap_works:
                     if ctx.author.id not in self.waterlevels:

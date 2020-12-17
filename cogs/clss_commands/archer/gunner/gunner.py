@@ -34,7 +34,7 @@ class gunner(commands.Cog):
     @commands.command()
     @commands.guild_only()
     async def shoot(self, ctx, target: discord.Member = None): # Shoots an arrow at someone.
-        if target and target != ctx.author and target.id != 713506775424565370 and await h.can_attack(ctx.author.id, target.id):
+        if target and target != ctx.author and target.id != 713506775424565370 and await h.can_attack(ctx.author.id, target.id, ctx):
             if self.bot.users_classes[str(ctx.author.id)] == "gunner":
                 ap_works = await h.alter_ap(ctx.message, 1, self.bot)
                 if ap_works:

@@ -51,7 +51,7 @@ class pyromancer(commands.Cog):
     @commands.command()
     @commands.guild_only()
     async def torch(self, ctx, target: discord.Member = None): 
-        if target and target != ctx.author and target.id != 713506775424565370 and await h.can_attack(ctx.author.id, target.id):
+        if target and target != ctx.author and target.id != 713506775424565370 and await h.can_attack(ctx.author.id, target.id, ctx):
             if self.bot.users_classes[str(ctx.author.id)] == "pyromancer":
                 ap_works = await h.alter_ap(ctx.message, 1, self.bot)
                 if ap_works:
@@ -91,6 +91,127 @@ class pyromancer(commands.Cog):
                     elif crit_check == 100:
                         hook = "**🔥[OVERHEAT!]🔥** + 75 Coolness | " + hook
                         await h.add_coolness(ctx.author.id, 75)
+                        await ctx.send(hook)
+            elif self.bot.users_classes[str(ctx.author.id)] == "flameborn":
+                ap_works = await h.alter_ap(ctx.message, 1, self.bot)
+                if ap_works:
+                    if ctx.author.id not in self.pyrolevels:
+                        self.pyrolevels[ctx.author.id] = 0
+                    elif ctx.author.id in self.pyrolevels:
+                        self.pyrolevels[ctx.author.id] += random.randint(10,20)
+
+                    crit_check = random.randint(10,20)
+                    body_part = random.choice(h.body_parts)
+                    hook = random.choice(self.hooks)
+
+                    pyrolevels = self.pyrolevels
+                    if pyrolevels[ctx.author.id] <= 25:
+                        hook += f"\n\n*usr1's inner fire kindles lightly at {pyrolevels[ctx.author.id]+20}°C...*"
+                    elif pyrolevels[ctx.author.id] <= 50:
+                        hook += f"\n\n*usr1's inner fire burns at {pyrolevels[ctx.author.id]+20}°C...*"
+                    elif pyrolevels[ctx.author.id] <= 75:
+                        hook += f"\n\n*usr1's inner fire burns strongly at {pyrolevels[ctx.author.id]+20}°C...*"
+                    elif pyrolevels[ctx.author.id] <= 99:
+                        hook += f"\n\n*usr1's inner fire roars at {pyrolevels[ctx.author.id]+20}°C...!*"
+                    elif pyrolevels[ctx.author.id] >= 100:
+                        hook = random.choice(self.mega_hooks)
+                        crit_check = 100
+                        pyrolevels[ctx.author.id] = -10
+                        
+                    hook = hook.replace("usr1", f"**{ctx.author.display_name}**")
+                    hook = hook.replace("bdypart", body_part)
+                    hook = hook.replace("usr2", f"**{target.display_name}**")
+
+                    if crit_check < 20:
+                        await ctx.send(hook)
+                    elif crit_check == 20:
+                        hook = "**✨[CRITICAL]✨** + 100 Coolness | " + hook
+                        await h.add_coolness(ctx.author.id, 100)
+                        await ctx.send(hook)
+                    elif crit_check == 100:
+                        hook = "**🔥[OVERHEAT!]🔥** + 75 Coolness | " + hook
+                        await h.add_coolness(ctx.author.id, 75)
+                        await ctx.send(hook)
+            elif self.bot.users_classes[str(ctx.author.id)] == "flame tongue":
+                ap_works = await h.alter_ap(ctx.message, 1, self.bot)
+                if ap_works:
+                    if ctx.author.id not in self.pyrolevels:
+                        self.pyrolevels[ctx.author.id] = 0
+                    elif ctx.author.id in self.pyrolevels:
+                        self.pyrolevels[ctx.author.id] += random.randint(10,20)
+
+                    crit_check = random.randint(1,17)
+                    body_part = random.choice(h.body_parts)
+                    hook = random.choice(self.hooks)
+
+                    pyrolevels = self.pyrolevels
+                    if pyrolevels[ctx.author.id] <= 50:
+                        hook += f"\n\n*usr1's inner fire kindles lightly at {pyrolevels[ctx.author.id]+20}°C...*"
+                    elif pyrolevels[ctx.author.id] <= 75:
+                        hook += f"\n\n*usr1's inner fire burns at {pyrolevels[ctx.author.id]+20}°C...*"
+                    elif pyrolevels[ctx.author.id] <= 100:
+                        hook += f"\n\n*usr1's inner fire burns strongly at {pyrolevels[ctx.author.id]+20}°C...*"
+                    elif pyrolevels[ctx.author.id] <= 150:
+                        hook += f"\n\n*usr1's inner fire roars at {pyrolevels[ctx.author.id]+20}°C...!*"
+                    elif pyrolevels[ctx.author.id] >= 200:
+                        hook = random.choice(self.mega_hooks)
+                        crit_check = 100
+                        pyrolevels[ctx.author.id] = -10
+                        
+                    hook = hook.replace("usr1", f"**{ctx.author.display_name}**")
+                    hook = hook.replace("bdypart", body_part)
+                    hook = hook.replace("usr2", f"**{target.display_name}**")
+
+                    if crit_check < 20:
+                        await ctx.send(hook)
+                    elif crit_check == 20:
+                        hook = "**✨[CRITICAL]✨** + 100 Coolness | " + hook
+                        await h.add_coolness(ctx.author.id, 100)
+                        await ctx.send(hook)
+                    elif crit_check == 100:
+                        hook = "**🔥[EXTREME OVERHEAT!]🔥** + 250 Coolness | " + hook
+                        await h.add_coolness(ctx.author.id, 75)
+                        await ctx.send(hook)
+            elif self.bot.users_classes[str(ctx.author.id)] == "fire lord":
+                ap_works = await h.alter_ap(ctx.message, 1, self.bot)
+                if ap_works:
+                    if ctx.author.id not in self.pyrolevels:
+                        self.pyrolevels[ctx.author.id] = 0
+                    elif ctx.author.id in self.pyrolevels:
+                        self.pyrolevels[ctx.author.id] += random.randint(1,17)
+
+                    crit_check = random.randint(1,20)
+                    body_part = random.choice(h.body_parts)
+                    hook = random.choice(self.hooks)
+
+                    pyrolevels = self.pyrolevels
+                    if pyrolevels[ctx.author.id] <= 25:
+                        hook += f"\n\n*usr1's inner fire kindles lightly at {pyrolevels[ctx.author.id]+20}°C...*"
+                    elif pyrolevels[ctx.author.id] <= 50:
+                        hook += f"\n\n*usr1's inner fire burns at {pyrolevels[ctx.author.id]+20}°C...*"
+                    elif pyrolevels[ctx.author.id] <= 75:
+                        hook += f"\n\n*usr1's inner fire burns strongly at {pyrolevels[ctx.author.id]+20}°C...*"
+                    elif pyrolevels[ctx.author.id] <= 99:
+                        hook += f"\n\n*usr1's inner fire roars at {pyrolevels[ctx.author.id]+20}°C...!*"
+                    elif pyrolevels[ctx.author.id] >= 100:
+                        hook = random.choice(self.mega_hooks)
+                        crit_check = 100
+                        pyrolevels[ctx.author.id] = -10
+                        
+                    hook = hook.replace("usr1", f"**{ctx.author.display_name}**")
+                    hook = hook.replace("bdypart", body_part)
+                    hook = hook.replace("usr2", f"**{target.display_name}**")
+
+                    if crit_check < 20:
+                        await ctx.send(hook)
+                    elif crit_check == 20:
+                        hook = "**✨[CRITICAL]✨** + 100 Coolness | " + hook
+                        await h.add_coolness(ctx.author.id, 100)
+                        await ctx.send(hook)
+                    elif crit_check == 100:
+                        hook = "**🔥[ROYAL OVERHEAT!]🔥** + 75 Coolness, + 200 Gold | " + hook
+                        await h.add_coolness(ctx.author.id, 75)
+                        await h.add_gold(ctx.author.id, 200, self.bot)
                         await ctx.send(hook)
                         
 # A setup function the every cog has
