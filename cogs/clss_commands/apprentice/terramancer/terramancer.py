@@ -47,10 +47,10 @@ class terramancer(commands.Cog):
     @commands.command()
     @commands.guild_only()
     async def stone(self, ctx, target: discord.Member = None): 
-        if target and target != ctx.author and target.id != 713506775424565370 and await h.can_attack(ctx.author.id, target.id, ctx):
+        if target and target != ctx.author and target.id != 713506775424565370:
             if self.bot.users_classes[str(ctx.author.id)] == "terramancer":
                 ap_works = await h.alter_ap(ctx.message, 1, self.bot)
-                if ap_works:
+                if ap_works and await h.can_attack(ctx.author.id, target.id, ctx):
                     if ctx.author.id not in self.shards:
                         self.shards[ctx.author.id] = 0
 

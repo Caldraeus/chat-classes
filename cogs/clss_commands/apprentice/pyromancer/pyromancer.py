@@ -51,10 +51,10 @@ class pyromancer(commands.Cog):
     @commands.command()
     @commands.guild_only()
     async def torch(self, ctx, target: discord.Member = None): 
-        if target and target != ctx.author and target.id != 713506775424565370 and await h.can_attack(ctx.author.id, target.id, ctx):
-            if self.bot.users_classes[str(ctx.author.id)] == "pyromancer":
+        if target and target != ctx.author and target.id != 713506775424565370:
+            if (self.bot.users_classes[str(ctx.author.id)] == "pyromancer" or self.bot.users_classes[str(ctx.author.id)] == "multi-mage"):
                 ap_works = await h.alter_ap(ctx.message, 1, self.bot)
-                if ap_works:
+                if ap_works and await h.can_attack(ctx.author.id, target.id, ctx):
                     if ctx.author.id not in self.pyrolevels:
                         self.pyrolevels[ctx.author.id] = 0
                     elif ctx.author.id in self.pyrolevels:
@@ -94,7 +94,7 @@ class pyromancer(commands.Cog):
                         await ctx.send(hook)
             elif self.bot.users_classes[str(ctx.author.id)] == "flameborn":
                 ap_works = await h.alter_ap(ctx.message, 1, self.bot)
-                if ap_works:
+                if ap_works and await h.can_attack(ctx.author.id, target.id, ctx):
                     if ctx.author.id not in self.pyrolevels:
                         self.pyrolevels[ctx.author.id] = 0
                     elif ctx.author.id in self.pyrolevels:
@@ -134,7 +134,7 @@ class pyromancer(commands.Cog):
                         await ctx.send(hook)
             elif self.bot.users_classes[str(ctx.author.id)] == "flame tongue":
                 ap_works = await h.alter_ap(ctx.message, 1, self.bot)
-                if ap_works:
+                if ap_works and await h.can_attack(ctx.author.id, target.id, ctx):
                     if ctx.author.id not in self.pyrolevels:
                         self.pyrolevels[ctx.author.id] = 0
                     elif ctx.author.id in self.pyrolevels:
@@ -174,7 +174,7 @@ class pyromancer(commands.Cog):
                         await ctx.send(hook)
             elif self.bot.users_classes[str(ctx.author.id)] == "fire lord":
                 ap_works = await h.alter_ap(ctx.message, 1, self.bot)
-                if ap_works:
+                if ap_works and await h.can_attack(ctx.author.id, target.id, ctx):
                     if ctx.author.id not in self.pyrolevels:
                         self.pyrolevels[ctx.author.id] = 0
                     elif ctx.author.id in self.pyrolevels:

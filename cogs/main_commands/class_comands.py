@@ -77,6 +77,30 @@ class class_comands(commands.Cog):
             hook = Webhook.from_url(url, adapter=AsyncWebhookAdapter(session))
             await hook.send(content=ctx.message.content, username=ctx.message.author.display_name, avatar_url=ctx.message.author.avatar_url)
     
+    @commands.command(aliases=["prog"])
+    @commands.guild_only()
+    async def progression(self, ctx, *, clss = None):
+        if clss:
+            classes = []
+            async with aiosqlite.connect('main.db') as conn:
+                async with conn.execute(f"select * from classes where preclass = '{clss}';") as cinfo:
+                    class_info = await cinfo.fetchall()
+
+            profile = discord.Embed(title=f"🌟 {clss.title()} Class Progression 🌟", colour=discord.Colour.from_rgb(255, 165, 0))
+            profile.set_footer(text=f"A lock symbol next to a class name means there's an achievement required to choose it!", icon_url="")
+            for potential_class in class_info:
+                classes.append(potential_class)
+                if potential_class[4] != 0: # It's an achievement locked class...
+                    profile.add_field(name=f"🔒 | {potential_class[0].title()}", value=potential_class[1], inline=False)
+                elif potential_class[4] == 0:
+                    profile.add_field(name=potential_class[0].title(), value=potential_class[1], inline=False)
+
+            if classes != []:
+                await ctx.send(embed=profile)
+            else:
+                await ctx.send("That class either doesn't exist or doesn't have any class progressions!")
+
+
     @commands.command()
     @commands.guild_only()
     async def classup(self, ctx):
@@ -91,7 +115,7 @@ class class_comands(commands.Cog):
         xp = prof[0]
 
         current_lvl = prof[1]
-        if (user[8]+1) % 10 == 0 and (xp >= h.max_xp(current_lvl) and ((prof[1]+1) % 10 == 0)):
+        if (user[8]+1) % 10 == 0 and (xp >= h.max_xp(current_lvl) and ((prof[1]+1) % 10 == 0)): # I think this makes sure they are high enough level 
             ###
             user_ach = user[6].split("|")
             clss = user[1].replace("_"," ")
@@ -137,6 +161,7 @@ class class_comands(commands.Cog):
                     await conn.commit()
 
                 self.bot.users_classes[str(ctx.author.id)] = chosen.content.lower()
+                self.bot.user_status[int(ctx.author.id)] = []
             else:
                 await ctx.send("Class-up cancelled! If you didn't mean for this to happen, make sure you spelt the class name correctly!")
         else:

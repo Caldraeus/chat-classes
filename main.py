@@ -27,13 +27,14 @@ bot.notified = []
 bot.servers = []
 bot.users_ap = {}
 bot.users_classes = {}
+bot.user_status = {}
 bot.version = '0.2.1'
 bot.server_boosters = []
 bot.reset_time = 0
 bot.claimed = []
 bot.tomorrow = bot.tomorrow = datetime.now().replace(hour=0, minute=0, second=0, microsecond=0) + timedelta(days=1)
 
-
+# custom achievement, and when data wipes, 10k starting gold
 
 if __name__ == '__main__': # Cog loader!
     def load_dir_files(path, dash):
@@ -101,6 +102,7 @@ async def on_ready():
                     bot.users_ap[guy[0]] = 20 
 
                 bot.users_classes[guy[0]] = guy[1]
+                bot.user_status[int(guy[0])] = []
 
     print(f'\n\nLogged in.')
     update = None
@@ -168,7 +170,7 @@ async def on_message(message):
                 for guy in usrs:
                     if int(guy[0]) in bot.server_boosters and int(guy[0]) != 217288785803608074:
                         bot.users_ap[guy[0]] = 40
-                    elif int(guy[0]) in bot.server_boosters and int(guy[0]) == 217288785803608074:
+                    elif int(guy[0]) == 217288785803608074:
                         bot.users_ap[guy[0]] = 100
                     else:
                         bot.users_ap[guy[0]] = 20
@@ -189,6 +191,13 @@ async def on_message(message):
                 await bot.process_commands(message) # Run commands.
             elif message.content[0] == ";":
                 await message.channel.send("⚠️ | Hey! Seems like you're trying to run a command. Sadly, the bot hasn't been activated for this server yet, or I'm still loading! If I'm not enabled, have the server owner say `;enablecc`")
+        # Here is how we handle on-message effects that can be caused by some classes.
+            try:
+                if message.content[0] != ";":
+                    await h.handle_effects(message, bot)
+            except:
+                pass
+
         if str(message.author.id) in bot.registered_users:
             await h.fetch_random_quest(message, bot)
             await asyncio.sleep(.1)

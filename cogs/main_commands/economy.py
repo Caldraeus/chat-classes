@@ -15,7 +15,8 @@ class economy(commands.Cog):
             "coffee" : 50,
             "hot dog" : 75,
             "monster" : 125,
-            "adrenaline" : 225
+            "adrenaline" : 225,
+            "void" : 250
         }
 
         self.hidden_items = {
@@ -33,6 +34,7 @@ class economy(commands.Cog):
             embed.add_field(name=f"Hot Dog | {self.items.get('hot dog')} G", value=f"A delicious hot dog. Restores 4 ap, and gives some coolness.", inline=False)
             embed.add_field(name=f"Monster | {self.items.get('monster')} G", value=f'A monster energy. Great if you ignore the kidney stones! Restores 6 AP.', inline=False)
             embed.add_field(name=f"Adrenaline | {self.items.get('adrenaline')} G", value="A pure vial of adrenaline. Very strong. Restores 10 AP.")
+            embed.add_field(name=f"Void | {self.items.get('void')} G", value="Holy shit, where did I get this stuff? Restores 20 AP, but applies 20 stacks of shatter!", inline=False)
             await ctx.send(embed=embed)
 
     @commands.command()
@@ -97,6 +99,13 @@ class economy(commands.Cog):
                             new_ap = max_ap
                         self.bot.users_ap[str(ctx.author.id)] = new_ap
                         await h.add_coolness(ctx.author.id, 10)
+                    elif item == "void":
+                        await ctx.send("👁️ | You 👍︎⚐︎☠︎💧︎🕆︎💣︎☜︎ your delectable ✞︎□︎✋︎👎︎. Golly, that sure was 👎︎☜︎☹︎♓︎👍︎✋︎⚐︎⬧︎! (+20 AP | +20 Shatter)")
+                        new_ap = self.bot.users_ap[str(ctx.author.id)] + 20
+                        if new_ap > max_ap:
+                            new_ap = max_ap
+                        self.bot.users_ap[str(ctx.author.id)] = new_ap
+                        await h.add_effect(ctx.author, self.bot, "shatter", 20)
 
                                 
                     ####

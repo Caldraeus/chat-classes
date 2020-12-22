@@ -52,15 +52,41 @@ class apprentice(commands.Cog):
             "usr1 inverts usr2. Which, as I'm sure you can imagine, is really, really nasty. And messy.",
             f"usr1 swaps usr2's bdypart and {random.choice(h.body_parts)} in their sleep. Huh."
         ]
+
+        self.hooks_cryo = [
+            "usr1 flings a shard of ice straight through usr2's bdypart!",
+            "usr1 freezes usr2's arm before shattering it with a punch.",
+            "usr1 shoves a large icicle through usr2's bdypart!",
+            "usr1 freezes usr2's bdypart before ripping it out and smashing it on the ground.",
+            "usr1 creates a patch of ice below usr2, causing them to slip and fall. It doesn't kill them or anything, it's just kinda funny.",
+            "usr2 is minding their own business when they're suddenly unable to move. Their legs have been frozen! They looks behind them to see usr1 sliding at them in a sled! By the time they break free it's too late - usr1 smashes through usr2 at mach speed.",
+            "usr1 throws a snowball into usr2's face before brutally stabbing them to death with blades of ice.",
+            "usr1 creates a scythe of ice and swipes usr2's head off!",
+            "usr1 freezes usr2's brain, slowly killing them.",
+            "usr1 slams into the earth, causing shards of ice to rise up beneath usr2, impaling them!",
+            "usr1 covers themself in ice and tackles usr2, crushing them!",
+            "usr1 freezes usr2's fingers, and breaks them. One. By. One. That's just cruel, usr1. Just cruel."
+        ]
+        self.impaled = []
+
+        self.hooks_fog = [
+            "usr1 surrounds usr2 in mist, then uses it to choke them to death!"
+        ]
+
+        self.hooks_psychic = [
+            "usr1 lifts usr2 with their telekinesis, then rips them in two!",
+            "usr1 mind controls usr2 to jump off a cliff! Brutal!",
+            "usr1 causes usr2's bdypart to pop."
+        ]
     pass
 
     @commands.command()
     @commands.guild_only()
     async def blast(self, ctx, target: discord.Member = None): # Shoots an arrow at someone.
-        if target and target != ctx.author and target.id != 713506775424565370 and await h.can_attack(ctx.author.id, target.id, ctx):
+        if target and target != ctx.author and target.id != 713506775424565370:
             if self.bot.users_classes[str(ctx.author.id)] == "apprentice":
                 ap_works = await h.alter_ap(ctx.message, 1, self.bot)
-                if ap_works:
+                if ap_works and await h.can_attack(ctx.author.id, target.id, ctx):
                     crit_check = random.randint(1,20)
                     body_part = random.choice(h.body_parts)
                     hook = random.choice(self.hooks)
@@ -75,7 +101,7 @@ class apprentice(commands.Cog):
                         await ctx.send(hook)
             elif self.bot.users_classes[str(ctx.author.id)] == "dark mage":
                 ap_works = await h.alter_ap(ctx.message, 1, self.bot)
-                if ap_works:
+                if ap_works and await h.can_attack(ctx.author.id, target.id, ctx):
                     crit_check = random.randint(1,20)
                     body_part = random.choice(h.body_parts)
                     hook = random.choice(self.hooks_dm)
@@ -87,6 +113,69 @@ class apprentice(commands.Cog):
                     else:
                         hook = "**✨[CRITICAL]✨** + 100 Coolness | " + hook
                         await h.add_coolness(ctx.author.id, 100)
+                        await ctx.send(hook)
+            elif self.bot.users_classes[str(ctx.author.id)] == "cryomancer":
+                ap_works = await h.alter_ap(ctx.message, 1, self.bot)
+                if ap_works and await h.can_attack(ctx.author.id, target.id, ctx):
+                    crit_check = random.randint(1,20)
+                    body_part = random.choice(h.body_parts)
+                    hook = random.choice(self.hooks_cryo)
+                    hook = hook.replace("usr1", f"**{ctx.author.display_name}**")
+                    hook = hook.replace("bdypart", body_part)
+                    hook = hook.replace("usr2", f"**{target.display_name}**")
+                    if target.id not in self.impaled:
+                        if crit_check != 20:
+                            await ctx.send(hook)
+                        else:
+                            self.impaled.append(target.id)
+                            hook = "**<:icicle:790043249456840734>[IMPALEMENT!]<:icicle:790043249456840734>** + 100 Coolness | " + hook
+                            await h.add_coolness(ctx.author.id, 100)
+                            await ctx.send(hook)
+                    else:
+                        hook = "**✨[MINI-CRIT]✨** + 75 Coolness | " + hook
+                        self.impaled.remove(target.id)
+                        await h.add_coolness(ctx.author.id, 75)
+                        await ctx.send(hook)
+            elif self.bot.users_classes[str(ctx.author.id)] == "fogwalker":
+                ap_works = await h.alter_ap(ctx.message, 1, self.bot)
+                if ap_works and await h.can_attack(ctx.author.id, target.id, ctx):
+                    crit_check = random.randint(1,20)
+                    body_part = random.choice(h.body_parts)
+                    hook = random.choice(self.hooks_fog)
+                    hook = hook.replace("usr1", f"**{ctx.author.display_name}**")
+                    hook = hook.replace("bdypart", body_part)
+                    hook = hook.replace("usr2", f"**{target.display_name}**")
+                    if crit_check != 20:
+                        await ctx.send(hook)
+                    else:
+                        if ctx.author.id in self.bot.server_boosters: # Check their maximum AP
+                            max_ap = 40
+                        else:
+                            max_ap = 20
+
+                        if str(ctx.author.id) in self.bot.users_ap:
+                            new_ap = self.bot.users_ap[str(ctx.author.id)] + 3
+                            if new_ap > max_ap:
+                                new_ap = max_ap
+                            self.bot.users_ap[str(ctx.author.id)] = new_ap
+                        hook = "**🌫️[CRITICAL]🌫️** + 100 Coolness, + 3 AP | " + hook
+                        await h.add_coolness(ctx.author.id, 100)
+                        await ctx.send(hook)
+            elif self.bot.users_classes[str(ctx.author.id)] == "psychic":
+                ap_works = await h.alter_ap(ctx.message, 1, self.bot)
+                if ap_works and await h.can_attack(ctx.author.id, target.id, ctx):
+                    crit_check = random.randint(1,20)
+                    body_part = random.choice(h.body_parts)
+                    hook = random.choice(self.hooks_psychic)
+                    hook = hook.replace("usr1", f"**{ctx.author.display_name}**")
+                    hook = hook.replace("bdypart", body_part)
+                    hook = hook.replace("usr2", f"**{target.display_name}**")
+                    if crit_check != 20:
+                        await ctx.send(hook)
+                    else:
+                        hook = "**⛓️[MINDSHATTER]⛓️** + 100 Coolness | " + hook + " This is so destructive, it applies 5 stacks of **shatter** to them!"
+                        await h.add_coolness(ctx.author.id, 100)
+                        await h.add_effect(target, self.bot, "shatter", 5)
                         await ctx.send(hook)
                         
 # A setup function the every cog has

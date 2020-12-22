@@ -4,6 +4,9 @@ from discord.ext.commands.cooldowns import BucketType
 import aiosqlite
 import asyncio
 import random
+from discord import Webhook, AsyncWebhookAdapter
+import aiohttp
+
 
 base_classes = {
     1 : 'Apprentice',
@@ -15,6 +18,102 @@ base_classes = {
 prefix = ';'
 
 body_parts = ['bones', 'hair', 'fingernail', 'thumb', 'middle finger', 'big toe', 'knees', 'kneecap', 'bum', 'cheek', 'bumcheek', 'leg hair', 'skeleton', 'ligaments', 'muscles', 'tendons', 'teeth', 'mouth', 'tongue', 'larynx', 'esophagus', 'stomach', 'small intestine', 'large intestine', 'liver', 'gallbladder', 'mesentery', 'pancreas', 'anus', 'nasal cavity', 'pharynx', 'larynx', 'trachea', 'lungs', 'diaphragm', 'groin', 'kidneys', 'heart', 'spleen', 'thymus', 'brain', 'cerebellum', 'spine', 'eye', 'ear', 'arm', 'leg', 'chest', 'neck', 'toe', 'finger']
+
+async def add_effect(target, bot, effect_name, amount = 1):
+    speaker = target.id
+    if speaker not in bot.user_status:
+        bot.user_status[speaker] = []
+    user_effects = bot.user_status[speaker]
+    exists = False
+    for status in user_effects: # If the status exists, increment it.
+        if status[0].lower() == effect_name.lower():
+            exists = True
+            status[1] += amount
+    if not exists:
+        bot.user_status[speaker].append([effect_name.lower(), amount])
+
+
+effect_list = {
+    "shatter" : "Your mind has been shattered! Your messages are jumbled up!",
+    "polymorph" : "You're a sheep! You can't speak human language!"
+}
+async def handle_effects(message, bot): # List of effects in the readme
+    speaker = message.author.id
+    if speaker in bot.user_status:
+        user_effects = bot.user_status[speaker]
+        for status in user_effects: # We go through each status affecting the user [NOT ALL APPLY TO ON-MESSAGE EVENTS. THEREFORE, WE NEED IF STATEMENTS]. These are applied in order
+            if status[0].lower() == "shatter":
+                ### HANDLE STACKS
+                remaining_stacks = status[1]-1
+                if remaining_stacks <= 0:
+                    bot.user_status[speaker].remove(status)
+                else:
+                    status[1] -= 1
+                ### APPLY EFFECT
+                while True:
+                    mad_content = " "
+                    content = message.content.split(" ")
+                    random.shuffle(content)
+                    mad_content = mad_content.join(content)
+                    if mad_content != message.content or all(x==content[0] for x in content) == True:
+                        break
+                
+                await message.delete()
+                async with aiohttp.ClientSession() as session:
+                    url = await webhook_safe_check(message.channel)
+                    clone_hook = Webhook.from_url(url, adapter=AsyncWebhookAdapter(session))
+                    await clone_hook.send(content=mad_content, username=message.author.display_name, avatar_url=message.author.avatar_url)
+            elif status[0].lower() == "polymorph":
+                ### HANDLE STACKS
+                remaining_stacks = status[1]-1
+                if remaining_stacks <= 0:
+                    bot.user_status[speaker].remove(status)
+                else:
+                    status[1] -= 1
+                ### APPLY EFFECT
+                names = ["Crazy Sheep", "Silly Sheep", "Fluffy Sheep", "Confused Sheep", "Interesting Sheep", "Tired Sheep", "Angry Sheep", "Boring Sheep", "Fast Sheep", "Slow Sheep", "Smart Sheep", "Dumb Sheep", "Cute Sheep", "Ugly Sheep", "Cold Sheep", "Warm Sheep", "Smelly Sheep", "Strong Sheep"]
+                urls = [
+                    "https://assets-global.website-files.com/5bbd49a137709a4145049ab0/5dd67614e984aa331e6dc8be_Fronde--blog-hero-image_0001_sheep.jpg",
+                    "https://thumbs-prod.si-cdn.com/SkuS5xz-Q-kr_-ol6xblY9fsoeA=/fit-in/1600x0/https://public-media.si-cdn.com/filer/d4/f6/d4f6e4bf-8f77-445d-a8f9-e3a74c6a40f0/ewkhdqqwsae0xpo.jpeg",
+                    "https://i.guim.co.uk/img/media/22bed68981e92d7a9ff204ed7d7f5776a16468fe/1933_1513_3623_2173/master/3623.jpg?width=1200&height=1200&quality=85&auto=format&fit=crop&s=b7545d644ba9f6bcc673a8bdf6d7db83",
+                    "https://images.theconversation.com/files/324133/original/file-20200330-173620-1q1nz5d.jpg?ixlib=rb-1.1.0&rect=0%2C697%2C4635%2C2314&q=45&auto=format&w=1356&h=668&fit=crop",
+                    "https://viva.org.uk/wp-content/uploads/2020/05/fun-facts.jpg",
+                    "https://spca.bc.ca/wp-content/uploads/lamb-in-grassy-field-825x550.jpg",
+                    "https://s7657.pcdn.co/wp-content/uploads/2016/01/Fluffy-sheep-940x480.jpg",
+                    "https://www.macmillandictionary.com/external/slideshow/thumb/137411_thumb.jpg",
+                    "https://www.abc.net.au/cm/rimage/9673494-3x4-xlarge.jpg?v=3"
+                ]
+
+                
+                sheep_content = ""
+                for word in message.content.split(" "):
+                    if word[-1] == ".":
+                        sheep_content += f"b{random.randint(1,10)*'a'}. "
+                    elif word[-1] == "!":
+                        sheep_content += f"b{random.randint(1,10)*'a'}! "
+                    elif word[-1] == ":":
+                        sheep_content += f"b{random.randint(1,10)*'a'}: "
+                    elif word[-1] == "?":
+                        sheep_content += f"b{random.randint(1,10)*'a'}? "
+                    elif word[-1] == ",":
+                        sheep_content += f"b{random.randint(1,10)*'a'}, "
+                    else:
+                        sheep_content += f"b{random.randint(1,10)*'a'} "
+
+                random.seed(message.author.id)
+                sheep_name = random.choice(names)
+                chosen_url = random.choice(urls)
+
+                await message.delete()
+                async with aiohttp.ClientSession() as session:
+                    url = await webhook_safe_check(message.channel)
+                    clone_hook = Webhook.from_url(url, adapter=AsyncWebhookAdapter(session))
+                    
+                    try:
+                        await clone_hook.send(content=sheep_content.capitalize(), username=sheep_name, avatar_url=chosen_url)
+                    except:
+                        await clone_hook.send(content="Ba"*random.randint(1,20), username=sheep_name, avatar_url=chosen_url)
+
 
 
 async def can_attack(user, target, ctx): # NOTE: Remember that you can't alter AP of those who have no profile in CC...
@@ -76,6 +175,7 @@ async def alter_ap(message, ap, bot):
             return False
 
 async def xp_handler(message, bot):
+    testing = True
     num = random.randint(1,4)
     if num == 4:
         if str(message.author.id) in bot.registered_users:
@@ -97,7 +197,7 @@ async def xp_handler(message, bot):
                 async with aiosqlite.connect('main.db') as conn:
                     await conn.execute(f"update users set exp = {max_xp(current_lvl)} where id = '{message.author.id}'")
                     await conn.commit()
-                if message.author.id not in bot.notified:
+                if message.author.id not in bot.notified and not testing:
                     bot.notified.append(message.author.id)
                     embed = discord.Embed(title=f"✨ Level up! ✨", colour=discord.Colour.from_rgb(255, 204, 153), description=f'You can now level up to {prof[1]+1}! Good job!')
                     embed.set_thumbnail(url=message.author.avatar_url)

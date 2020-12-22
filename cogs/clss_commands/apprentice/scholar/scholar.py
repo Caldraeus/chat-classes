@@ -80,7 +80,38 @@ class scholar(commands.Cog):
                             new_exp = old_exp[0] + 300
                             await conn.execute(f"update users set exp = {new_exp} where id = '{ctx.author.id}';")
                             await conn.commit() 
-                        
+        elif self.bot.users_classes[str(ctx.author.id)] == "proficient scholar":
+            ap_works = await h.alter_ap(ctx.message, 5, self.bot)
+            if ap_works:
+                crit_check = random.randint(1,20)
+                body_part = random.choice(h.body_parts)
+                hook = random.choice(self.hooks)
+                hook = hook.replace("usr1", f"**{ctx.author.display_name}**")
+                hook = hook.replace("magic", random.choice(self.subjects))
+
+                xp_gained = random.randint(100, 300)
+
+                if crit_check != 20:
+                    await ctx.send(f"+{xp_gained} XP | {hook}")
+
+                    async with aiosqlite.connect('main.db') as conn:
+                        async with conn.execute(f"select exp from users where id = '{ctx.author.id}'") as exp:
+                            old_exp = await exp.fetchone()
+                            new_exp = old_exp[0] + xp_gained
+                            await conn.execute(f"update users set exp = {new_exp} where id = '{ctx.author.id}';")
+                            await conn.commit() 
+
+                else:
+                    hook = "**💡[EPIPHANY]💡** + 1000 XP | " + hook
+                    await ctx.send(hook)
+
+                    async with aiosqlite.connect('main.db') as conn:
+                        async with conn.execute(f"select exp from users where id = '{ctx.author.id}'") as exp:
+                            old_exp = await exp.fetchone()
+                            new_exp = old_exp[0] + 1000
+                            await conn.execute(f"update users set exp = {new_exp} where id = '{ctx.author.id}';")
+                            await conn.commit() 
+                            
 # A setup function the every cog has
 def setup(bot):
     bot.add_cog(scholar(bot))

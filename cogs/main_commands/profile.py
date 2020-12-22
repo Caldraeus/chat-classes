@@ -27,6 +27,23 @@ class profile(commands.Cog):
 
     @commands.command()
     @commands.guild_only()
+    async def effects(self, ctx, target: discord.Member = None):
+        if target != None:
+            usr = target
+        else:
+            usr = ctx.author
+        effects = self.bot.user_status[usr.id]
+        if effects != []:
+            profile = discord.Embed(title=f"{usr.display_name}'s Status Effects", colour=discord.Colour.from_rgb(255,105,180))
+            for effect in effects:
+                profile.add_field(name=f"{effect[0].title()} - {effect[1]}×", value=h.effect_list[effect[0]], inline=False)
+
+            await ctx.send(embed=profile)
+        else:
+            await ctx.send("No current status effects!")
+
+    @commands.command(aliases=["inv"])
+    @commands.guild_only()
     async def inventory(self, ctx):
         # embed.set_author(name="author name", url="https://discordapp.com", icon_url="https://cdn.discordapp.com/embed/avatars/0.png")
         if str(ctx.author.id) in self.bot.registered_users:
@@ -131,7 +148,11 @@ class profile(commands.Cog):
                             final_list += f"\n**{ach_info[1]}**"
                     async with conn.execute("select count(*) from achievements;") as numcount:
                         num = await numcount.fetchone()
-                        total_achievements = num[0] # Self explanatory.
+                        total_achievements = num[0]-1 # Self explanatory. We subtract the amount of "unobtainable" achievements.
+                        """
+                        Unobtainable Achievements
+                        #15 - Beloved By...
+                        """
         if final_list != "":
             profile = discord.Embed(title=f"{target.display_name}'s Achievements", colour=discord.Colour.from_rgb(255,69,0), description=final_list)
             profile.set_thumbnail(url=target.avatar_url)

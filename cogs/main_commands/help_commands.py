@@ -32,7 +32,6 @@ class help_commands(commands.Cog):
     @commands.command(aliases=['h'])
     @commands.guild_only()
     async def help(self, ctx, module = "modules"):
-        pages = 1
         module = module.lower()
         profile = discord.Embed(title=f"Chat Classes Help Sections", colour=discord.Colour.from_rgb(255,165,0), description="")
         profile.set_footer(text=f"Use {h.prefix}help [section name] to see specific commands!", icon_url="")
@@ -49,6 +48,7 @@ class help_commands(commands.Cog):
             profile.add_field(name="achs {optional: @user}", value="Display someones achievements.", inline=False)
             profile.add_field(name="quest", value="Show your current quest, if you have one.", inline=False)
             profile.add_field(name="classup", value="Choose your next class. Only works if you're a level below a level equal to a multiple of ten and have 100% xp. (10, 20, 30...)", inline=False)
+            profile.add_field(name="effects {optional: @user}", value="Display your or someone elses current status effects and their stacks.")
             profile.set_thumbnail(url="https://archive-media-0.nyafuu.org/c/image/1531/86/1531863615508.png")
             await ctx.send(embed=profile)
         elif module == "general":
@@ -71,6 +71,7 @@ class help_commands(commands.Cog):
             profile.add_field(name="start", value="Register with the bot to begin using class commands.", inline=False)
             profile.add_field(name="classup", value="Choose your next class! Only available at levels 9, 19, 29, 39, 49.", inline=False)
             profile.add_field(name="classinfo {optional: class name}", value="Show your class specific commands by default, or a specific class's details.", inline=False)
+            profile.add_field(name="prog {class name}", value="Show a class's future class-up options.", inline=False)
             profile.set_thumbnail(url="https://archive-media-0.nyafuu.org/c/image/1531/86/1531863615508.png")
             await ctx.send(embed=profile)
         elif module == "shop":

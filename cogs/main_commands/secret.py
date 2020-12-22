@@ -32,6 +32,13 @@ class secret(commands.Cog):
 
     @commands.command()
     @commands.guild_only()
+    async def baby(self, ctx):
+        await h.award_ach(9, ctx.message, self.bot)
+        await ctx.message.delete()
+        await ctx.send("https://www.youtube.com/watch?v=i-la2O4Ej28")
+
+    @commands.command()
+    @commands.guild_only()
     async def god(self, ctx):
         await h.award_ach(9, ctx.message, self.bot)
         await ctx.message.delete()
