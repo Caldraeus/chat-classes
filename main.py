@@ -168,14 +168,17 @@ async def on_message(message):
             async with conn.execute(f"select id, class, achievements, ap from users;") as people:
                 usrs = await people.fetchall()
                 for guy in usrs:
-                    if int(guy[0]) in bot.server_boosters and int(guy[0]) != 217288785803608074:
-                        bot.users_ap[guy[0]] = 40
-                    elif int(guy[0]) == 217288785803608074:
-                        bot.users_ap[guy[0]] = 100
-                    else:
-                        bot.users_ap[guy[0]] = 20
+                    try:
+                        if int(guy[0]) in bot.server_boosters and int(guy[0]) != 217288785803608074:
+                            bot.users_ap[guy[0]] = 40
+                        elif int(guy[0]) == 217288785803608074:
+                            bot.users_ap[guy[0]] = 100
+                        else:
+                            bot.users_ap[guy[0]] = 20
 
-                    bot.users_classes[guy[0]] = guy[1]
+                        bot.users_classes[guy[0]] = guy[1]
+                    except:
+                        pass
         
         # We reset the daily gift counter.
         bot.claimed = []

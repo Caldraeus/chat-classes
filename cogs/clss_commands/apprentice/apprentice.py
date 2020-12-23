@@ -70,13 +70,26 @@ class apprentice(commands.Cog):
         self.impaled = []
 
         self.hooks_fog = [
-            "usr1 surrounds usr2 in mist, then uses it to choke them to death!"
+            "usr1 surrounds usr2 in mist, then uses it to choke them to death!",
+            "usr1 uses the fog to slice at usr2, cutting off their bdypart!",
+            "usr1 causes usr2 to get lost in a forest due to the fog. usr2 is never seen again.",
+            "usr1 whips wind at usr2, shredding their bdypart!",
+            "usr1 pushes usr2 off a cliff using a fist of fog.",
+            "usr1 creates a wall of fog in front of usr2, and another behind them. Then, usr1 slams the two walls together, smushing usr2. That was... a bit intense.",
+            "usr1 forces thick fog down usr2's orfices, causing them to vomit up blood and die. Holy shit. A bit much usr1, don't you think?",
+            "usr1 causes a thick fog to encapsulate usr2, then lifts them far, far away. Bye bye!"
         ]
 
         self.hooks_psychic = [
             "usr1 lifts usr2 with their telekinesis, then rips them in two!",
             "usr1 mind controls usr2 to jump off a cliff! Brutal!",
-            "usr1 causes usr2's bdypart to pop."
+            "usr1 causes usr2's bdypart to pop.",
+            "usr1 twists usr2's body, demolishing their insides.",
+            "usr1 reads usr2's mind and causes usr2 to see their biggest fear: the opposite gender. It's so scary, usr2 drops dead.",
+            "usr1 lifts a car up using their mind and slams it onto usr2.",
+            "usr1 shoots psychic bolts at usr2, piercing their bdypart and killing them!",
+            "usr1 flattens usr2 with a burst of psychic energy!",
+            "usr1 causes usr2's organs to suddenly rupture. usr2 drops, dead."
         ]
     pass
 
@@ -154,11 +167,11 @@ class apprentice(commands.Cog):
                             max_ap = 20
 
                         if str(ctx.author.id) in self.bot.users_ap:
-                            new_ap = self.bot.users_ap[str(ctx.author.id)] + 3
+                            new_ap = self.bot.users_ap[str(ctx.author.id)] + 10
                             if new_ap > max_ap:
                                 new_ap = max_ap
                             self.bot.users_ap[str(ctx.author.id)] = new_ap
-                        hook = "**🌫️[CRITICAL]🌫️** + 100 Coolness, + 3 AP | " + hook
+                        hook = "**🌫️[CRITICAL]🌫️** + 100 Coolness, + 10 AP | " + hook
                         await h.add_coolness(ctx.author.id, 100)
                         await ctx.send(hook)
             elif self.bot.users_classes[str(ctx.author.id)] == "psychic":
@@ -173,7 +186,23 @@ class apprentice(commands.Cog):
                     if crit_check != 20:
                         await ctx.send(hook)
                     else:
-                        hook = "**⛓️[MINDSHATTER]⛓️** + 100 Coolness | " + hook + " This is so destructive, it applies 5 stacks of **shatter** to them!"
+                        hook = "**⛓️[MINDSHATTER]⛓️** + 100 Coolness | " + hook + " This is so mind-destroying that it applies 5 stacks of **shatter** to them!"
+                        await h.add_coolness(ctx.author.id, 100)
+                        await h.add_effect(target, self.bot, "shatter", 5)
+                        await ctx.send(hook)
+            elif self.bot.users_classes[str(ctx.author.id)] == "sorcerer":
+                ap_works = await h.alter_ap(ctx.message, 1, self.bot)
+                if ap_works and await h.can_attack(ctx.author.id, target.id, ctx):
+                    crit_check = random.randint(1,20)
+                    body_part = random.choice(h.body_parts)
+                    hook = random.choice(self.hooks_psychic)
+                    hook = hook.replace("usr1", f"**{ctx.author.display_name}**")
+                    hook = hook.replace("bdypart", body_part)
+                    hook = hook.replace("usr2", f"**{target.display_name}**")
+                    if crit_check != 20:
+                        await ctx.send(hook)
+                    else:
+                        hook = "**✨[CRITICAL]✨** + 100 Coolness | " + hook + " This is so destructive, it drains 5 ap from them!"
                         await h.add_coolness(ctx.author.id, 100)
                         await h.add_effect(target, self.bot, "shatter", 5)
                         await ctx.send(hook)

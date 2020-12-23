@@ -17,6 +17,9 @@ base_classes = {
 
 prefix = ';'
 
+with open('adjectives.txt') as f:
+    sheep_names = [line.rstrip() for line in f]
+
 body_parts = ['bones', 'hair', 'fingernail', 'thumb', 'middle finger', 'big toe', 'knees', 'kneecap', 'bum', 'cheek', 'bumcheek', 'leg hair', 'skeleton', 'ligaments', 'muscles', 'tendons', 'teeth', 'mouth', 'tongue', 'larynx', 'esophagus', 'stomach', 'small intestine', 'large intestine', 'liver', 'gallbladder', 'mesentery', 'pancreas', 'anus', 'nasal cavity', 'pharynx', 'larynx', 'trachea', 'lungs', 'diaphragm', 'groin', 'kidneys', 'heart', 'spleen', 'thymus', 'brain', 'cerebellum', 'spine', 'eye', 'ear', 'arm', 'leg', 'chest', 'neck', 'toe', 'finger']
 
 async def add_effect(target, bot, effect_name, amount = 1):
@@ -35,7 +38,7 @@ async def add_effect(target, bot, effect_name, amount = 1):
 
 effect_list = {
     "shatter" : "Your mind has been shattered! Your messages are jumbled up!",
-    "polymorph" : "You're a sheep! You can't speak human language!"
+    "polymorph" : "You're a sheep! You can't speak human languages!"
 }
 async def handle_effects(message, bot): # List of effects in the readme
     speaker = message.author.id
@@ -71,7 +74,7 @@ async def handle_effects(message, bot): # List of effects in the readme
                 else:
                     status[1] -= 1
                 ### APPLY EFFECT
-                names = ["Crazy Sheep", "Silly Sheep", "Fluffy Sheep", "Confused Sheep", "Interesting Sheep", "Tired Sheep", "Angry Sheep", "Boring Sheep", "Fast Sheep", "Slow Sheep", "Smart Sheep", "Dumb Sheep", "Cute Sheep", "Ugly Sheep", "Cold Sheep", "Warm Sheep", "Smelly Sheep", "Strong Sheep"]
+                
                 urls = [
                     "https://assets-global.website-files.com/5bbd49a137709a4145049ab0/5dd67614e984aa331e6dc8be_Fronde--blog-hero-image_0001_sheep.jpg",
                     "https://thumbs-prod.si-cdn.com/SkuS5xz-Q-kr_-ol6xblY9fsoeA=/fit-in/1600x0/https://public-media.si-cdn.com/filer/d4/f6/d4f6e4bf-8f77-445d-a8f9-e3a74c6a40f0/ewkhdqqwsae0xpo.jpeg",
@@ -81,10 +84,11 @@ async def handle_effects(message, bot): # List of effects in the readme
                     "https://spca.bc.ca/wp-content/uploads/lamb-in-grassy-field-825x550.jpg",
                     "https://s7657.pcdn.co/wp-content/uploads/2016/01/Fluffy-sheep-940x480.jpg",
                     "https://www.macmillandictionary.com/external/slideshow/thumb/137411_thumb.jpg",
-                    "https://www.abc.net.au/cm/rimage/9673494-3x4-xlarge.jpg?v=3"
+                    "https://www.abc.net.au/cm/rimage/9673494-3x4-xlarge.jpg?v=3",
+                    "https://ichef.bbci.co.uk/news/1024/cpsprodpb/081B/production/_98657020_c0042087-black_faced_sheep-spl.jpg"
                 ]
 
-                
+                random.seed(len(message.content))
                 sheep_content = ""
                 for word in message.content.split(" "):
                     if word[-1] == ".":
@@ -101,7 +105,7 @@ async def handle_effects(message, bot): # List of effects in the readme
                         sheep_content += f"b{random.randint(1,10)*'a'} "
 
                 random.seed(message.author.id)
-                sheep_name = random.choice(names)
+                sheep_name = random.choice(sheep_names).title() + " Sheep"
                 chosen_url = random.choice(urls)
 
                 await message.delete()
@@ -171,7 +175,7 @@ async def alter_ap(message, ap, bot):
             bot.users_ap[uid] = balance
             return True
         else:
-            await message.channel.send("You are currently out of AP! Buy some refreshers from the shop, do some quests, or wait until rollover!")
+            await message.channel.send("You don't have enough AP to do that! Buy some refreshers from the shop, do some quests, or wait until rollover!")
             return False
 
 async def xp_handler(message, bot):
