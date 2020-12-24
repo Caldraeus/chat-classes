@@ -41,6 +41,37 @@ class terramancer(commands.Cog):
             "usr1 creates a giant stone hammer, then repeatedly smashes usr2's bdypart, killing them. Brutality!"
         ]
 
+        self.hooks_sand = [
+            "usr1 covers usr2 in sand, suffocating them.",
+            "usr1 creates quicksand, sucking usr2 into the ground!",
+            "usr1 grabs usr2 by the throat, and slowly turns usr2 into sand. Wait, usr1, you can do that?!",
+            "usr1 shoots a blast of sand through usr2's bdypart, obliterating it completely.",
+            "usr1 creates a comically large spoon of sand, then beats usr2 to death with it.",
+            "usr1 surrounds usr2 in sand, causing them to trip and fall off a cliff. Lmao, nice one usr2.",
+            "usr1 bores a hole through usr2's bdypart using a small, but powerful, stream of sand.",
+            "usr1 throws pocket sand into the eyes of usr2, then kicks them into a wall of spikes constructed of sand.",
+            "usr1 throws a spiked ball of sand through usr2's torso, then slams usr2 into the ground.",
+            "usr1 shoots sand into usr2's bdypart, then causes it to burst!"
+        ]
+        
+        self.hooks_sand_mega = [
+            "usr1 creates an entire sandstorm around usr2, completely enveloping them and leaving nothing but bones behind.",
+            "usr1 opens up a hole in the sand below usr2, sending them falling thousands of feet down into the Earths core, until they impale on a large spike.",
+            "usr1 grabs usr2 and lifts them into the air, slowly turning them into sand. usr2's scream slowly fade away, as their bones turn to sand, followed by the rest of their body.",
+            "usr1 creates a large hammer of sand, then slams it into usr2. Then, usr1 causes usr2 to sink into the sand, burying them alive.",
+            "usr1 slams usr2 into the ground, slowly forcing them deeper into the ground. usr2's screams are muffled by the sand as they finally perish.",
+            "usr1 throws sand into usr2's eyes, then forces it to bore deeper into their brain.",
+            "usr1 trips usr2, creating a bunch of spikes at the impact site. Needless to say, usr2's got a lot more holes in them now."
+        ]
+
+        self.hooks_lava = [
+            "usr2 fires a lance of molten rock straight through usr2's bdyart."
+        ]
+
+        self.lava_mega_hooks = [
+
+        ]
+
         self.shards = {}
     pass
 
@@ -72,8 +103,77 @@ class terramancer(commands.Cog):
 
                     if crit_check < 20:
                         await ctx.send(hook)
-                    elif crit_check == 20 and ~(crit_check >= 20):
+                    elif crit_check == 20:
                         hook = "**✨[CRITICAL]✨** + 100 Coolness & + 1 Stone Shard | " + hook
+                        self.shards[ctx.author.id] += 1
+                        await h.add_coolness(ctx.author.id, 100)
+                        await ctx.send(hook)
+                    elif crit_check == 100:
+                        hook = "**🪨[MEGA-CRIT!]🪨** + 1000 Coolness | " + hook
+                        self.shards[ctx.author.id] = 0
+                        await h.add_coolness(ctx.author.id, 1000)
+                        await ctx.send(hook)
+            elif self.bot.users_classes[str(ctx.author.id)] == "dune wizard":
+                ap_works = await h.alter_ap(ctx.message, 1, self.bot)
+                if ap_works and await h.can_attack(ctx.author.id, target.id, ctx):
+                    if ctx.author.id not in self.shards:
+                        self.shards[ctx.author.id] = 0
+
+                    crit_check = random.randint(1,20)
+
+                    body_part = random.choice(h.body_parts)
+                    hook = random.choice(self.hooks_sand)
+
+                    shards = self.shards
+                    if shards[ctx.author.id] >= 0 and shards[ctx.author.id] < 100:
+                        hook += f"\n\n*usr1 has {shards[ctx.author.id]}/100 sand!*"
+                    elif shards[ctx.author.id] >= 100:
+                        hook = random.choice(self.hooks_sand_mega)
+                        crit_check = 100
+
+                    hook = hook.replace("usr1", f"**{ctx.author.display_name}**")
+                    hook = hook.replace("bdypart", body_part)
+                    hook = hook.replace("usr2", f"**{target.display_name}**")
+
+                    if crit_check < 20:
+                        self.shards[ctx.author.id] += random.randint(1,5)
+                        await ctx.send(hook)
+                    elif crit_check == 20:
+                        hook = "**✨[CRITICAL]✨** + 100 Coolness, + 50 Sand | " + hook
+                        self.shards[ctx.author.id] += 50
+                        await h.add_coolness(ctx.author.id, 100)
+                        await ctx.send(hook)
+                    elif crit_check == 100:
+                        hook = "**🪨[MEGA-CRIT!]🪨** + 1000 Coolness | " + hook
+                        self.shards[ctx.author.id] = 0
+                        await h.add_coolness(ctx.author.id, 1000)
+                        await ctx.send(hook)
+        elif self.bot.users_classes[str(ctx.author.id)] == "igneous mage":
+                ap_works = await h.alter_ap(ctx.message, 1, self.bot)
+                if ap_works and await h.can_attack(ctx.author.id, target.id, ctx):
+                    if ctx.author.id not in self.shards:
+                        self.shards[ctx.author.id] = 0
+
+                    crit_check = random.randint(1,20)
+
+                    body_part = random.choice(h.body_parts)
+                    hook = random.choice(self.hooks_lava)
+
+                    shards = self.shards
+                    if shards[ctx.author.id] > 0 and shards[ctx.author.id] < 5:
+                        hook += f"\n\n*usr1 has {shards[ctx.author.id]}/5 lava shards!*"
+                    elif shards[ctx.author.id] >= 5:
+                        hook = random.choice(self.lava_mega_hooks)
+                        crit_check = 100
+
+                    hook = hook.replace("usr1", f"**{ctx.author.display_name}**")
+                    hook = hook.replace("bdypart", body_part)
+                    hook = hook.replace("usr2", f"**{target.display_name}**")
+
+                    if crit_check < 20:
+                        await ctx.send(hook)
+                    elif crit_check == 20:
+                        hook = "**✨[CRITICAL]✨** + 100 Coolness & + 1 Lava Shard | " + hook
                         self.shards[ctx.author.id] += 1
                         await h.add_coolness(ctx.author.id, 100)
                         await ctx.send(hook)

@@ -91,6 +91,21 @@ class apprentice(commands.Cog):
             "usr1 flattens usr2 with a burst of psychic energy!",
             "usr1 causes usr2's organs to suddenly rupture. usr2 drops, dead."
         ]
+
+        self.hooks_sorc = [
+            "usr1 blasts usr2 apart with lava!",
+            "usr1 shoots an arcane orb through usr2, ripping them in two!",
+            "usr1 slams the ground, releasing an arcane shockwave that turns usr2 to dust!",
+            "usr1 fires an arcane missile at usr2, blowing off their bdypary. usr1 then runs up to usr2 and slams them into the ground, before blasting them at point blank with a fireball.",
+            "usr1 shoots two bolts of crackling energy into usr2's legs, crippling them.",
+            "usr1 rips out usr2's bdypart, sets it on fire, then fires it back at usr2.",
+            "usr1 shocks usr2, completely frying them.",
+            "usr1 fires raw magical energy into usr2's bdypart, causing it to explode.",
+            "usr1 makes a huge orb of magical energy, and slams it into usr2, completely destroying them!",
+            "usr1 shoots out three discs of magic, slicing off usr2's bdypart, arm and both legs! Fatality!",
+            "usr1 kicks usr2 off a bridge, then fires a beam of magic through them as they fall down!",
+            "usr1 sets usr2 ablaze in a spectacular blue flame. usr2 runs around in circles before burning to death."
+        ]
     pass
 
     @commands.command()
@@ -195,16 +210,22 @@ class apprentice(commands.Cog):
                 if ap_works and await h.can_attack(ctx.author.id, target.id, ctx):
                     crit_check = random.randint(1,20)
                     body_part = random.choice(h.body_parts)
-                    hook = random.choice(self.hooks_psychic)
+                    hook = random.choice(self.hooks_sorc)
                     hook = hook.replace("usr1", f"**{ctx.author.display_name}**")
                     hook = hook.replace("bdypart", body_part)
                     hook = hook.replace("usr2", f"**{target.display_name}**")
                     if crit_check != 20:
                         await ctx.send(hook)
                     else:
-                        hook = "**✨[CRITICAL]✨** + 100 Coolness | " + hook + " This is so destructive, it drains 5 ap from them!"
+                        hook = "**✨[CRITICAL]✨** + 100 Coolness | " + hook + " This is so destructive, it drains 5 AP from them!"
+                        if str(target.id) in self.bot.users_ap.keys():
+                            new_ap = self.bot.users_ap[str(target.id)] - 5
+                            if new_ap < 0:
+                                new_ap = 0
+
+                            self.bot.users_ap[str(target.id)] = new_ap
+
                         await h.add_coolness(ctx.author.id, 100)
-                        await h.add_effect(target, self.bot, "shatter", 5)
                         await ctx.send(hook)
                         
 # A setup function the every cog has

@@ -67,7 +67,7 @@ if __name__ == '__main__': # Cog loader!
                     traceback.print_exc()
 
     load_dir_files('cogs' ,"├─")
-
+# Test
 @bot.event
 async def on_ready():
     home = bot.get_guild(732632186204979281)
