@@ -182,11 +182,11 @@ class apprentice(commands.Cog):
                             max_ap = 20
 
                         if str(ctx.author.id) in self.bot.users_ap:
-                            new_ap = self.bot.users_ap[str(ctx.author.id)] + 10
+                            new_ap = self.bot.users_ap[str(ctx.author.id)] + 5
                             if new_ap > max_ap:
                                 new_ap = max_ap
                             self.bot.users_ap[str(ctx.author.id)] = new_ap
-                        hook = "**🌫️[CRITICAL]🌫️** + 100 Coolness, + 10 AP | " + hook
+                        hook = "**🌫️[CRITICAL]🌫️** + 100 Coolness, + 5 AP | " + hook
                         await h.add_coolness(ctx.author.id, 100)
                         await ctx.send(hook)
             elif self.bot.users_classes[str(ctx.author.id)] == "psychic":

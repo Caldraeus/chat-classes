@@ -88,6 +88,7 @@ class management(commands.Cog):
         profile.add_field(name="Bot Version", value=self.bot.version, inline=False)
         profile.add_field(name="Creator", value=f'Caldraeus#1337', inline=False)
         profile.add_field(name="Library", value=f'discord.py', inline=False)
+        profile.add_field(name="Extra", value=f'Thank you to everyone who has helped me create this bot! I would also like to thank Kingdom of Loathing for the inspiration to create this bot in the first place. And thank you for using it!', inline=False)
     
     
         await ctx.send(embed=profile)

@@ -38,7 +38,9 @@ async def add_effect(target, bot, effect_name, amount = 1):
 
 effect_list = {
     "shatter" : "Your mind has been shattered! Your messages are jumbled up!",
-    "polymorph" : "You're a sheep! You can't speak human languages!"
+    "polymorph" : "You're a sheep! You can't speak human languages!",
+    "drunk" : "You had a bit too much to drink...",
+    "burning" : "You are on fire. Good luck."
 }
 async def handle_effects(message, bot): # List of effects in the readme
     speaker = message.author.id
@@ -117,7 +119,82 @@ async def handle_effects(message, bot): # List of effects in the readme
                         await clone_hook.send(content=sheep_content.capitalize(), username=sheep_name, avatar_url=chosen_url)
                     except:
                         await clone_hook.send(content="Ba"*random.randint(1,20), username=sheep_name, avatar_url=chosen_url)
+            elif status[0].lower() == "drunk":
+                chance = random.randint(1,5)
+                if chance == 5:
+                    ### HANDLE STACKS
+                    remaining_stacks = status[1]-1
+                    if remaining_stacks <= 0:
+                        bot.user_status[speaker].remove(status)
+                    else:
+                        status[1] -= 1
+                    ### APPLY EFFECT
+                    chosen_effect = random.randint(1,4)
+                    
+                    if chosen_effect == 1:
+                        await message.delete()
+                        async with aiohttp.ClientSession() as session:
+                            url = await webhook_safe_check(message.channel)
+                            clone_hook = Webhook.from_url(url, adapter=AsyncWebhookAdapter(session))
+                            await clone_hook.send(content=message.content + " -hic-", username=message.author.display_name, avatar_url=message.author.avatar_url)
+                    elif chosen_effect == 2:
+                        await message.channel.send(f'*{message.author.display_name} vomits all over the floor.*')
+                    elif chosen_effect == 3:
+                        await message.channel.send(f'*{message.author.display_name} stumbles over their own feet, nearly falling over.*')
+                    elif chosen_effect == 3:
+                        await message.channel.send(f'*{message.author.display_name} burps.*')
+                    elif chosen_effect == 4:
+                        await message.delete()
+                        async with aiohttp.ClientSession() as session:
+                            url = await webhook_safe_check(message.channel)
+                            clone_hook = Webhook.from_url(url, adapter=AsyncWebhookAdapter(session))
+                            await clone_hook.send(content="-hic- " + message.content + " -hic-", username=message.author.display_name, avatar_url=message.author.avatar_url)
+            elif status[0].lower() == "burning":
+                ### HANDLE STACKS
+                remaining_stacks = status[1]-1
+                if remaining_stacks <= 0:
+                    bot.user_status[speaker].remove(status)
+                else:
+                    status[1] -= 1
+                ### APPLY EFFECT
 
+                fstring = "🔥 "
+                for word in message.content.split():
+                    chance = random.randint(1,4)
+                    fstring += word + " 🔥 "
+                    if chance == 2:
+                        fire_words = [
+                        "OOH AAAA HOT HOT",
+                        "SHIT SHIT HOT AHHHHH",
+                        "HOT HOT HOT",
+                        "FIRE AHHHH IM BURNING",
+                        "AHH AHH AHH",
+                        "FIRE FIRE AHHHHH",
+                        "AHHH FIRE FIRE FIRE",
+                        "HOT FIRE HOT",
+                        "A" + "H"*random.randint(5,15),
+                        "AH AH AH HELP",
+                        "FIRE FIRE FIRE",
+                        "OW OW OW OW FIRE",
+                        "OWCH OWIE FIRE",
+                        "FIRE BURNS HELP",
+                        "I AM ON FIRE HELP",
+                        "HOT OW HOT",
+                        "AH SHIT OWCH",
+                        "OWCH OWCH OWCH OWCH FIRE",
+                        "SOMEONE GET ME SOME WATER"
+                        ]
+                        fstring += "**" + random.choice(fire_words) + "** "
+                fstring += " 🔥 "
+                await message.delete()
+                async with aiohttp.ClientSession() as session:
+                    url = await webhook_safe_check(message.channel)
+                    clone_hook = Webhook.from_url(url, adapter=AsyncWebhookAdapter(session))
+                    try:
+                        await clone_hook.send(content=fstring, username=message.author.display_name, avatar_url=message.author.avatar_url)
+                    except:
+                        await clone_hook.send(content="**I AM ON FIRE HELP MEEEEEEEEEEEEEEEE**", username=message.author.display_name, avatar_url=message.author.avatar_url)
+                    
 
 
 async def can_attack(user, target, ctx): # NOTE: Remember that you can't alter AP of those who have no profile in CC...

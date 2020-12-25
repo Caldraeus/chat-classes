@@ -8,10 +8,3 @@ That's all that needs to be installed if I recall correctly.
 
 Code is currently on a vultr VPS.
 
-
-# Ongoing Effects
-Here I have a list of the current "ongoing effects" that can be caused by a class's effect.
-
-| Effect        | Effect           | Caused By  |
-| ------------- |:----------------:| ----------:|
-| Shatter       | Jumbled messages | Psychic    |

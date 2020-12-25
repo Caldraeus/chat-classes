@@ -65,11 +65,52 @@ class terramancer(commands.Cog):
         ]
 
         self.hooks_lava = [
-            "usr2 fires a lance of molten rock straight through usr2's bdyart."
+            "usr1 fires a lance of molten rock straight through usr2's bdypart.",
+            "usr1 flings molten rock all over usr2's bdypart, melting straight through it.",
+            "usr1 trips usr2 into a pit of lava. Rude.",
+            "usr1 causes a lavaburst below usr2, incinerating them instantly!",
+            "usr1 creates a large ball of magma, then rolls it at usr2. usr2 laughs at the dumb attempt and easily jumps to the side to avoid it, but doesn't realize they just jumped into a pit of lava. Woops.",
+            "usr1 kicks usr2 into a spike of stone, then slowly pours lava over them.",
+            "usr1 fires a glob of lava onto usr2's bdypart, slowly burning it away.",
+            "urs1 offers usr2 a nice martini, then kicks them in the bdypart, and pushes them into a pit of lava. Ah, the classic bait and switch!",
+            "usr1 forges a large hammer of molten rock, then slams it into usr2's size, burning straight through them!",
+            "usr2 is minding their own business when usr2 shows up in front of them. usr1 punches usr2 in the bdypart, then summons a big wave of lava to burn them away. That was pretty rude."
         ]
 
         self.lava_mega_hooks = [
+            "usr1 grabs usr2 by the neck, and slowly melts them from the outside in.",
+            "usr1 shoves usr2 into the ground, before summoning lava to burn away their head.",
+            "usr1 covers their hand in magma, then shoves their hand into usr2's chest. Then, usr1 crushes usr2's heart.",
+            "usr1 throws usr2 into a stone wall, then kicks them in the bdypart before pouring lava over them.",
+            "usr1 forms a lance of molten rock, then charges usr2, impaling them. usr2 slowly slides down the lance, melting as they do."
+        ]
 
+        self.hooks_mineral = [
+            "usr1 fires an iron rod through usr2.",
+            "usr1 creates a rod of iron and slams usr2's head into it.",
+            "usr1 creates a golden sword, then slices off usr2's bdypart.",
+            "usr1 throws 5 shards of metal into usr2's bdypart, shredding it!",
+            "usr1 kicks usr2 down a pit, impaling them on a spike of iron.",
+            "usr1 covers their fist in gems and slams it into usr2's bdypart, crushing it instantly.",
+            "usr1 creates a crystal staff and jams it into usr2's bdypart. Owch!",
+            "usr1 kicks usr2 into a wall of iron spikes, then throws several golden spears into usr2's torso. Owch.",
+            "usr1 creates a shield of iron and slams into usr2, catching them off balance and causing them to fall over onto an iron spike, impaling their bdypart.",
+            "usr1 creates a spiked ball of iron around their fist, then slams it from overhead into usr2, knocking usr2's head straight off!",
+            "usr1 grabs usr2 and slams their knee into usr2's face, then creates an iron blade to pierce usr2's bdypart."
+        ]
+
+        self.hooks_mineral_mega = [
+            "usr1 summons a wall of golden spikes from the ground, then slams them onto usr2.",
+            "usr1 kicks usr2 into a wall of spikes that slowly grow around usr2 before pulling them into the earth, forever lost.",
+            "usr1 stabs usr2's bdypart with a crystal blade, then stabs them several more times to make sure they are dead.",
+            "usr1 throws usr2 into an earthen maw of crystal spikes. The maw chews usr2 up and spits them out, shredded to pieces. Gross!",
+            "usr1 throws a spear of amethyst through usr2's bdypart, impaling them on the spot."
+        ]
+
+        self.hooks_mineral_shatter = [
+            "usr1's gem spike shatters, throwing thousands of shards into usr2's face. Owch!",
+            "usr1's gem spike explodes, sending blades of crystal into us2's bdypart. Owch!",
+            "usr2 sees usr1 and tries to run, but trips and falls right next to usr1's crystal trap, which explodes, killing usr2!"
         ]
 
         self.shards = {}
@@ -104,7 +145,7 @@ class terramancer(commands.Cog):
                     if crit_check < 20:
                         await ctx.send(hook)
                     elif crit_check == 20:
-                        hook = "**✨[CRITICAL]✨** + 100 Coolness & + 1 Stone Shard | " + hook
+                        hook = "**✨[CRITICAL]✨** + 100 Coolness, + 1 Stone Shard | " + hook
                         self.shards[ctx.author.id] += 1
                         await h.add_coolness(ctx.author.id, 100)
                         await ctx.send(hook)
@@ -148,7 +189,7 @@ class terramancer(commands.Cog):
                         self.shards[ctx.author.id] = 0
                         await h.add_coolness(ctx.author.id, 1000)
                         await ctx.send(hook)
-        elif self.bot.users_classes[str(ctx.author.id)] == "igneous mage":
+            elif self.bot.users_classes[str(ctx.author.id)] == "igneous mage":
                 ap_works = await h.alter_ap(ctx.message, 1, self.bot)
                 if ap_works and await h.can_attack(ctx.author.id, target.id, ctx):
                     if ctx.author.id not in self.shards:
@@ -163,7 +204,7 @@ class terramancer(commands.Cog):
                     if shards[ctx.author.id] > 0 and shards[ctx.author.id] < 5:
                         hook += f"\n\n*usr1 has {shards[ctx.author.id]}/5 lava shards!*"
                     elif shards[ctx.author.id] >= 5:
-                        hook = random.choice(self.lava_mega_hooks)
+                        hook = random.choice(self.lava_mega_hooks) + "\n\nusr2 is set ablaze!"
                         crit_check = 100
 
                     hook = hook.replace("usr1", f"**{ctx.author.display_name}**")
@@ -173,15 +214,70 @@ class terramancer(commands.Cog):
                     if crit_check < 20:
                         await ctx.send(hook)
                     elif crit_check == 20:
-                        hook = "**✨[CRITICAL]✨** + 100 Coolness & + 1 Lava Shard | " + hook
+                        hook = "**✨[CRITICAL]✨** + 100 Coolness, + 1 Lava Shard | " + hook
                         self.shards[ctx.author.id] += 1
                         await h.add_coolness(ctx.author.id, 100)
                         await ctx.send(hook)
                     elif crit_check == 100:
                         hook = "**🪨[MEGA-CRIT!]🪨** + 1000 Coolness | " + hook
+                        await h.add_effect(target, self.bot, "burning", 10)
                         self.shards[ctx.author.id] = 0
                         await h.add_coolness(ctx.author.id, 1000)
                         await ctx.send(hook)
+            elif self.bot.users_classes[str(ctx.author.id)] == "mineral mage":
+                ap_works = await h.alter_ap(ctx.message, 1, self.bot)
+                if ap_works and await h.can_attack(ctx.author.id, target.id, ctx):
+                    if ctx.author.id not in self.shards:
+                        self.shards[ctx.author.id] = 0
+
+                    crit_check = random.randint(1,20)
+
+                    body_part = random.choice(h.body_parts)
+                    hook = random.choice(self.hooks_mineral)
+
+                    shards = self.shards
+
+                    if shards[ctx.author.id] > 0 and shards[ctx.author.id] < 5:
+                        hook += f"\n\n*usr1 has {shards[ctx.author.id]}/5 stone shards!*"
+                    elif shards[ctx.author.id] >= 5:
+                        hook = random.choice(self.hooks_mineral_mega) + "\n\nusr2 is impaled with a volatile gem spike! Watch out, everyone!"
+                        crit_check = 100
+
+                    hook = hook.replace("usr1", f"**{ctx.author.display_name}**")
+                    hook = hook.replace("bdypart", body_part)
+                    hook = hook.replace("usr2", f"**{target.display_name}**")
+                    
+                    if crit_check < 20:
+                        await ctx.send(hook)
+                    elif crit_check == 20:
+                        hook = "**✨[CRITICAL]✨** + 100 Coolness, + 1 Stone Shard | " + hook
+                        self.shards[ctx.author.id] += 1
+                        await h.add_coolness(ctx.author.id, 100)
+                        await ctx.send(hook)
+                    elif crit_check == 100:
+                        hook = "**<:crystals:791767682382692382>[MEGA-CRIT!]<:crystals:791767682382692382>** + 1000 Coolness | " + hook
+                        self.shards[ctx.author.id] = 0
+                        await h.add_coolness(ctx.author.id, 1000)
+                        await ctx.send(hook)
+                        def check(m: discord.Message):
+                            return m.author and m.channel == ctx.message.channel and m.author.id != ctx.author.id
+                            
+                        target = await self.bot.wait_for('message', check=check)
+                        target = target.author
+                        crit_check = random.randint(1,20)
+
+                        hook = random.choice(self.hooks_mineral_shatter)
+                        hook = hook.replace("usr1", f"**{ctx.author.display_name}**")
+                        hook = hook.replace("bdypart", body_part)
+                        hook = hook.replace("usr2", f"**{target.display_name}**")
+
+                        if crit_check < 20:
+                            await ctx.send(hook)
+                        elif crit_check == 20:
+                            hook = "**✨[CRITICAL]✨** + 100 Coolness, + 1 Stone Shard | " + hook
+                            self.shards[ctx.author.id] += 1
+                            await h.add_coolness(ctx.author.id, 100)
+                            await ctx.send(hook)
                         
 # A setup function the every cog has
 def setup(bot):
