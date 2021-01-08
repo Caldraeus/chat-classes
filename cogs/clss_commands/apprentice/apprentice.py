@@ -134,7 +134,7 @@ class apprentice(commands.Cog):
             "usr1 fires multiple blasts into usr2, demolishing them.",
             "usr1 grabs usr2 and slams them into the ground, then tears out usr2's soul.",
             "usr1 kicks usr2 into the wall, then forcefully seperates their soul from their body.",
-            "usr1 throws usr2 into the ground and blasts a hole through their usr2."
+            "usr1 throws usr2 into the ground and blasts a hole through their bdypart."
         ]
     pass
 
