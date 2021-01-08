@@ -123,6 +123,19 @@ class apprentice(commands.Cog):
         ]
 
         self.souls = {}
+
+        self.hooks_crusher = [
+            "usr1 fires a blast into usr2, ripping their soul apart.",
+            "usr1 grabs usr2 and drains their life essence.",
+            "usr1 grabs usr2's bdypart and tears it off, before crushing it and punching usr2.",
+            "usr1 slams their staff into usr2, then fires off multiple magic blasts. Ouch!",
+            "usr1 kicks usr2 back, then tears their soul out and pockets it.",
+            "usr1 grabs usr2 and tears out their soul, before curbstomping it. Damn, dude.",
+            "usr1 fires multiple blasts into usr2, demolishing them.",
+            "usr1 grabs usr2 and slams them into the ground, then tears out usr2's soul.",
+            "usr1 kicks usr2 into the wall, then forcefully seperates their soul from their body.",
+            "usr1 throws usr2 into the ground and blasts a hole through their usr2."
+        ]
     pass
 
     @commands.command()
@@ -265,7 +278,7 @@ class apprentice(commands.Cog):
                 if ap_works and await h.can_attack(ctx.author.id, target.id, ctx):
                     crit_check = random.randint(1,20)
                     body_part = random.choice(h.body_parts)
-                    hook = random.choice(self.hooks_toxin)
+                    hook = random.choice(self.hooks_crusher)
                     hook = hook.replace("usr1", f"**{ctx.author.display_name}**")
                     hook = hook.replace("bdypart", body_part)
                     hook = hook.replace("usr2", f"**{target.display_name}**")
