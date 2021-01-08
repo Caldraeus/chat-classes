@@ -96,8 +96,8 @@ async def on_ready():
                 
                 if int(guy[0]) in bot.server_boosters and int(guy[0]) != 217288785803608074:
                     bot.users_ap[guy[0]] = 40
-                elif int(guy[0]) in bot.server_boosters and int(guy[0]) == 217288785803608074:
-                    bot.users_ap[guy[0]] = 100
+                elif int(guy[0]) == 217288785803608074:
+                    bot.users_ap[guy[0]] = 5000
                 else:
                     bot.users_ap[guy[0]] = 20 
 

@@ -40,7 +40,8 @@ effect_list = {
     "shatter" : "Your mind has been shattered! Your messages are jumbled up!",
     "polymorph" : "You're a sheep! You can't speak human languages!",
     "drunk" : "You had a bit too much to drink...",
-    "burning" : "You are on fire. Good luck."
+    "burning" : "You are on fire. Good luck.",
+    "poisoned" : "Every time you make an attack, you lose an extra 2 AP!"
 }
 async def handle_effects(message, bot): # List of effects in the readme
     speaker = message.author.id
@@ -197,11 +198,27 @@ async def handle_effects(message, bot): # List of effects in the readme
                     
 
 
-async def can_attack(user, target, ctx): # NOTE: Remember that you can't alter AP of those who have no profile in CC...
+async def can_attack(user, target, ctx): # NOTE: Remember that you can't alter AP of those who have no profile in CC... | h.can_attack(ctx.author.id, target.id, ctx):
+    bot = ctx.bot
+    user_effects = bot.user_status[user]
+    for status in user_effects: 
+        if status[0].lower() == "poisoned":
+            ### HANDLE STACKS
+            remaining_stacks = status[1]-1
+            if remaining_stacks <= 0:
+                bot.user_status[user].remove(status)
+            else:
+                status[1] -= 1
+            ### APPLY EFFECT
+            uid = str(user)
+            balance = (bot.users_ap[uid] - 2)
+            if balance >= 0:
+                bot.users_ap[uid] = balance
+
     return True
 
 def max_xp(lvl):
-    return 15 * (lvl ^ 15) + 150 * lvl + 15
+    return 20 * (lvl ^ 35) + 250 * lvl + 25
 
 async def alter_items(uid, ctx, bot, item, change = 1, cost = 0):
     item = item.lower()

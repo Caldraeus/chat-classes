@@ -106,6 +106,23 @@ class apprentice(commands.Cog):
             "usr1 kicks usr2 off a bridge, then fires a beam of magic through them as they fall down!",
             "usr1 sets usr2 ablaze in a spectacular blue flame. usr2 runs around in circles before burning to death."
         ]
+
+        self.hooks_toxin = [ 
+            "usr1 fires globs of poison at usr2, dissolving their flesh!",
+            "usr1 pricks usr2 with a needle, poisoning them to death.",
+            "usr1 summons poisonous mushrooms in usr2's lungs, killing them slowly.",
+            "usr1 fires a wave of poison at usr2, dissolving their flesh and killing them, slowly.",
+            "usr1 slams into usr2, then turns their blood to poison, killing them painfully.",
+            "usr1 charges up a massize ball of energy, then fires out a smog of poison around usr2. usr2 coughs, trying to escape, but ultimately dies in the smog.",
+            "usr1 dodges usr2's attack, then puts their hand over usr2's mouth before summoning a ton of poison, killing them.",
+            "usr1 flings poison into usr2's eyes, causing them to bleed and dissolve, killing usr2. Brutal!",
+            "usr1 jabs usr2 in the neck with a vial of poison. usr2's neck dissolves, and they die.",
+            "usr1 fires four magical poison bolts into usr2's bdypart, poisoning it badly and causing the poison to spread out among the rest of usr2, killing them.",
+            "usr1 poisons usr2 badly, then watches usr2 flail about as they die. Painfully. Slowly.",
+            "usr1 forces poison into usr2's bdypart, then watches it slowly dissolve."
+        ]
+
+        self.souls = {}
     pass
 
     @commands.command()
@@ -227,6 +244,53 @@ class apprentice(commands.Cog):
 
                         await h.add_coolness(ctx.author.id, 100)
                         await ctx.send(hook)
+            elif self.bot.users_classes[str(ctx.author.id)] == "toxinmancer":
+                ap_works = await h.alter_ap(ctx.message, 1, self.bot)
+                if ap_works and await h.can_attack(ctx.author.id, target.id, ctx):
+                    crit_check = random.randint(1,20)
+                    body_part = random.choice(h.body_parts)
+                    hook = random.choice(self.hooks_toxin)
+                    hook = hook.replace("usr1", f"**{ctx.author.display_name}**")
+                    hook = hook.replace("bdypart", body_part)
+                    hook = hook.replace("usr2", f"**{target.display_name}**")
+                    if crit_check != 20:
+                        await ctx.send(hook)
+                    else:
+                        await h.add_effect(target, self.bot, "poisoned", amount = 3)
+                        hook = "**<:poisoned:791885218558640158>[CRITICAL]<:poisoned:791885218558640158>** + 100 Coolness | " + hook + " This leaves them poisoned!"
+                        await h.add_coolness(ctx.author.id, 100)
+                        await ctx.send(hook)
+            elif self.bot.users_classes[str(ctx.author.id)] == "soulcrusher":
+                ap_works = await h.alter_ap(ctx.message, 1, self.bot)
+                if ap_works and await h.can_attack(ctx.author.id, target.id, ctx):
+                    crit_check = random.randint(1,20)
+                    body_part = random.choice(h.body_parts)
+                    hook = random.choice(self.hooks_toxin)
+                    hook = hook.replace("usr1", f"**{ctx.author.display_name}**")
+                    hook = hook.replace("bdypart", body_part)
+                    hook = hook.replace("usr2", f"**{target.display_name}**")
+                    attacker = ctx.message.author.id
+
+                    if attacker not in self.souls:
+                        self.souls[attacker] = []
+                    
+                    if target.id not in self.souls[attacker] and crit_check == 20:
+                        self.souls[attacker].append(target.id) # Alter this to make it add them to it, else change crit_check to 100 and do a mega crit.
+                    elif target.id in self.souls[attacker]:
+                        self.souls[attacker].remove(target.id)
+                        crit_check = 100
+
+                    if crit_check < 20:
+                        await ctx.send(hook)
+                    elif crit_check == 20:
+                        hook = "**✨[SOUL STEAL!]✨** + 100 Coolness | " + hook
+                        await h.add_coolness(ctx.author.id, 100)
+                        await ctx.send(hook)
+                    else:
+                        hook = "**💀[SOUL CRUSH!]💀** + 1000 Coolness | " + hook
+                        await h.add_coolness(ctx.author.id, 1000)
+                        await ctx.send(hook)
+
                         
 # A setup function the every cog has
 def setup(bot):
