@@ -303,6 +303,8 @@ class apprentice(commands.Cog):
                         hook = "**💀[SOUL CRUSH!]💀** + 1000 Coolness | " + hook
                         await h.add_coolness(ctx.author.id, 1000)
                         await ctx.send(hook)
+            elif self.bot.users_classes[str(ctx.author.id)] == "pacted":
+                pass
 
                         
 # A setup function the every cog has

@@ -1,3 +1,4 @@
+import grequests
 import discord
 from discord.ext import commands
 from discord.ext.commands.cooldowns import BucketType
@@ -6,7 +7,7 @@ import asyncio
 import random
 from discord import Webhook, AsyncWebhookAdapter
 import aiohttp
-
+from PIL import Image
 
 base_classes = {
     1 : 'Apprentice',
@@ -36,6 +37,12 @@ async def add_effect(target, bot, effect_name, amount = 1):
         bot.user_status[speaker].append([effect_name.lower(), amount])
 
 
+async def reply_check(message):
+    if message.reference:
+        return True
+    else:
+        return False
+
 effect_list = {
     "shatter" : "Your mind has been shattered! Your messages are jumbled up!",
     "polymorph" : "You're a sheep! You can't speak human languages!",
@@ -43,6 +50,8 @@ effect_list = {
     "burning" : "You are on fire. Good luck.",
     "poisoned" : "Every time you make an attack, you lose an extra 2 AP!"
 }
+
+
 async def handle_effects(message, bot): # List of effects in the readme
     speaker = message.author.id
     if speaker in bot.user_status:
@@ -56,14 +65,15 @@ async def handle_effects(message, bot): # List of effects in the readme
                 else:
                     status[1] -= 1
                 ### APPLY EFFECT
-                while True:
-                    mad_content = " "
-                    content = message.content.split(" ")
-                    random.shuffle(content)
-                    mad_content = mad_content.join(content)
-                    if mad_content != message.content or all(x==content[0] for x in content) == True:
-                        break
-                
+                mad_content = " "
+                if message.content != "":
+                    while True:
+                        content = message.content.split(" ")
+                        random.shuffle(content)
+                        mad_content = mad_content.join(content)
+                        if mad_content != message.content or all(x==content[0] for x in content) == True:
+                            break
+
                 await message.delete()
                 async with aiohttp.ClientSession() as session:
                     url = await webhook_safe_check(message.channel)

@@ -68,15 +68,6 @@ class class_comands(commands.Cog):
         
         await ctx.send(embed=profile)
     
-    @commands.command()
-    @commands.guild_only()
-    async def test(self, ctx):
-        async with aiohttp.ClientSession() as session:
-            # testhook = await ctx.channel.create_webhook(name="Test")
-            url = await h.webhook_safe_check(ctx.channel)
-            hook = Webhook.from_url(url, adapter=AsyncWebhookAdapter(session))
-            await hook.send(content=ctx.message.content, username=ctx.message.author.display_name, avatar_url=ctx.message.author.avatar_url)
-    
     @commands.command(aliases=["prog"])
     @commands.guild_only()
     async def progression(self, ctx, *, clss = None):

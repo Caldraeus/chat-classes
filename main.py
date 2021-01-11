@@ -1,3 +1,7 @@
+########################################################
+from gevent import monkey as curious_george            # https://stackoverflow.com/questions/56309763/grequests-monkey-patch-warning
+curious_george.patch_all(thread=False, select=False)   #
+########################################################
 import discord
 from discord.ext import commands
 from discord.ext.commands.cooldowns import BucketType
@@ -67,7 +71,7 @@ if __name__ == '__main__': # Cog loader!
                     traceback.print_exc()
 
     load_dir_files('cogs' ,"├─")
-# Test
+
 @bot.event
 async def on_ready():
     home = bot.get_guild(732632186204979281)
@@ -187,7 +191,8 @@ async def on_message(message):
         print("\n\n\n----------------Daily reset has occurred----------------\n\n\n")
     else:
         pass
-        
+    
+    ctx = await bot.get_context(message)
     if not message.author.bot:
         if (str(message.channel.id) not in bot.banned_channels) or message.content.lower() == f"{h.prefix}classzone" or message.author.id == 67217288785803608074: # Put in-chat things here, as this is where it makes sure the channel is enabled.
             if message.guild.id in bot.servers or message.content.lower() == f"{h.prefix}enablecc":
@@ -196,7 +201,7 @@ async def on_message(message):
                 await message.channel.send("⚠️ | Hey! Seems like you're trying to run a command. Sadly, the bot hasn't been activated for this server yet, or I'm still loading! If I'm not enabled, have the server owner say `;enablecc`")
         # Here is how we handle on-message effects that can be caused by some classes.
             try:
-                if message.content[0] != ";":
+                if ctx.command == None:
                     await h.handle_effects(message, bot)
             except:
                 pass
@@ -216,6 +221,5 @@ async def invite_link(ctx):
     await ctx.send("https://discord.com/oauth2/authorize?client_id=713506775424565370&scope=bot&permissions=8")
 
 
-
 bot.run('NzEzNTA2Nzc1NDI0NTY1Mzcw.XshXTQ.5XwBZmS-Mf9vNnDSGyi0hWcmZG8') # Official Bot
-# bot.run('NzY3MTEyMzU4NjQ0MDIzMzI2.X4tLDg.Mer95w4E9L0HVHupQ7VYu0v3GCs') # Test Branch
+# bot.run('NzY3MTEyMzU4NjQ0MDIzMzI2.X4tLDg.Mer95w4E9L0HVHupQ7VYu0v3GCs') 
