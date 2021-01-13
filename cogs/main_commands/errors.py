@@ -34,8 +34,8 @@ class CommandErrorHandler(commands.Cog):
         elif isinstance(error, discord.ext.commands.errors.NotOwner):
             return await ctx.send("Hate to rain on your parade, pal, but that's a me-only command.")
         
-        # elif isinstance(error, KeyError):
-        #     return await ctx.send('🚫 | If you are getting this error, it is likely you have not ran `;start`. If you have ran start, then it was I who messed up. Sorry!')
+        elif isinstance(error, KeyError):
+            return await ctx.send('🚫 | If you are getting this error, it is likely you have not ran `;start`. If you have ran start, then it was I who messed up. Sorry!')
 
         elif isinstance(error, discord.ext.commands.errors.MissingPermissions):
             return await ctx.send("You do not have permission to run this command!")

@@ -71,13 +71,13 @@ class swordsman(commands.Cog):
             if self.bot.users_classes[str(ctx.author.id)] == "swordsman":
                 ap_works = await h.alter_ap(ctx.message, 1, self.bot)
                 if ap_works and await h.can_attack(ctx.author.id, target.id, ctx):
-                    crit_check = random.randint(1,20)
+                    crit_check = await h.crit_handler(self.bot, ctx.author.id, target.id)
                     body_part = random.choice(h.body_parts)
                     hook = random.choice(self.hooks)
                     hook = hook.replace("usr1", f"**{ctx.author.display_name}**")
                     hook = hook.replace("bdypart", body_part)
                     hook = hook.replace("usr2", f"**{target.display_name}**")
-                    if crit_check != 20:
+                    if crit_check == False:
                         await ctx.send(hook)
                     else:
                         hook = "**✨[CRITICAL]✨** + 100 Coolness | " + hook
@@ -86,13 +86,13 @@ class swordsman(commands.Cog):
             elif self.bot.users_classes[str(ctx.author.id)] == "warrior":
                 ap_works = await h.alter_ap(ctx.message, 1, self.bot)
                 if ap_works and await h.can_attack(ctx.author.id, target.id, ctx):
-                    crit_check = random.randint(1,20)
+                    crit_check = await h.crit_handler(self.bot, ctx.author.id, target.id)
                     body_part = random.choice(h.body_parts)
                     hook = random.choice(self.hooks_w)
                     hook = hook.replace("usr1", f"**{ctx.author.display_name}**")
                     hook = hook.replace("bdypart", body_part)
                     hook = hook.replace("usr2", f"**{target.display_name}**")
-                    if crit_check != 20:
+                    if crit_check == False:
                         await ctx.send(hook)
                     else:
                         hook = "**✨[CRITICAL]✨** + 100 Coolness | " + hook
@@ -101,13 +101,13 @@ class swordsman(commands.Cog):
             elif self.bot.users_classes[str(ctx.author.id)] == "samurai":
                 ap_works = await h.alter_ap(ctx.message, 1, self.bot)
                 if ap_works and await h.can_attack(ctx.author.id, target.id, ctx):
-                    crit_check = random.randint(1,20)
+                    crit_check = await h.crit_handler(self.bot, ctx.author.id, target.id)
                     body_part = random.choice(h.body_parts)
                     hook = random.choice(self.hooks_s)
                     hook = hook.replace("usr1", f"**{ctx.author.display_name}**")
                     hook = hook.replace("bdypart", body_part)
                     hook = hook.replace("usr2", f"**{target.display_name}**")
-                    if crit_check != 20:
+                    if crit_check == False:
                         await ctx.send(hook)
                     else:
                         hook = "**🌸[SENBONZAKURA!]🌸** + 250 Coolness | " + hook

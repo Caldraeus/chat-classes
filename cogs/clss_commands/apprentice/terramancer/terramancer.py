@@ -126,7 +126,7 @@ class terramancer(commands.Cog):
                     if ctx.author.id not in self.shards:
                         self.shards[ctx.author.id] = 0
 
-                    crit_check = random.randint(1,20)
+                    crit_check = 0
 
                     body_part = random.choice(h.body_parts)
                     hook = random.choice(self.hooks)
@@ -138,13 +138,16 @@ class terramancer(commands.Cog):
                         hook = random.choice(self.mega_hooks)
                         crit_check = 100
 
+                    if crit_check != 100:
+                        crit_check = await h.crit_handler(self.bot, ctx.author.id, target.id)
+
                     hook = hook.replace("usr1", f"**{ctx.author.display_name}**")
                     hook = hook.replace("bdypart", body_part)
                     hook = hook.replace("usr2", f"**{target.display_name}**")
 
-                    if crit_check < 20:
+                    if crit_check == False:
                         await ctx.send(hook)
-                    elif crit_check == 20:
+                    elif crit_check == True:
                         hook = "**✨[CRITICAL]✨** + 100 Coolness, + 1 Stone Shard | " + hook
                         self.shards[ctx.author.id] += 1
                         await h.add_coolness(ctx.author.id, 100)
@@ -160,7 +163,7 @@ class terramancer(commands.Cog):
                     if ctx.author.id not in self.shards:
                         self.shards[ctx.author.id] = 0
 
-                    crit_check = random.randint(1,20)
+                    crit_check = 0
 
                     body_part = random.choice(h.body_parts)
                     hook = random.choice(self.hooks_sand)
@@ -172,14 +175,17 @@ class terramancer(commands.Cog):
                         hook = random.choice(self.hooks_sand_mega)
                         crit_check = 100
 
+                    if crit_check != 100:
+                        crit_check = await h.crit_handler(self.bot, ctx.author.id, target.id)
+
                     hook = hook.replace("usr1", f"**{ctx.author.display_name}**")
                     hook = hook.replace("bdypart", body_part)
                     hook = hook.replace("usr2", f"**{target.display_name}**")
 
-                    if crit_check < 20:
+                    if crit_check == False:
                         self.shards[ctx.author.id] += random.randint(1,5)
                         await ctx.send(hook)
-                    elif crit_check == 20:
+                    elif crit_check == True:
                         hook = "**✨[CRITICAL]✨** + 100 Coolness, + 50 Sand | " + hook
                         self.shards[ctx.author.id] += 50
                         await h.add_coolness(ctx.author.id, 100)
@@ -195,7 +201,7 @@ class terramancer(commands.Cog):
                     if ctx.author.id not in self.shards:
                         self.shards[ctx.author.id] = 0
 
-                    crit_check = random.randint(1,20)
+                    crit_check = 0
 
                     body_part = random.choice(h.body_parts)
                     hook = random.choice(self.hooks_lava)
@@ -207,13 +213,16 @@ class terramancer(commands.Cog):
                         hook = random.choice(self.lava_mega_hooks) + "\n\nusr2 is set ablaze!"
                         crit_check = 100
 
+                    if crit_check != 100:
+                        crit_check = await h.crit_handler(self.bot, ctx.author.id, target.id)
+
                     hook = hook.replace("usr1", f"**{ctx.author.display_name}**")
                     hook = hook.replace("bdypart", body_part)
                     hook = hook.replace("usr2", f"**{target.display_name}**")
 
-                    if crit_check < 20:
+                    if crit_check == False:
                         await ctx.send(hook)
-                    elif crit_check == 20:
+                    elif crit_check == True:
                         hook = "**✨[CRITICAL]✨** + 100 Coolness, + 1 Lava Shard | " + hook
                         self.shards[ctx.author.id] += 1
                         await h.add_coolness(ctx.author.id, 100)
@@ -230,7 +239,7 @@ class terramancer(commands.Cog):
                     if ctx.author.id not in self.shards:
                         self.shards[ctx.author.id] = 0
 
-                    crit_check = random.randint(1,20)
+                    crit_check = 0
 
                     body_part = random.choice(h.body_parts)
                     hook = random.choice(self.hooks_mineral)
@@ -243,13 +252,16 @@ class terramancer(commands.Cog):
                         hook = random.choice(self.hooks_mineral_mega) + "\n\nusr2 is impaled with a volatile gem spike! Watch out, everyone!"
                         crit_check = 100
 
+                    if crit_check != 100:
+                        crit_check = await h.crit_handler(self.bot, ctx.author.id, target.id)
+
                     hook = hook.replace("usr1", f"**{ctx.author.display_name}**")
                     hook = hook.replace("bdypart", body_part)
                     hook = hook.replace("usr2", f"**{target.display_name}**")
                     
-                    if crit_check < 20:
+                    if crit_check == False:
                         await ctx.send(hook)
-                    elif crit_check == 20:
+                    elif crit_check == True:
                         hook = "**✨[CRITICAL]✨** + 100 Coolness, + 1 Stone Shard | " + hook
                         self.shards[ctx.author.id] += 1
                         await h.add_coolness(ctx.author.id, 100)
@@ -264,7 +276,7 @@ class terramancer(commands.Cog):
                             
                         target = await self.bot.wait_for('message', check=check)
                         target = target.author
-                        crit_check = random.randint(1,20)
+                        crit_check = random.randint(1,20) # This doesn't need to be changed.
 
                         hook = random.choice(self.hooks_mineral_shatter)
                         hook = hook.replace("usr1", f"**{ctx.author.display_name}**")

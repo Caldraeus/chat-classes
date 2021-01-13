@@ -83,6 +83,16 @@ async def can_attack(user, target, ctx): # NOTE: Remember that you can't alter A
 
     return True
 
+async def crit_handler(bot, attacker, defender):
+    # Values needed for later
+    crit_thresh = 1                    # The number needed to roll below to get a critical 
+    crit = random.randint(1,20)        # The rolled critical chance
+    # End Values
+    if crit <= crit_thresh:
+        return True
+    else:
+        return False
+
 def max_xp(lvl):
     return 20 * (lvl ^ 35) + 250 * lvl + 25
 

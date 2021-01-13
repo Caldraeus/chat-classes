@@ -60,7 +60,7 @@ class pyromancer(commands.Cog):
                     elif ctx.author.id in self.pyrolevels:
                         self.pyrolevels[ctx.author.id] += random.randint(1,17)
 
-                    crit_check = random.randint(1,20)
+                    crit_check = 0
                     body_part = random.choice(h.body_parts)
                     hook = random.choice(self.hooks)
 
@@ -77,14 +77,17 @@ class pyromancer(commands.Cog):
                         hook = random.choice(self.mega_hooks)
                         crit_check = 100
                         pyrolevels[ctx.author.id] = -10
+                    
+                    if crit_check != 100:
+                        crit_check = await h.crit_handler(self.bot, ctx.author.id, target.id)
                         
                     hook = hook.replace("usr1", f"**{ctx.author.display_name}**")
                     hook = hook.replace("bdypart", body_part)
                     hook = hook.replace("usr2", f"**{target.display_name}**")
 
-                    if crit_check < 20:
+                    if crit_check == False:
                         await ctx.send(hook)
-                    elif crit_check == 20:
+                    elif crit_check == True:
                         hook = "**✨[CRITICAL]✨** + 100 Coolness | " + hook
                         await h.add_coolness(ctx.author.id, 100)
                         await ctx.send(hook)
@@ -100,7 +103,7 @@ class pyromancer(commands.Cog):
                     elif ctx.author.id in self.pyrolevels:
                         self.pyrolevels[ctx.author.id] += random.randint(10,20)
 
-                    crit_check = random.randint(10,20)
+                    crit_check = 0
                     body_part = random.choice(h.body_parts)
                     hook = random.choice(self.hooks)
 
@@ -117,14 +120,17 @@ class pyromancer(commands.Cog):
                         hook = random.choice(self.mega_hooks)
                         crit_check = 100
                         pyrolevels[ctx.author.id] = -10
+
+                    if crit_check != 100:
+                        crit_check = await h.crit_handler(self.bot, ctx.author.id, target.id)
                         
                     hook = hook.replace("usr1", f"**{ctx.author.display_name}**")
                     hook = hook.replace("bdypart", body_part)
                     hook = hook.replace("usr2", f"**{target.display_name}**")
 
-                    if crit_check < 20:
+                    if crit_check == False:
                         await ctx.send(hook)
-                    elif crit_check == 20:
+                    elif crit_check == True:
                         hook = "**✨[CRITICAL]✨** + 100 Coolness | " + hook
                         await h.add_coolness(ctx.author.id, 100)
                         await ctx.send(hook)
@@ -140,7 +146,7 @@ class pyromancer(commands.Cog):
                     elif ctx.author.id in self.pyrolevels:
                         self.pyrolevels[ctx.author.id] += random.randint(10,20)
 
-                    crit_check = random.randint(1,17)
+                    crit_check = 0
                     body_part = random.choice(h.body_parts)
                     hook = random.choice(self.hooks)
 
@@ -157,14 +163,17 @@ class pyromancer(commands.Cog):
                         hook = random.choice(self.mega_hooks)
                         crit_check = 100
                         pyrolevels[ctx.author.id] = -10
+
+                    if crit_check != 100:
+                        crit_check = await h.crit_handler(self.bot, ctx.author.id, target.id)
                         
                     hook = hook.replace("usr1", f"**{ctx.author.display_name}**")
                     hook = hook.replace("bdypart", body_part)
                     hook = hook.replace("usr2", f"**{target.display_name}**")
 
-                    if crit_check < 20:
+                    if crit_check == False:
                         await ctx.send(hook)
-                    elif crit_check == 20:
+                    elif crit_check == True:
                         hook = "**✨[CRITICAL]✨** + 100 Coolness | " + hook
                         await h.add_coolness(ctx.author.id, 100)
                         await ctx.send(hook)
@@ -180,7 +189,7 @@ class pyromancer(commands.Cog):
                     elif ctx.author.id in self.pyrolevels:
                         self.pyrolevels[ctx.author.id] += random.randint(1,17)
 
-                    crit_check = random.randint(1,20)
+                    crit_check = 0
                     body_part = random.choice(h.body_parts)
                     hook = random.choice(self.hooks)
 
@@ -197,14 +206,17 @@ class pyromancer(commands.Cog):
                         hook = random.choice(self.mega_hooks)
                         crit_check = 100
                         pyrolevels[ctx.author.id] = -10
+
+                    if crit_check != 100:
+                        crit_check = await h.crit_handler(self.bot, ctx.author.id, target.id)
                         
                     hook = hook.replace("usr1", f"**{ctx.author.display_name}**")
                     hook = hook.replace("bdypart", body_part)
                     hook = hook.replace("usr2", f"**{target.display_name}**")
 
-                    if crit_check < 20:
+                    if crit_check == False:
                         await ctx.send(hook)
-                    elif crit_check == 20:
+                    elif crit_check == True:
                         hook = "**✨[CRITICAL]✨** + 100 Coolness | " + hook
                         await h.add_coolness(ctx.author.id, 100)
                         await ctx.send(hook)

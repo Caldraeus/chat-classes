@@ -42,7 +42,7 @@ class criminal(commands.Cog):
         if self.bot.users_classes[str(ctx.author.id)] == "criminal":
             ap_works = await h.alter_ap(ctx.message, 5, self.bot)
             if ap_works:
-                crit_check = random.randint(1,20)
+                crit_check = random.randint(1,20) # Doesn't need to change.
                 body_part = random.choice(h.body_parts)
 
                 goal = random.randint(1,3) # 1 = XP | 2 = GOLD | 3 = COOLNESS

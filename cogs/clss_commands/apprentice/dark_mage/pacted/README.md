@@ -9,4 +9,4 @@ This class uses the same command as another class (apprentice) and can be found 
 * Trokgroor - Demon of Greed - You gain 5x daily money
 * Zollok - Demon of Sloth - The longer your don't get a crit, the more your next crit gives
 * Malakar - Demon of Pride - Allows you to `;gloat`, which 
-* Minehart - Demon of Envy - When someone gets a critical on you, you gain 50% of the coolness from it.
+* Minehart - Demon of Envy - Whenever ANYONE gets a critical, Minehart stores up a small amount of coolness for you to use `;invoke minehart` to gain.

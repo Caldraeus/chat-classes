@@ -145,13 +145,13 @@ class apprentice(commands.Cog):
             if self.bot.users_classes[str(ctx.author.id)] == "apprentice":
                 ap_works = await h.alter_ap(ctx.message, 1, self.bot)
                 if ap_works and await h.can_attack(ctx.author.id, target.id, ctx):
-                    crit_check = random.randint(1,20)
+                    crit_check = await h.crit_handler(self.bot, ctx.author.id, target.id)
                     body_part = random.choice(h.body_parts)
                     hook = random.choice(self.hooks)
                     hook = hook.replace("usr1", f"**{ctx.author.display_name}**")
                     hook = hook.replace("bdypart", body_part)
                     hook = hook.replace("usr2", f"**{target.display_name}**")
-                    if crit_check != 20:
+                    if crit_check == False:
                         await ctx.send(hook)
                     else:
                         hook = "**✨[CRITICAL]✨** + 100 Coolness | " + hook
@@ -160,13 +160,13 @@ class apprentice(commands.Cog):
             elif self.bot.users_classes[str(ctx.author.id)] == "dark mage":
                 ap_works = await h.alter_ap(ctx.message, 1, self.bot)
                 if ap_works and await h.can_attack(ctx.author.id, target.id, ctx):
-                    crit_check = random.randint(1,20)
+                    crit_check = await h.crit_handler(self.bot, ctx.author.id, target.id)
                     body_part = random.choice(h.body_parts)
                     hook = random.choice(self.hooks_dm)
                     hook = hook.replace("usr1", f"**{ctx.author.display_name}**")
                     hook = hook.replace("bdypart", body_part)
                     hook = hook.replace("usr2", f"**{target.display_name}**")
-                    if crit_check != 20:
+                    if crit_check == False:
                         await ctx.send(hook)
                     else:
                         hook = "**✨[CRITICAL]✨** + 100 Coolness | " + hook
@@ -175,14 +175,14 @@ class apprentice(commands.Cog):
             elif self.bot.users_classes[str(ctx.author.id)] == "cryomancer":
                 ap_works = await h.alter_ap(ctx.message, 1, self.bot)
                 if ap_works and await h.can_attack(ctx.author.id, target.id, ctx):
-                    crit_check = random.randint(1,20)
+                    crit_check = await h.crit_handler(self.bot, ctx.author.id, target.id)
                     body_part = random.choice(h.body_parts)
                     hook = random.choice(self.hooks_cryo)
                     hook = hook.replace("usr1", f"**{ctx.author.display_name}**")
                     hook = hook.replace("bdypart", body_part)
                     hook = hook.replace("usr2", f"**{target.display_name}**")
                     if target.id not in self.impaled:
-                        if crit_check != 20:
+                        if crit_check == False:
                             await ctx.send(hook)
                         else:
                             self.impaled.append(target.id)
@@ -190,20 +190,25 @@ class apprentice(commands.Cog):
                             await h.add_coolness(ctx.author.id, 100)
                             await ctx.send(hook)
                     else:
+                        chance_to_stay = random.randint(1,3)
                         hook = "**✨[MINI-CRIT]✨** + 75 Coolness | " + hook
-                        self.impaled.remove(target.id)
+                        if chance_to_stay == 1:
+                            hook += "\n*The icicle stays lodged!*"
+                        else:
+                            self.impaled.remove(target.id)
+                        
                         await h.add_coolness(ctx.author.id, 75)
                         await ctx.send(hook)
             elif self.bot.users_classes[str(ctx.author.id)] == "fogwalker":
                 ap_works = await h.alter_ap(ctx.message, 1, self.bot)
                 if ap_works and await h.can_attack(ctx.author.id, target.id, ctx):
-                    crit_check = random.randint(1,20)
+                    crit_check = await h.crit_handler(self.bot, ctx.author.id, target.id)
                     body_part = random.choice(h.body_parts)
                     hook = random.choice(self.hooks_fog)
                     hook = hook.replace("usr1", f"**{ctx.author.display_name}**")
                     hook = hook.replace("bdypart", body_part)
                     hook = hook.replace("usr2", f"**{target.display_name}**")
-                    if crit_check != 20:
+                    if crit_check == False:
                         await ctx.send(hook)
                     else:
                         if ctx.author.id in self.bot.server_boosters: # Check their maximum AP
@@ -212,23 +217,23 @@ class apprentice(commands.Cog):
                             max_ap = 20
 
                         if str(ctx.author.id) in self.bot.users_ap:
-                            new_ap = self.bot.users_ap[str(ctx.author.id)] + 5
+                            new_ap = self.bot.users_ap[str(ctx.author.id)] + 10
                             if new_ap > max_ap:
                                 new_ap = max_ap
                             self.bot.users_ap[str(ctx.author.id)] = new_ap
-                        hook = "**🌫️[CRITICAL]🌫️** + 100 Coolness, + 5 AP | " + hook
+                        hook = "**🌫️[CRITICAL]🌫️** + 100 Coolness, + 10 AP | " + hook
                         await h.add_coolness(ctx.author.id, 100)
                         await ctx.send(hook)
             elif self.bot.users_classes[str(ctx.author.id)] == "psychic":
                 ap_works = await h.alter_ap(ctx.message, 1, self.bot)
                 if ap_works and await h.can_attack(ctx.author.id, target.id, ctx):
-                    crit_check = random.randint(1,20)
+                    crit_check = await h.crit_handler(self.bot, ctx.author.id, target.id)
                     body_part = random.choice(h.body_parts)
                     hook = random.choice(self.hooks_psychic)
                     hook = hook.replace("usr1", f"**{ctx.author.display_name}**")
                     hook = hook.replace("bdypart", body_part)
                     hook = hook.replace("usr2", f"**{target.display_name}**")
-                    if crit_check != 20:
+                    if crit_check == False:
                         await ctx.send(hook)
                     else:
                         hook = "**⛓️[MINDSHATTER]⛓️** + 100 Coolness | " + hook + " This is so mind-destroying that it applies 5 stacks of **shatter** to them!"
@@ -238,13 +243,13 @@ class apprentice(commands.Cog):
             elif self.bot.users_classes[str(ctx.author.id)] == "sorcerer":
                 ap_works = await h.alter_ap(ctx.message, 1, self.bot)
                 if ap_works and await h.can_attack(ctx.author.id, target.id, ctx):
-                    crit_check = random.randint(1,20)
+                    crit_check = await h.crit_handler(self.bot, ctx.author.id, target.id)
                     body_part = random.choice(h.body_parts)
                     hook = random.choice(self.hooks_sorc)
                     hook = hook.replace("usr1", f"**{ctx.author.display_name}**")
                     hook = hook.replace("bdypart", body_part)
                     hook = hook.replace("usr2", f"**{target.display_name}**")
-                    if crit_check != 20:
+                    if crit_check == False:
                         await ctx.send(hook)
                     else:
                         hook = "**✨[CRITICAL]✨** + 100 Coolness | " + hook + " This is so destructive, it drains 5 AP from them!"
@@ -260,13 +265,13 @@ class apprentice(commands.Cog):
             elif self.bot.users_classes[str(ctx.author.id)] == "toxinmancer":
                 ap_works = await h.alter_ap(ctx.message, 1, self.bot)
                 if ap_works and await h.can_attack(ctx.author.id, target.id, ctx):
-                    crit_check = random.randint(1,20)
+                    crit_check = await h.crit_handler(self.bot, ctx.author.id, target.id)
                     body_part = random.choice(h.body_parts)
                     hook = random.choice(self.hooks_toxin)
                     hook = hook.replace("usr1", f"**{ctx.author.display_name}**")
                     hook = hook.replace("bdypart", body_part)
                     hook = hook.replace("usr2", f"**{target.display_name}**")
-                    if crit_check != 20:
+                    if crit_check == False:
                         await ctx.send(hook)
                     else:
                         await h.add_effect(target, self.bot, "poisoned", amount = 3)
@@ -276,7 +281,7 @@ class apprentice(commands.Cog):
             elif self.bot.users_classes[str(ctx.author.id)] == "soulcrusher":
                 ap_works = await h.alter_ap(ctx.message, 1, self.bot)
                 if ap_works and await h.can_attack(ctx.author.id, target.id, ctx):
-                    crit_check = random.randint(1,20)
+                    crit_check = await h.crit_handler(self.bot, ctx.author.id, target.id)
                     body_part = random.choice(h.body_parts)
                     hook = random.choice(self.hooks_crusher)
                     hook = hook.replace("usr1", f"**{ctx.author.display_name}**")
@@ -287,15 +292,15 @@ class apprentice(commands.Cog):
                     if attacker not in self.souls:
                         self.souls[attacker] = []
                     
-                    if target.id not in self.souls[attacker] and crit_check == 20:
+                    if target.id not in self.souls[attacker] and crit_check == False:
                         self.souls[attacker].append(target.id) # Alter this to make it add them to it, else change crit_check to 100 and do a mega crit.
                     elif target.id in self.souls[attacker]:
                         self.souls[attacker].remove(target.id)
                         crit_check = 100
 
-                    if crit_check < 20:
+                    if crit_check == False:
                         await ctx.send(hook)
-                    elif crit_check == 20:
+                    elif crit_check == True:
                         hook = "**✨[SOUL STEAL!]✨** + 100 Coolness | " + hook
                         await h.add_coolness(ctx.author.id, 100)
                         await ctx.send(hook)
