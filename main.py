@@ -217,23 +217,13 @@ async def invite_link(ctx):
     await ctx.send("https://discord.com/oauth2/authorize?client_id=713506775424565370&scope=bot&permissions=8")
 
 ###### The following below is implemented here rather than in helper due to the nature of it's blocking commands that I need to use jishaku's stuff for 
-####
-effect_list = {
-    "shatter" : "Your mind has been shattered! Your messages are jumbled up!",
-    "polymorph" : "You're a sheep! You can't speak human languages!",
-    "drunk" : "You had a bit too much to drink...",
-    "burning" : "You are on fire. Good luck.",
-    "poisoned" : "Every time you make an attack, you lose an extra 2 AP!"
-}
 
-@executor_function
+@executor_function # makes sync int
 def shatter_image(url):
     with Image.open(requests.get(url, stream=True).raw) as im:
-        im = ImageOps.flip(im)
         im = ImageOps.mirror(im)
         buff = BytesIO()
         im.save(buff, 'png')
-    
     buff.seek(0)
     return buff
 
@@ -294,7 +284,6 @@ async def handle_effects(message, bot): # List of effects in the readme
                     "https://www.abc.net.au/cm/rimage/9673494-3x4-xlarge.jpg?v=3",
                     "https://ichef.bbci.co.uk/news/1024/cpsprodpb/081B/production/_98657020_c0042087-black_faced_sheep-spl.jpg"
                 ]
-
                 random.seed(len(message.content))
                 sheep_content = ""
                 for word in message.content.split(" "):
@@ -312,12 +301,11 @@ async def handle_effects(message, bot): # List of effects in the readme
                         sheep_content += f"b{random.randint(1,10)*'a'} "
 
                 random.seed(message.author.id)
-                sheep_name = random.choice(sheep_names).title() + " Sheep"
+                sheep_name = random.choice(h.sheep_names).title() + " Sheep"
                 chosen_url = random.choice(urls)
-
                 await message.delete()
                 async with aiohttp.ClientSession() as session:
-                    url = await webhook_safe_check(message.channel)
+                    url = await h.webhook_safe_check(message.channel)
                     clone_hook = Webhook.from_url(url, adapter=AsyncWebhookAdapter(session))
                     
                     try:
@@ -339,7 +327,7 @@ async def handle_effects(message, bot): # List of effects in the readme
                     if chosen_effect == 1:
                         await message.delete()
                         async with aiohttp.ClientSession() as session:
-                            url = await webhook_safe_check(message.channel)
+                            url = await h.webhook_safe_check(message.channel)
                             clone_hook = Webhook.from_url(url, adapter=AsyncWebhookAdapter(session))
                             await clone_hook.send(content=message.content + " -hic-", username=message.author.display_name, avatar_url=message.author.avatar_url)
                     elif chosen_effect == 2:
@@ -351,7 +339,7 @@ async def handle_effects(message, bot): # List of effects in the readme
                     elif chosen_effect == 4:
                         await message.delete()
                         async with aiohttp.ClientSession() as session:
-                            url = await webhook_safe_check(message.channel)
+                            url = await h.webhook_safe_check(message.channel)
                             clone_hook = Webhook.from_url(url, adapter=AsyncWebhookAdapter(session))
                             await clone_hook.send(content="-hic- " + message.content + " -hic-", username=message.author.display_name, avatar_url=message.author.avatar_url)
             elif status[0].lower() == "burning":
@@ -393,7 +381,7 @@ async def handle_effects(message, bot): # List of effects in the readme
                 fstring += " 🔥 "
                 await message.delete()
                 async with aiohttp.ClientSession() as session:
-                    url = await webhook_safe_check(message.channel)
+                    url = await h.webhook_safe_check(message.channel)
                     clone_hook = Webhook.from_url(url, adapter=AsyncWebhookAdapter(session))
                     try:
                         await clone_hook.send(content=fstring, username=message.author.display_name, avatar_url=message.author.avatar_url)

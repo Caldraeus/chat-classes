@@ -1,4 +1,5 @@
 import grequests
+import math
 import discord
 from discord.ext import commands
 from discord.ext.commands.cooldowns import BucketType
@@ -9,6 +10,13 @@ from discord import Webhook, AsyncWebhookAdapter
 import aiohttp
 from PIL import Image
 
+effect_list = {
+    "shatter" : "Your mind has been shattered! Your messages are jumbled up!",
+    "polymorph" : "You're a sheep! You can't speak human languages!",
+    "drunk" : "You had a bit too much to drink...",
+    "burning" : "You are on fire. Good luck.",
+    "poisoned" : "Every time you make an attack, you lose an extra 2 AP!"
+}
 
 base_classes = {
     1 : 'Apprentice',
@@ -23,6 +31,16 @@ with open('adjectives.txt') as f:
     sheep_names = [line.rstrip() for line in f]
 
 body_parts = ['bones', 'hair', 'fingernail', 'thumb', 'middle finger', 'big toe', 'knees', 'kneecap', 'bum', 'cheek', 'bumcheek', 'leg hair', 'skeleton', 'ligaments', 'muscles', 'tendons', 'teeth', 'mouth', 'tongue', 'larynx', 'esophagus', 'stomach', 'small intestine', 'large intestine', 'liver', 'gallbladder', 'mesentery', 'pancreas', 'anus', 'nasal cavity', 'pharynx', 'larynx', 'trachea', 'lungs', 'diaphragm', 'groin', 'kidneys', 'heart', 'spleen', 'thymus', 'brain', 'cerebellum', 'spine', 'eye', 'ear', 'arm', 'leg', 'chest', 'neck', 'toe', 'finger']
+
+magnitudeDict={0:'', 1:'Thousand', 2:'Million', 3:'Billion', 4:'Trillion', 5:'Quadrillion', 6:'Quintillion', 7:'Sextillion', 8:'Septillion', 9:'Octillion', 10:'Nonillion', 11:'Decillion'}
+
+def simplify(num):
+    num=math.floor(num)
+    magnitude=0
+    while num>=1000.0:
+        magnitude+=1
+        num=num/1000.0
+    return(f'{math.floor(num*100.0)/100.0} {magnitudeDict[magnitude]}')
 
 async def add_effect(target, bot, effect_name, amount = 1):
     speaker = target.id
@@ -46,6 +64,8 @@ async def reply_check(message):
 
 async def can_attack(user, target, ctx): # NOTE: Remember that you can't alter AP of those who have no profile in CC... | h.can_attack(ctx.author.id, target.id, ctx):
     bot = ctx.bot
+    if user not in bot.user_status:
+        bot.user_status[user] = []
     user_effects = bot.user_status[user]
     for status in user_effects: 
         if status[0].lower() == "poisoned":

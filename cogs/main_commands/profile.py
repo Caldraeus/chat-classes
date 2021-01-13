@@ -8,6 +8,8 @@ import os
 import aiohttp
 import time
 import aiosqlite
+from jishaku.functools import executor_function
+from io import BytesIO
 
 class profile(commands.Cog):
     def __init__(self, bot):
