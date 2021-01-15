@@ -7,6 +7,9 @@ import math
 import os
 import aiohttp
 import aiosqlite
+import matplotlib.pyplot as plt
+from jishaku.functools import executor_function
+from io import BytesIO
 
 class economy(commands.Cog):
     def __init__(self, bot):
@@ -15,7 +18,10 @@ class economy(commands.Cog):
             "coffee" : 50,
             "hot dog" : 75,
             "monster" : 125,
-            "adrenaline" : 225
+            "adrenaline" : 225,
+            "void" : 250,
+            "milk" : 1000,
+            "jamba juice" : 5000
         }
 
         self.hidden_items = {
@@ -33,6 +39,9 @@ class economy(commands.Cog):
             embed.add_field(name=f"Hot Dog | {self.items.get('hot dog')} G", value=f"A delicious hot dog. Restores 4 ap, and gives some coolness.", inline=False)
             embed.add_field(name=f"Monster | {self.items.get('monster')} G", value=f'A monster energy. Great if you ignore the kidney stones! Restores 6 AP.', inline=False)
             embed.add_field(name=f"Adrenaline | {self.items.get('adrenaline')} G", value="A pure vial of adrenaline. Very strong. Restores 10 AP.")
+            embed.add_field(name=f"Void | {self.items.get('void')} G", value="Holy shit, where did I get this stuff? Restores 20 AP, but applies 20 stacks of shatter!", inline=False)
+            embed.add_field(name=f"Milk | {self.items.get('milk')} G", value="A powerful liquid... milk. Removes up to 100 stacks of your most recent status effect when consumed!", inline=False)
+            embed.add_field(name=f"Jamba Juice | {self.items.get('jamba juice')} G", value="The *most* powerful and holy liquid... jamba juice! Removes all status effects, good or bad, when consumed!", inline=False)
             await ctx.send(embed=embed)
 
     @commands.command()
@@ -91,12 +100,55 @@ class economy(commands.Cog):
                             new_ap = max_ap
                         self.bot.users_ap[str(ctx.author.id)] = new_ap
                     elif item == "hot dog":
-                        await ctx.send("🌭 | You eat your delicious hot dog. Ah, just like being at the faire! (+4 AP | +10 Coolness)")
-                        new_ap = self.bot.users_ap[str(ctx.author.id)] + 4
+                        if self.bot.users_classes[str(ctx.author.id)] == "pacted" and await h.get_demon(ctx.author.id, self.bot) == "foop": # Buffed dot hogs
+                            async with aiosqlite.connect('main.db') as conn:
+                                async with conn.execute(f"select * from users where id = '{ctx.author.id}';") as info:
+                                    user = await info.fetchone()
+                            level = user[8] - 19
+                            await ctx.send(f"🌭 | You and Foop split a delicious hot dog. Ah, just like being at the faire with your best friend! (+{4+(level)} AP | +{10+(5*level)} Coolness)")
+                            new_ap = self.bot.users_ap[str(ctx.author.id)] + 4+(level)
+                            if new_ap > max_ap:
+                                new_ap = max_ap
+                            self.bot.users_ap[str(ctx.author.id)] = new_ap
+                            await h.add_coolness(ctx.author.id, 10+(5*level))
+                        else:
+                            await ctx.send("🌭 | You eat your delicious hot dog. Ah, just like being at the faire! (+4 AP | +10 Coolness)")
+                            new_ap = self.bot.users_ap[str(ctx.author.id)] + 4
+                            if new_ap > max_ap:
+                                new_ap = max_ap
+                            self.bot.users_ap[str(ctx.author.id)] = new_ap
+                            await h.add_coolness(ctx.author.id, 10)
+                    elif item == "void":
+                        await ctx.send("👁️ | You 👍︎⚐︎☠︎💧︎🕆︎💣︎☜︎ your delectable ✞︎□︎✋︎👎︎. Golly, that sure was 👎︎☜︎☹︎♓︎👍︎✋︎⚐︎⬧︎! (+20 AP | +20 Shatter)")
+                        new_ap = self.bot.users_ap[str(ctx.author.id)] + 20
                         if new_ap > max_ap:
                             new_ap = max_ap
                         self.bot.users_ap[str(ctx.author.id)] = new_ap
-                        await h.add_coolness(ctx.author.id, 10)
+                        await h.add_effect(ctx.author, self.bot, "shatter", 20)
+                    elif item == "milk":
+                        speaker = ctx.author.id
+                        if speaker not in self.bot.user_status:
+                            self.bot.user_status[speaker] = []
+                            await ctx.send(f"🥛 | You drink a cold glass of milk. You don't feel any different.")
+                        else:
+                            try:
+                                effect_cleansing = self.bot.user_status[speaker][0][0]
+                                self.bot.user_status[speaker][0][1] = self.bot.user_status[speaker][0][1] - 100
+                                if self.bot.user_status[speaker][0][1] <= 0:
+                                    removed = self.bot.user_status[speaker][0][1] + 100
+                                    self.bot.user_status[speaker].remove(self.bot.user_status[speaker][0])
+                                else:
+                                    removed_amount = 100
+                                await ctx.send(f"🥛 | You drink a cold glass of milk. You feel a lot better! (-{removed} {effect_cleansing.title()})") 
+                            except IndexError:
+                                await ctx.send(f"🥛 | You drink a cold glass of milk. You don't feel any different.")
+                    elif item == "jamba juice":
+                        await ctx.send("<:jambajuice:798725534472339516> | You drink a delicous jamba juice! You feel a helluva lot better! (Status effects cleansed)")
+                        speaker = ctx.author.id
+                        if speaker not in self.bot.user_status:
+                            self.bot.user_status[speaker] = []
+                        else:
+                            self.bot.user_status[speaker] = []
 
                                 
                     ####
@@ -129,32 +181,94 @@ class economy(commands.Cog):
                
     @commands.command()
     @commands.guild_only()
-    async def buy(self, ctx, *, item: str = None):
-        if item:
-            if item in self.items:
-                await h.alter_items(ctx.author.id, ctx, self.bot, item.lower(), 1, self.items[item.lower()])
+    async def buy(self, ctx, amount, *, item: str = None):
+        try:
+            amount = int(amount)
+            if amount >= 1:
+                item = item.lower()
+                if item:
+                    if item in self.items:  
+                        await h.alter_items(ctx.author.id, ctx, self.bot, item.lower(), amount, self.items[item.lower()]*amount)
+                    else:
+                        await ctx.send("That item doesn't exist. Did you make a typo?")
+                    
+                else:
+                    await ctx.send("You forgot to specify what you'd like to buy!")
             else:
-                await ctx.send("That item doesn't exist. Did you make a typo?")
-            
-        else:
-            await ctx.send("You forgot to specify what you'd like to buy!")
+                await ctx.send("That's an invalid amount of items!")
+        except:
+            await ctx.send("You need to specify how many you'd like to buy! (Ex. `;buy 1 hot dog`).")
     
     @commands.command()
     @commands.guild_only()
-    async def daily(self, ctx):
-        if ctx.author.id in self.bot.claimed:
-            await ctx.send("❌ | You've already claimed your daily gift this rollover! Use `;rollover` to check when you can claim again.")
-        else:
-            if ctx.author.id in self.bot.server_boosters:
-                await ctx.send("✅ | You gained 200 gold!")
+    async def daily(self, ctx): 
+        try:
+            # if self.bot.users_classes[str(ctx.author.id)] == "pacted" and await h.get_demon(ctx.author.id, self.bot) == "foop":
+            if ctx.author.id in self.bot.claimed: # or ctx.author.id == 340222819680124929 or ctx.author.id == 740308712450818079:
+                await ctx.send("❌ | You've already claimed your daily gift this rollover! Use `;rollover` to check when you can claim again.")
             else:
-                await ctx.send("✅ | You gained 100 gold!")
-            
-            await h.add_gold(ctx.author.id, 100, self.bot)
-            self.bot.claimed.append(ctx.author.id)
+                if self.bot.users_classes[str(ctx.author.id)] == "pacted":
+                    if await h.get_demon(ctx.author.id, self.bot) == "trokgroor":
+                        async with aiosqlite.connect('main.db') as conn:
+                            async with conn.execute(f"select * from users where id = '{ctx.author.id}';") as info:
+                                user = await info.fetchone()
+                        level = user[8] - 19
+                        await h.add_gold(ctx.author.id, 100+(level*50), self.bot)
+                        if ctx.author.id in self.bot.server_boosters:
+                            await ctx.send(f"✅ | You and Trokgroor print {2*(100+(level*50))} gold!")
+                        else:
+                            await ctx.send(f"✅ | You and Trokgroor print {100+(level*50)} gold!")
+                else:
+                    await h.add_gold(ctx.author.id, 100, self.bot)
+                    if ctx.author.id in self.bot.server_boosters:
+                        await ctx.send("✅ | You gained 200 gold!")
+                    else:
+                        await ctx.send("✅ | You gained 100 gold!")
+                self.bot.claimed.append(ctx.author.id)
+        except TypeError:
+            await ctx.send("❌ | You need to run `;start` first!")
         
+    @commands.command()
+    @commands.guild_only()
+    async def economy(self, ctx, exact: str = "Basic"):
+        async with aiosqlite.connect('main.db') as conn:
+                async with conn.execute(f"SELECT SUM(gold), AVG(gold), MAX(gold) as sum_gold FROM users;") as t_g:
+                    gold_stats = await t_g.fetchone()
+        if exact == "exact":
+            total_gold = gold_stats[0]
+            avg_gold = gold_stats[1]
+            max_gold = gold_stats[2]
+        else:
+            exact = "Basic"
+            total_gold = h.simplify(gold_stats[0])
+            avg_gold = h.simplify(gold_stats[1])
+            max_gold = h.simplify(gold_stats[2])
 
+        async with aiosqlite.connect('main.db') as conn:
+                async with conn.execute(f"SELECT level, AVG(gold) FROM users GROUP BY level;") as data:
+                    u_data = await data.fetchall()
         
+        x_values = [i[0] for i in u_data]
+        y_values = [i[1] for i in u_data]
+
+        buff = await get_graph(x_values, y_values)
+
+        f_content = f"**Economy Information** - {exact.title()}\n\n__Total Gold In Circulation:__ {total_gold}\n__Average Gold Per User:__ {avg_gold}\n__Most Gold Owned By User:__ {max_gold}"
+        await ctx.send(content=f_content, file=buff)
+        
+@executor_function # makes sync int
+def get_graph(x_values, y_values):
+    plt.cla()
+    plt.plot(x_values, y_values)
+    plt.xlabel('User Levels') 
+    plt.ylabel('Average Gold') 
+    plt.title('Average Gold Per Level') 
+    buff = BytesIO()
+    plt.savefig(buff, format='png')
+    buff.seek(0)
+    buff = discord.File(fp=buff, filename='graph.png')
+    plt.close()
+    return(buff)
 
 # A setup function the every cog has
 def setup(bot):

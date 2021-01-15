@@ -38,16 +38,61 @@ class hydromancer(commands.Cog):
     @commands.guild_only()
     async def douse(self, ctx, target: discord.Member = None): # Shoots an arrow at someone.
         if target and target != ctx.author and target.id != 713506775424565370:
-            if self.bot.users_classes[str(ctx.author.id)] == "hydromancer" and await h.can_attack(ctx.author.id, target.id):
+            if self.bot.users_classes[str(ctx.author.id)] == "hydromancer" or self.bot.users_classes[str(ctx.author.id)] == "multi-mage":
                 ap_works = await h.alter_ap(ctx.message, 1, self.bot)
-                if ap_works:
+                if ap_works and await h.can_attack(ctx.author.id, target.id, ctx): 
                     if ctx.author.id not in self.waterlevels:
                         self.waterlevels[ctx.author.id] = 0
                     elif ctx.author.id in self.waterlevels:
                         self.waterlevels[ctx.author.id] += random.randint(0,20)
 
                     hook = random.choice(self.hooks)
-                    crit_check = random.randint(1,20)
+                    crit_check = 0
+
+                    waterlevels = self.waterlevels
+                    if waterlevels[ctx.author.id] <= 25:
+                        hook += f"\n\n*usr1's water level sits lowly at {waterlevels[ctx.author.id]}%.*"
+                    elif waterlevels[ctx.author.id] <= 50:
+                        hook += f"\n\n*usr1's water level sits comfortably at {waterlevels[ctx.author.id]}%.*"
+                    elif waterlevels[ctx.author.id] <= 75:
+                        hook += f"\n\n*usr1's water level sits highly at {waterlevels[ctx.author.id]}%.*"
+                    elif waterlevels[ctx.author.id] <= 99:
+                        hook += f"\n\n*usr1's water level is close to overflowing at {waterlevels[ctx.author.id]}%!*"
+                    elif waterlevels[ctx.author.id] >= 100:
+                        crit_check = 100
+                        waterlevels[ctx.author.id] = 0
+
+                    if crit_check != 100:
+                        crit_check = await h.crit_handler(self.bot, ctx.author.id, target.id)
+
+                    body_part = random.choice(h.body_parts)
+                    hook = hook.replace("usr1", f"**{ctx.author.display_name}**")
+                    hook = hook.replace("bdypart", body_part)
+                    hook = hook.replace("usr2", f"**{target.display_name}**")
+                    
+                    if crit_check == False:
+                        await ctx.send(hook)
+                    elif crit_check == True:
+                        hook = "**✨[CRITICAL]✨** + 100 Coolness | " + hook
+                        await h.add_coolness(ctx.author.id, 100)
+                        await ctx.send(hook)
+                    elif crit_check == 100:
+                        hook = "**💧[OVERFLOW]💧** + 5 AP | " + hook
+
+                        new_ap = self.bot.users_ap[str(ctx.author.id)] + 6
+                        self.bot.users_ap[str(ctx.author.id)] = new_ap
+
+                        await ctx.send(hook)
+            elif self.bot.users_classes[str(ctx.author.id)] == "tidal mage" and await h.can_attack(ctx.author.id, target.id, ctx):
+                ap_works = await h.alter_ap(ctx.message, 1, self.bot)
+                if ap_works and await h.can_attack(ctx.author.id, target.id, ctx):
+                    if ctx.author.id not in self.waterlevels:
+                        self.waterlevels[ctx.author.id] = 0
+                    elif ctx.author.id in self.waterlevels:
+                        self.waterlevels[ctx.author.id] += random.randint(15,40)
+
+                    hook = random.choice(self.hooks)
+                    crit_check = 0
 
                     waterlevels = self.waterlevels
                     if waterlevels[ctx.author.id] <= 25:
@@ -66,10 +111,13 @@ class hydromancer(commands.Cog):
                     hook = hook.replace("usr1", f"**{ctx.author.display_name}**")
                     hook = hook.replace("bdypart", body_part)
                     hook = hook.replace("usr2", f"**{target.display_name}**")
+
+                    if crit_check != 100:
+                        crit_check = await h.crit_handler(self.bot, ctx.author.id, target.id)
                     
-                    if crit_check < 20:
+                    if crit_check == False:
                         await ctx.send(hook)
-                    elif crit_check == 20:
+                    elif crit_check == True:
                         hook = "**✨[CRITICAL]✨** + 100 Coolness | " + hook
                         await h.add_coolness(ctx.author.id, 100)
                         await ctx.send(hook)

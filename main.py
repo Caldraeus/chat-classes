@@ -1,3 +1,7 @@
+########################################################
+from gevent import monkey as curious_george            # https://stackoverflow.com/questions/56309763/grequests-monkey-patch-warning
+curious_george.patch_all(thread=False, select=False)   #
+########################################################
 import discord
 from discord.ext import commands
 from discord.ext.commands.cooldowns import BucketType
@@ -14,6 +18,10 @@ import random
 import os
 from datetime import datetime  
 from datetime import timedelta  
+from PIL import Image, ImageOps
+import requests
+from jishaku.functools import executor_function
+from io import BytesIO
 
 intents = discord.Intents.all()
 bot = discord.Client()
@@ -27,13 +35,14 @@ bot.notified = []
 bot.servers = []
 bot.users_ap = {}
 bot.users_classes = {}
+bot.user_status = {}
 bot.version = '0.2.1'
 bot.server_boosters = []
 bot.reset_time = 0
 bot.claimed = []
 bot.tomorrow = bot.tomorrow = datetime.now().replace(hour=0, minute=0, second=0, microsecond=0) + timedelta(days=1)
 
-
+# custom achievement, and when data wipes, 10k starting gold
 
 if __name__ == '__main__': # Cog loader!
     def load_dir_files(path, dash):
@@ -66,6 +75,7 @@ if __name__ == '__main__': # Cog loader!
                     traceback.print_exc()
 
     load_dir_files('cogs' ,"├─")
+    bot.load_extension('jishaku') # For sync to async
 
 @bot.event
 async def on_ready():
@@ -95,23 +105,15 @@ async def on_ready():
                 
                 if int(guy[0]) in bot.server_boosters and int(guy[0]) != 217288785803608074:
                     bot.users_ap[guy[0]] = 40
-                elif int(guy[0]) in bot.server_boosters and int(guy[0]) == 217288785803608074:
-                    bot.users_ap[guy[0]] = 100
+                elif int(guy[0]) == 217288785803608074:
+                    bot.users_ap[guy[0]] = 5000
                 else:
                     bot.users_ap[guy[0]] = 20 
 
                 bot.users_classes[guy[0]] = guy[1]
+                bot.user_status[int(guy[0])] = []
 
-    print(f'\n\nLogged in.')
-    update = None
-    print("Thanks.")
-
-
-    if update:
-        channel = bot.get_channel(734108098129821757)
-        embed = discord.Embed(title=f"⭐ New Update! ⭐", colour=discord.Colour.from_rgb(21,244,238), description=update)
-        mss = await channel.send(content="╱╲╱╲╱╲╱╲╱╲╱╲╱╲╱╲╱╲", embed=embed)
-        await mss.publish()
+    print(f'\n\nLogged in.\nThanks.')
 
 @bot.event
 async def on_guild_channel_delete(channel):
@@ -166,14 +168,17 @@ async def on_message(message):
             async with conn.execute(f"select id, class, achievements, ap from users;") as people:
                 usrs = await people.fetchall()
                 for guy in usrs:
-                    if int(guy[0]) in bot.server_boosters and int(guy[0]) != 217288785803608074:
-                        bot.users_ap[guy[0]] = 40
-                    elif int(guy[0]) in bot.server_boosters and int(guy[0]) == 217288785803608074:
-                        bot.users_ap[guy[0]] = 100
-                    else:
-                        bot.users_ap[guy[0]] = 20
+                    try:
+                        if int(guy[0]) in bot.server_boosters and int(guy[0]) != 217288785803608074:
+                            bot.users_ap[guy[0]] = 40
+                        elif int(guy[0]) == 217288785803608074:
+                            bot.users_ap[guy[0]] = 100
+                        else:
+                            bot.users_ap[guy[0]] = 20
 
-                    bot.users_classes[guy[0]] = guy[1]
+                        bot.users_classes[guy[0]] = guy[1]
+                    except:
+                        pass
         
         # We reset the daily gift counter.
         bot.claimed = []
@@ -182,13 +187,21 @@ async def on_message(message):
         print("\n\n\n----------------Daily reset has occurred----------------\n\n\n")
     else:
         pass
-        
+    
+    ctx = await bot.get_context(message)
     if not message.author.bot:
         if (str(message.channel.id) not in bot.banned_channels) or message.content.lower() == f"{h.prefix}classzone" or message.author.id == 67217288785803608074: # Put in-chat things here, as this is where it makes sure the channel is enabled.
             if message.guild.id in bot.servers or message.content.lower() == f"{h.prefix}enablecc":
                 await bot.process_commands(message) # Run commands.
             elif message.content[0] == ";":
                 await message.channel.send("⚠️ | Hey! Seems like you're trying to run a command. Sadly, the bot hasn't been activated for this server yet, or I'm still loading! If I'm not enabled, have the server owner say `;enablecc`")
+        # Here is how we handle on-message effects that can be caused by some classes.
+            try:
+                if ctx.command == None:
+                    await handle_effects(message, bot)
+            except:
+                pass
+
         if str(message.author.id) in bot.registered_users:
             await h.fetch_random_quest(message, bot)
             await asyncio.sleep(.1)
@@ -203,7 +216,181 @@ async def on_message(message):
 async def invite_link(ctx):
     await ctx.send("https://discord.com/oauth2/authorize?client_id=713506775424565370&scope=bot&permissions=8")
 
+###### The following below is implemented here rather than in helper due to the nature of it's blocking commands that I need to use jishaku's stuff for 
 
+@executor_function # makes sync int
+def shatter_image(url):
+    with Image.open(requests.get(url, stream=True).raw) as im:
+        im = ImageOps.mirror(im)
+        buff = BytesIO()
+        im.save(buff, 'png')
+    buff.seek(0)
+    return buff
+
+
+async def handle_effects(message, bot): # List of effects in the readme
+    speaker = message.author.id
+    if speaker in bot.user_status:
+        user_effects = bot.user_status[speaker]
+        for status in user_effects: # We go through each status affecting the user [NOT ALL APPLY TO ON-MESSAGE EVENTS. THEREFORE, WE NEED IF STATEMENTS]. These are applied in order
+            if status[0].lower() == "shatter":
+                ### HANDLE STACKS
+                remaining_stacks = status[1]-1
+                if remaining_stacks <= 0:
+                    bot.user_status[speaker].remove(status)
+                else:
+                    status[1] -= 1
+                ### APPLY EFFECT
+                mad_content = " "
+                if message.content != "":
+                    while True:
+                        mad_content = " "
+                        content = message.content.split(" ")
+                        random.shuffle(content)
+                        mad_content = mad_content.join(content)
+                        if mad_content != message.content or all(x==content[0] for x in content) == True:
+                            break
+                if message.attachments != []:
+                    if len(message.attachments) == 1:
+                        buff = await shatter_image(url=message.attachments[0].url)
+                        buff = discord.File(fp=buff, filename='fucked_image.png')
+                    else:
+                        buff = None
+                else:
+                    buff = None
+
+                await message.delete()
+                async with aiohttp.ClientSession() as session:
+                    url = await h.webhook_safe_check(message.channel)
+                    clone_hook = Webhook.from_url(url, adapter=AsyncWebhookAdapter(session))
+                    await clone_hook.send(content=mad_content, username=message.author.display_name, avatar_url=message.author.avatar_url, file=buff)
+                    
+            elif status[0].lower() == "polymorph":
+                ### HANDLE STACKS
+                remaining_stacks = status[1]-1
+                if remaining_stacks <= 0:
+                    bot.user_status[speaker].remove(status)
+                else:
+                    status[1] -= 1
+                ### APPLY EFFECT
+                
+                urls = [
+                    "https://assets-global.website-files.com/5bbd49a137709a4145049ab0/5dd67614e984aa331e6dc8be_Fronde--blog-hero-image_0001_sheep.jpg",
+                    "https://thumbs-prod.si-cdn.com/SkuS5xz-Q-kr_-ol6xblY9fsoeA=/fit-in/1600x0/https://public-media.si-cdn.com/filer/d4/f6/d4f6e4bf-8f77-445d-a8f9-e3a74c6a40f0/ewkhdqqwsae0xpo.jpeg",
+                    "https://i.guim.co.uk/img/media/22bed68981e92d7a9ff204ed7d7f5776a16468fe/1933_1513_3623_2173/master/3623.jpg?width=1200&height=1200&quality=85&auto=format&fit=crop&s=b7545d644ba9f6bcc673a8bdf6d7db83",
+                    "https://images.theconversation.com/files/324133/original/file-20200330-173620-1q1nz5d.jpg?ixlib=rb-1.1.0&rect=0%2C697%2C4635%2C2314&q=45&auto=format&w=1356&h=668&fit=crop",
+                    "https://viva.org.uk/wp-content/uploads/2020/05/fun-facts.jpg",
+                    "https://spca.bc.ca/wp-content/uploads/lamb-in-grassy-field-825x550.jpg",
+                    "https://s7657.pcdn.co/wp-content/uploads/2016/01/Fluffy-sheep-940x480.jpg",
+                    "https://www.macmillandictionary.com/external/slideshow/thumb/137411_thumb.jpg",
+                    "https://www.abc.net.au/cm/rimage/9673494-3x4-xlarge.jpg?v=3",
+                    "https://ichef.bbci.co.uk/news/1024/cpsprodpb/081B/production/_98657020_c0042087-black_faced_sheep-spl.jpg"
+                ]
+                random.seed(len(message.content))
+                sheep_content = ""
+                for word in message.content.split(" "):
+                    if word[-1] == ".":
+                        sheep_content += f"b{random.randint(1,10)*'a'}. "
+                    elif word[-1] == "!":
+                        sheep_content += f"b{random.randint(1,10)*'a'}! "
+                    elif word[-1] == ":":
+                        sheep_content += f"b{random.randint(1,10)*'a'}: "
+                    elif word[-1] == "?":
+                        sheep_content += f"b{random.randint(1,10)*'a'}? "
+                    elif word[-1] == ",":
+                        sheep_content += f"b{random.randint(1,10)*'a'}, "
+                    else:
+                        sheep_content += f"b{random.randint(1,10)*'a'} "
+
+                random.seed(message.author.id)
+                sheep_name = random.choice(h.sheep_names).title() + " Sheep"
+                chosen_url = random.choice(urls)
+                await message.delete()
+                async with aiohttp.ClientSession() as session:
+                    url = await h.webhook_safe_check(message.channel)
+                    clone_hook = Webhook.from_url(url, adapter=AsyncWebhookAdapter(session))
+                    
+                    try:
+                        await clone_hook.send(content=sheep_content.capitalize(), username=sheep_name, avatar_url=chosen_url)
+                    except:
+                        await clone_hook.send(content="Ba"*random.randint(1,20), username=sheep_name, avatar_url=chosen_url)
+            elif status[0].lower() == "drunk":
+                chance = random.randint(1,5)
+                if chance == 5:
+                    ### HANDLE STACKS
+                    remaining_stacks = status[1]-1
+                    if remaining_stacks <= 0:
+                        bot.user_status[speaker].remove(status)
+                    else:
+                        status[1] -= 1
+                    ### APPLY EFFECT
+                    chosen_effect = random.randint(1,4)
+                    
+                    if chosen_effect == 1:
+                        await message.delete()
+                        async with aiohttp.ClientSession() as session:
+                            url = await h.webhook_safe_check(message.channel)
+                            clone_hook = Webhook.from_url(url, adapter=AsyncWebhookAdapter(session))
+                            await clone_hook.send(content=message.content + " -hic-", username=message.author.display_name, avatar_url=message.author.avatar_url)
+                    elif chosen_effect == 2:
+                        await message.channel.send(f'*{message.author.display_name} vomits all over the floor.*')
+                    elif chosen_effect == 3:
+                        await message.channel.send(f'*{message.author.display_name} stumbles over their own feet, nearly falling over.*')
+                    elif chosen_effect == 3:
+                        await message.channel.send(f'*{message.author.display_name} burps.*')
+                    elif chosen_effect == 4:
+                        await message.delete()
+                        async with aiohttp.ClientSession() as session:
+                            url = await h.webhook_safe_check(message.channel)
+                            clone_hook = Webhook.from_url(url, adapter=AsyncWebhookAdapter(session))
+                            await clone_hook.send(content="-hic- " + message.content + " -hic-", username=message.author.display_name, avatar_url=message.author.avatar_url)
+            elif status[0].lower() == "burning":
+                ### HANDLE STACKS
+                remaining_stacks = status[1]-1
+                if remaining_stacks <= 0:
+                    bot.user_status[speaker].remove(status)
+                else:
+                    status[1] -= 1
+                ### APPLY EFFECT
+
+                fstring = "🔥 "
+                for word in message.content.split():
+                    chance = random.randint(1,4)
+                    fstring += word + " 🔥 "
+                    if chance == 2:
+                        fire_words = [
+                        "OOH AAAA HOT HOT",
+                        "SHIT SHIT HOT AHHHHH",
+                        "HOT HOT HOT",
+                        "FIRE AHHHH IM BURNING",
+                        "AHH AHH AHH",
+                        "FIRE FIRE AHHHHH",
+                        "AHHH FIRE FIRE FIRE",
+                        "HOT FIRE HOT",
+                        "A" + "H"*random.randint(5,15),
+                        "AH AH AH HELP",
+                        "FIRE FIRE FIRE",
+                        "OW OW OW OW FIRE",
+                        "OWCH OWIE FIRE",
+                        "FIRE BURNS HELP",
+                        "I AM ON FIRE HELP",
+                        "HOT OW HOT",
+                        "AH SHIT OWCH",
+                        "OWCH OWCH OWCH OWCH FIRE",
+                        "SOMEONE GET ME SOME WATER"
+                        ]
+                        fstring += "**" + random.choice(fire_words) + "** "
+                fstring += " 🔥 "
+                await message.delete()
+                async with aiohttp.ClientSession() as session:
+                    url = await h.webhook_safe_check(message.channel)
+                    clone_hook = Webhook.from_url(url, adapter=AsyncWebhookAdapter(session))
+                    try:
+                        await clone_hook.send(content=fstring, username=message.author.display_name, avatar_url=message.author.avatar_url)
+                    except:
+                        await clone_hook.send(content="**I AM ON FIRE HELP MEEEEEEEEEEEEEEEE**", username=message.author.display_name, avatar_url=message.author.avatar_url)
+
+####
 
 bot.run('NzEzNTA2Nzc1NDI0NTY1Mzcw.XshXTQ.5XwBZmS-Mf9vNnDSGyi0hWcmZG8') # Official Bot
-# bot.run('NzY3MTEyMzU4NjQ0MDIzMzI2.X4tLDg.Mer95w4E9L0HVHupQ7VYu0v3GCs') # Test Branch
+# bot.run('NzY3MTEyMzU4NjQ0MDIzMzI2.X4tLDg.Mer95w4E9L0HVHupQ7VYu0v3GCs') 

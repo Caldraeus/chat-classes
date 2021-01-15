@@ -5,7 +5,6 @@ from discord.ext.commands.cooldowns import BucketType
 import random
 import math
 import os
-import aiohttp
 import aiosqlite
 import asyncio
 from discord import Webhook, AsyncWebhookAdapter

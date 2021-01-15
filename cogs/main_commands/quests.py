@@ -48,7 +48,19 @@ class quests(commands.Cog):
 
                 else:
                     await ctx.send("You currently do not have a quest! Get one by being active in chat!")
-
+    
+    @commands.command()
+    @commands.guild_only()
+    async def abandon(self, ctx):
+        try:
+            async with aiosqlite.connect('main.db') as conn:
+                async with conn.execute(f"select currently_questing from users where id = '{ctx.author.id}';") as chan:
+                    quest = await chan.fetchone()
+            if quest:
+                quest = quest[0]
+                await h.update_quest(ctx.message, quest, -1)
+        except TypeError:
+            await ctx.send("You have no active quest!")
 
 # A setup function the every cog has
 def setup(bot):
