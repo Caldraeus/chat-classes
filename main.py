@@ -75,7 +75,7 @@ if __name__ == '__main__': # Cog loader!
                     traceback.print_exc()
 
     load_dir_files('cogs' ,"├─")
-    bot.load_extension('jishaku')
+    bot.load_extension('jishaku') # For sync to async
 
 @bot.event
 async def on_ready():
