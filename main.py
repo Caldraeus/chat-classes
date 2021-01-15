@@ -244,6 +244,7 @@ async def handle_effects(message, bot): # List of effects in the readme
                 mad_content = " "
                 if message.content != "":
                     while True:
+                        mad_content = " "
                         content = message.content.split(" ")
                         random.shuffle(content)
                         mad_content = mad_content.join(content)
@@ -263,6 +264,7 @@ async def handle_effects(message, bot): # List of effects in the readme
                     url = await h.webhook_safe_check(message.channel)
                     clone_hook = Webhook.from_url(url, adapter=AsyncWebhookAdapter(session))
                     await clone_hook.send(content=mad_content, username=message.author.display_name, avatar_url=message.author.avatar_url, file=buff)
+                    
             elif status[0].lower() == "polymorph":
                 ### HANDLE STACKS
                 remaining_stacks = status[1]-1

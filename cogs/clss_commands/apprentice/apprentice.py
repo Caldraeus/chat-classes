@@ -136,6 +136,22 @@ class apprentice(commands.Cog):
             "usr1 kicks usr2 into the wall, then forcefully seperates their soul from their body.",
             "usr1 throws usr2 into the ground and blasts a hole through their bdypart."
         ]
+
+        self.hooks_pact = [
+            "usr1 shoots a dark blast of energy at usr2!",
+            "usr1 has their demon rip out usr2's bdypart!",
+            "usr1 removes usr2's bdypart and feeds it to their demon! Awwww.",
+            "usr1 throws their demon at usr2, who rips apart usr2.",
+            "usr1 blasts usr2's bdypart off, then has their demon rip apart usr2.",
+            "usr1's demon trips usr2, then usr1 fires a dark blast through usr2. Team work makes the dream work!",
+            "usr1's demon jumps on usr2, causing usr2 to trip and fall into a nearby river and drown. Huh, okay.",
+            "usr1 blasts usr2 in the stomach, causing blood to drip out. usr1's demon quickly runs over and drink usr2's blood. Ewww!!",
+            "usr1 blasts usr2 in the bdypart, then leaves the rest to their demon.",
+            "usr2 is minding their own business when they see usr1's demon! usr1's demon makes short work of usr2, then reports back to usr1! High five!",
+            "usr1's demon blocks an attack from usr2, then usr1 follows up with a blast into usr2's bdypart!"
+        ]
+
+        self.zollok = {}
     pass
 
     @commands.command()
@@ -309,7 +325,46 @@ class apprentice(commands.Cog):
                         await h.add_coolness(ctx.author.id, 400)
                         await ctx.send(hook)
             elif self.bot.users_classes[str(ctx.author.id)] == "pacted":
-                pass
+                ap_works = await h.alter_ap(ctx.message, 1, self.bot)
+                if ap_works and await h.can_attack(ctx.author.id, target.id, ctx):
+                    demon = await h.get_demon(ctx.author.id, self.bot)
+
+                    special_demons = ["zollok", "ilixnith"] # Doing this once here, specifically for demons that have stuff here. This way we avoid doing it multiple times.
+                    if demon in special_demons:
+                        async with aiosqlite.connect('main.db') as conn:
+                            async with conn.execute(f"select * from users where id = '{ctx.author.id}';") as info:
+                                user = await info.fetchone()
+                        level = user[8] - 19
+
+                    crit_check = await h.crit_handler(self.bot, ctx.author.id, target.id)
+                    body_part = random.choice(h.body_parts)
+                    hook = random.choice(self.hooks_pact)
+                    hook = hook.replace("usr1", f"**{ctx.author.display_name}**")
+                    hook = hook.replace("bdypart", body_part)
+                    hook = hook.replace("usr2", f"**{target.display_name}**")
+                    if crit_check == False:
+                        if demon == "zollok":
+                            if ctx.author.id not in self.zollok:
+                                self.zollok[ctx.author.id] = 0
+                            else:
+                                self.zollok[ctx.author.id] = self.zollok[ctx.author.id] + 1
+                        await ctx.send(hook)
+                    else:
+                        if demon == "ilixnith":
+                            hook = f"**✨[CRITICAL]✨** + {50*(1+level)} Coolness | " + hook
+                            await h.add_coolness(ctx.author.id, 50*(1+level))
+                        else:
+                            crit_amount = 100
+                            if demon == "zollok":
+                                if ctx.author.id not in self.zollok:
+                                    self.zollok[ctx.author.id] = 0
+                                else:
+                                    boost = self.zollok[ctx.author.id]*(5*level)
+                                    self.zollok[ctx.author.id] = 0
+                                crit_amount = 100+boost
+                            hook = f"**✨[CRITICAL]✨** + {crit_amount} Coolness | " + hook
+                            await h.add_coolness(ctx.author.id, crit_amount)
+                        await ctx.send(hook)
 
                         
 # A setup function the every cog has

@@ -15,7 +15,8 @@ effect_list = {
     "polymorph" : "You're a sheep! You can't speak human languages!",
     "drunk" : "You had a bit too much to drink...",
     "burning" : "You are on fire. Good luck.",
-    "poisoned" : "Every time you make an attack, you lose an extra 2 AP!"
+    "poisoned" : "Every time you make an attack, you lose an extra 2 AP!",
+    "confidence" : "Hey, you're pretty good at this! Slightly raises your critical chance."
 }
 
 base_classes = {
@@ -26,6 +27,8 @@ base_classes = {
 }
 
 prefix = ';'
+
+unobtainable_achs = 1
 
 with open('adjectives.txt') as f:
     sheep_names = [line.rstrip() for line in f]
@@ -62,7 +65,7 @@ async def reply_check(message):
     else:
         return False
 
-async def can_attack(user, target, ctx): # NOTE: Remember that you can't alter AP of those who have no profile in CC... | h.can_attack(ctx.author.id, target.id, ctx):
+async def can_attack(user, target, ctx): # NOTE: Remember that you can't alter AP of those who have no profile in CC... Also, target may not always exist
     bot = ctx.bot
     if user not in bot.user_status:
         bot.user_status[user] = []
@@ -81,14 +84,58 @@ async def can_attack(user, target, ctx): # NOTE: Remember that you can't alter A
             if balance >= 0:
                 bot.users_ap[uid] = balance
 
+    # UPDATE ATTACKING BASED QUESTS
+    attack_based_quests = [7, 8, 9, 10, 11, 12, 13, 14]
+    async with aiosqlite.connect('main.db') as conn:
+        async with conn.execute(f"select currently_questing from users where id = '{ctx.author.id}';") as chan:
+            quest = await chan.fetchone()
+    if quest:
+        quest = quest[0]
+        if quest in attack_based_quests:
+            await update_quest(ctx.message, quest, 1)
+    # UPDATE ATTACKING BASED QUESTS
+
     return True
 
-async def crit_handler(bot, attacker, defender):
-    # Values needed for later
-    crit_thresh = 1                    # The number needed to roll below to get a critical 
-    crit = random.randint(1,20)        # The rolled critical chance
-    # End Values
+async def crit_handler(bot, attacker, defender): 
+    # Values needed for later ##############################################################
+    crit_thresh = 1                    # The number needed to roll below to get a critical #
+    crit = random.randint(1,20)        # The rolled critical chance                        #
+    # End Values                                                                           #
+    ########################################################################################
+    ########################################################################################
+    # Getting user status effects to check for critical-altering ones ###
+    speaker = attacker
+    if speaker in bot.user_status:
+        user_effects = bot.user_status[speaker]
+        for status in user_effects: # We go through each status affecting the user [NOT ALL APPLY TO ON-MESSAGE EVENTS. THEREFORE, WE NEED IF STATEMENTS]. These are applied in order
+            if status[0].lower() == "confidence":
+                crit_thresh += 4
+                ### HANDLE STACKS
+                if crit <= crit_thresh:
+                    remaining_stacks = status[1]-1
+                    if remaining_stacks <= 0:
+                        bot.user_status[speaker].remove(status)
+                    else:
+                        status[1] -= 1
+    # End Status Effect Check ############################################
+    ######################################################################
+
     if crit <= crit_thresh:
+        ########################################################################################
+        # This is for classes that have "when someone gets a crit on you" effects. #############
+        if bot.users_classes[str(defender)] == "pacted" and await get_demon(defender, bot) == "minehart":
+            async with aiosqlite.connect('main.db') as conn:
+                async with conn.execute(f"select * from users where id = '{defender}';") as info:
+                    user = await info.fetchone()
+            level = user[8] - 19
+
+            amount = 2*level    
+            cog = bot.get_cog('pacted')
+            cog.minehart[defender] = cog.minehart[defender] + amount
+
+        ########################################################################################
+        ########################################################################################
         return True
     else:
         return False
@@ -198,7 +245,7 @@ async def webhook_safe_check(channel): # This function should be run before any 
             await conn.commit()
             return new_hook.url
 
-basic_text_quests = [1,2,3,4,5,6]
+basic_text_quests = [1,2,3,4,5,6,15,16,17]
 async def on_message_quest_handler(user, mss, people): # This takes the message sent, checks if it's applicable to any quest. I just put it here instead of main.py honestly.
     uid = str(user.id)
     if uid in people:
@@ -298,7 +345,41 @@ async def update_quest(message, quest_id, addition):
                         continue
                     break
     else:
-        pass # For failing quests. Not yet implemented.
+        chan = message.channel
+        user = message.author
+        async with aiosqlite.connect('main.db') as conn:
+            async with conn.execute(f"select * from quests where quest_id = {quest_id}") as q_info:
+                await conn.execute(f"update users set currently_questing = 0 where id = '{message.author.id}';")
+                quest_info = await q_info.fetchone()
+                await conn.commit()
+            
+        questers = quest_info[5].split("|")
+
+        for guy in questers:
+            new_guy = guy.split(",")
+            questers[questers.index(guy)] = new_guy
+
+        for new_guy in questers: # Have to do this in a seperate loop to prevent a critical error.
+            if new_guy[0] == str(user.id):
+                found = True
+                questers.pop(questers.index(new_guy))
+        
+        end = ""
+        for sublist in questers:
+            if questers.index(sublist) == len(questers)-1:
+                end += f"{','.join(sublist)}"
+            else:
+                end += f"{','.join(sublist)}|"
+
+        async with aiosqlite.connect('main.db') as conn:
+            await conn.execute(f"update quests set users = '{end}' where quest_id = '{quest_id}';")
+            await conn.commit()
+
+
+
+        embed = discord.Embed(title=f"Quest Failed!", colour=discord.Colour.from_rgb(166, 148, 255), description=f'**{quest_info[6]}**\n*{quest_info[1]}*')
+        embed.set_thumbnail(url=quest_info[4])
+        notif = await chan.send(content=message.author.mention, embed=embed)
                         
                 
 
@@ -470,7 +551,8 @@ async def genprof(uid, aps):
     async with aiosqlite.connect('main.db') as conn:
         async with conn.execute("select count(*) from achievements;") as numcount:
             num = await numcount.fetchone()
-            total_achievements = num[0] # Self explanatory.
+            num_not = unobtainable_achs
+            total_achievements = num[0]-num_not # Self explanatory.
         async with conn.execute(f"select * from users where id = '{uid.id}';") as info:
             user = await info.fetchone()
 
@@ -505,3 +587,24 @@ async def genrank(uid):
                 else:
                     rank+=1
             return(rank)
+
+async def get_demon(uid, bot):
+    cog = bot.get_cog('pacted')
+    users_demons = cog.users_demons
+    if uid in users_demons:
+        demon = users_demons[uid]
+        if demon == "minehart" and uid not in cog.minehart:
+            cog.minehart[uid] = 0
+    else:
+        async with aiosqlite.connect('classTables.db') as conn:
+            async with conn.execute(f"select uid, demon from pacted_demons where uid = '{uid}'") as u_info:
+                user_info = await u_info.fetchone()
+        if user_info:
+            users_demons[uid] = user_info[1]
+            cog.users_demons = users_demons
+            demon = user_info[1]
+            if demon == "minehart" and uid not in cog.minehart:
+                cog.minehart[uid] = 0
+        elif user_info == None:
+            demon = None
+    return demon

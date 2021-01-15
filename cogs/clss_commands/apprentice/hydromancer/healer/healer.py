@@ -21,8 +21,6 @@ class healer(commands.Cog):
             "usr1 drags usr2 to safety and heals them back up",
             "usr1 reattaches usr2's bdypart properly"
         ]
-
-        self.waterlevels = {}
     pass
 
     @commands.command()

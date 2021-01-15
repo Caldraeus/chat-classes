@@ -100,12 +100,24 @@ class economy(commands.Cog):
                             new_ap = max_ap
                         self.bot.users_ap[str(ctx.author.id)] = new_ap
                     elif item == "hot dog":
-                        await ctx.send("🌭 | You eat your delicious hot dog. Ah, just like being at the faire! (+4 AP | +10 Coolness)")
-                        new_ap = self.bot.users_ap[str(ctx.author.id)] + 4
-                        if new_ap > max_ap:
-                            new_ap = max_ap
-                        self.bot.users_ap[str(ctx.author.id)] = new_ap
-                        await h.add_coolness(ctx.author.id, 10)
+                        if self.bot.users_classes[str(ctx.author.id)] == "pacted" and await h.get_demon(ctx.author.id, self.bot) == "foop": # Buffed dot hogs
+                            async with aiosqlite.connect('main.db') as conn:
+                                async with conn.execute(f"select * from users where id = '{ctx.author.id}';") as info:
+                                    user = await info.fetchone()
+                            level = user[8] - 19
+                            await ctx.send(f"🌭 | You and Foop split a delicious hot dog. Ah, just like being at the faire with your best friend! (+{4+(level)} AP | +{10+(5*level)} Coolness)")
+                            new_ap = self.bot.users_ap[str(ctx.author.id)] + 4+(level)
+                            if new_ap > max_ap:
+                                new_ap = max_ap
+                            self.bot.users_ap[str(ctx.author.id)] = new_ap
+                            await h.add_coolness(ctx.author.id, 10+(5*level))
+                        else:
+                            await ctx.send("🌭 | You eat your delicious hot dog. Ah, just like being at the faire! (+4 AP | +10 Coolness)")
+                            new_ap = self.bot.users_ap[str(ctx.author.id)] + 4
+                            if new_ap > max_ap:
+                                new_ap = max_ap
+                            self.bot.users_ap[str(ctx.author.id)] = new_ap
+                            await h.add_coolness(ctx.author.id, 10)
                     elif item == "void":
                         await ctx.send("👁️ | You 👍︎⚐︎☠︎💧︎🕆︎💣︎☜︎ your delectable ✞︎□︎✋︎👎︎. Golly, that sure was 👎︎☜︎☹︎♓︎👍︎✋︎⚐︎⬧︎! (+20 AP | +20 Shatter)")
                         new_ap = self.bot.users_ap[str(ctx.author.id)] + 20
@@ -189,16 +201,28 @@ class economy(commands.Cog):
     
     @commands.command()
     @commands.guild_only()
-    async def daily(self, ctx):
+    async def daily(self, ctx): 
         try:
-            await h.add_gold(ctx.author.id, 100, self.bot)
-            if ctx.author.id in self.bot.claimed:
+            # if self.bot.users_classes[str(ctx.author.id)] == "pacted" and await h.get_demon(ctx.author.id, self.bot) == "foop":
+            if ctx.author.id in self.bot.claimed: # or ctx.author.id == 340222819680124929 or ctx.author.id == 740308712450818079:
                 await ctx.send("❌ | You've already claimed your daily gift this rollover! Use `;rollover` to check when you can claim again.")
             else:
-                if ctx.author.id in self.bot.server_boosters:
-                    await ctx.send("✅ | You gained 200 gold!")
+                if self.bot.users_classes[str(ctx.author.id)] == "pacted" and await h.get_demon(ctx.author.id, self.bot) == "trokgroor":
+                    async with aiosqlite.connect('main.db') as conn:
+                        async with conn.execute(f"select * from users where id = '{ctx.author.id}';") as info:
+                            user = await info.fetchone()
+                    level = user[8] - 19
+                    await h.add_gold(ctx.author.id, 100+(level*50), self.bot)
+                    if ctx.author.id in self.bot.server_boosters:
+                        await ctx.send(f"✅ | You and Trokgroor print {2*(100+(level*50))} gold!")
+                    else:
+                        await ctx.send(f"✅ | You and Trokgroor print {100+(level*50)} gold!")
                 else:
-                    await ctx.send("✅ | You gained 100 gold!")
+                    await h.add_gold(ctx.author.id, 100, self.bot)
+                    if ctx.author.id in self.bot.server_boosters:
+                        await ctx.send("✅ | You gained 200 gold!")
+                    else:
+                        await ctx.send("✅ | You gained 100 gold!")
                 self.bot.claimed.append(ctx.author.id)
         except TypeError:
             await ctx.send("❌ | You need to run `;start` first!")
@@ -214,6 +238,7 @@ class economy(commands.Cog):
             avg_gold = gold_stats[1]
             max_gold = gold_stats[2]
         else:
+            exact = "Basic"
             total_gold = h.simplify(gold_stats[0])
             avg_gold = h.simplify(gold_stats[1])
             max_gold = h.simplify(gold_stats[2])

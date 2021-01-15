@@ -150,7 +150,8 @@ class profile(commands.Cog):
                             final_list += f"\n**{ach_info[1]}**"
                     async with conn.execute("select count(*) from achievements;") as numcount:
                         num = await numcount.fetchone()
-                        total_achievements = num[0]-1 # Self explanatory. We subtract the amount of "unobtainable" achievements.
+                        num_not = h.unobtainable_achs
+                        total_achievements = num[0]-h.unobtainable_achs # Self explanatory. We subtract the amount of "unobtainable" achievements.
                         """
                         Unobtainable Achievements
                         #15 - Beloved By...

@@ -47,6 +47,7 @@ class help_commands(commands.Cog):
             profile.add_field(name="profile {optional: @user}", value="Display someones profile.", inline=False)
             profile.add_field(name="achs {optional: @user}", value="Display someones achievements.", inline=False)
             profile.add_field(name="quest", value="Show your current quest, if you have one.", inline=False)
+            profile.add_field(name="abandon", value="Abandon your current quest, if you have one.", inline=False)
             profile.add_field(name="classup", value="Choose your next class. Only works if you're a level below a level equal to a multiple of ten and have 100% xp. (10, 20, 30...)", inline=False)
             profile.add_field(name="effects {optional: @user}", value="Display your or someone elses current status effects and their stacks.")
             profile.set_thumbnail(url="https://archive-media-0.nyafuu.org/c/image/1531/86/1531863615508.png")
@@ -79,6 +80,7 @@ class help_commands(commands.Cog):
             profile.add_field(name="inventory", value="Display your item inventory.", inline=False)
             profile.add_field(name="use [item]", value="Use an item.", inline=False)
             profile.add_field(name="buy [item]", value="Buy an item.")
+            profile.add_field(name="economy {optional: 'exact' or 'basic'}", value="Display facts about the Chat Classes economy.", inline=False)
             profile.set_thumbnail(url="https://archive-media-0.nyafuu.org/c/image/1531/86/1531863615508.png")
             await ctx.send(embed=profile)
     
