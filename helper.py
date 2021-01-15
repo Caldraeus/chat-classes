@@ -124,15 +124,17 @@ async def crit_handler(bot, attacker, defender):
     if crit <= crit_thresh:
         ########################################################################################
         # This is for classes that have "when someone gets a crit on you" effects. #############
-        if bot.users_classes[str(defender)] == "pacted" and await get_demon(defender, bot) == "minehart":
-            async with aiosqlite.connect('main.db') as conn:
-                async with conn.execute(f"select * from users where id = '{defender}';") as info:
-                    user = await info.fetchone()
-            level = user[8] - 19
+        if str(defender) in bot.users_classes:
+            if bot.users_classes[str(defender)] == "pacted":
+                if await get_demon(defender, bot) == "minehart":
+                    async with aiosqlite.connect('main.db') as conn:
+                        async with conn.execute(f"select * from users where id = '{defender}';") as info:
+                            user = await info.fetchone()
+                    level = user[8] - 19
 
-            amount = 2*level    
-            cog = bot.get_cog('pacted')
-            cog.minehart[defender] = cog.minehart[defender] + amount
+                    amount = 2*level    
+                    cog = bot.get_cog('pacted')
+                    cog.minehart[defender] = cog.minehart[defender] + amount
 
         ########################################################################################
         ########################################################################################

@@ -122,9 +122,9 @@ class pacted(commands.Cog):
                             except KeyError:
                                 pass # User doesn't exist.
                         
-                        await h.add_coolness(ctx.author.id, 15*ap_healed)
+                        await h.add_coolness(ctx.author.id, 5*ap_healed)
 
-                        await ctx.send(f"{hook}, restoring {ap_healed} AP to them and personally gaining {ap_healed*15} coolness!")
+                        await ctx.send(f"{hook}, restoring {ap_healed} AP to them and personally gaining {ap_healed*5} coolness!")
     @commands.command()
     @commands.guild_only()
     async def demon(self, ctx): # Shoots an arrow at someone.

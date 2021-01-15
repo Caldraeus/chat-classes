@@ -145,7 +145,7 @@ class apprentice(commands.Cog):
             "usr1 blasts usr2's bdypart off, then has their demon rip apart usr2.",
             "usr1's demon trips usr2, then usr1 fires a dark blast through usr2. Team work makes the dream work!",
             "usr1's demon jumps on usr2, causing usr2 to trip and fall into a nearby river and drown. Huh, okay.",
-            "usr1 blasts usr2 in the stomach, causing blood to drip out. usr1's demon quickly runs over and drink usr2's blood. Ewww!!",
+            "usr1 blasts usr2 in the stomach, causing blood to drip out. usr1's demon quickly runs over and drinks usr2's blood. Ewww!!",
             "usr1 blasts usr2 in the bdypart, then leaves the rest to their demon.",
             "usr2 is minding their own business when they see usr1's demon! usr1's demon makes short work of usr2, then reports back to usr1! High five!",
             "usr1's demon blocks an attack from usr2, then usr1 follows up with a blast into usr2's bdypart!"

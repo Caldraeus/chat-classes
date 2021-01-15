@@ -207,16 +207,17 @@ class economy(commands.Cog):
             if ctx.author.id in self.bot.claimed: # or ctx.author.id == 340222819680124929 or ctx.author.id == 740308712450818079:
                 await ctx.send("❌ | You've already claimed your daily gift this rollover! Use `;rollover` to check when you can claim again.")
             else:
-                if self.bot.users_classes[str(ctx.author.id)] == "pacted" and await h.get_demon(ctx.author.id, self.bot) == "trokgroor":
-                    async with aiosqlite.connect('main.db') as conn:
-                        async with conn.execute(f"select * from users where id = '{ctx.author.id}';") as info:
-                            user = await info.fetchone()
-                    level = user[8] - 19
-                    await h.add_gold(ctx.author.id, 100+(level*50), self.bot)
-                    if ctx.author.id in self.bot.server_boosters:
-                        await ctx.send(f"✅ | You and Trokgroor print {2*(100+(level*50))} gold!")
-                    else:
-                        await ctx.send(f"✅ | You and Trokgroor print {100+(level*50)} gold!")
+                if self.bot.users_classes[str(ctx.author.id)] == "pacted":
+                    if await h.get_demon(ctx.author.id, self.bot) == "trokgroor":
+                        async with aiosqlite.connect('main.db') as conn:
+                            async with conn.execute(f"select * from users where id = '{ctx.author.id}';") as info:
+                                user = await info.fetchone()
+                        level = user[8] - 19
+                        await h.add_gold(ctx.author.id, 100+(level*50), self.bot)
+                        if ctx.author.id in self.bot.server_boosters:
+                            await ctx.send(f"✅ | You and Trokgroor print {2*(100+(level*50))} gold!")
+                        else:
+                            await ctx.send(f"✅ | You and Trokgroor print {100+(level*50)} gold!")
                 else:
                     await h.add_gold(ctx.author.id, 100, self.bot)
                     if ctx.author.id in self.bot.server_boosters:
