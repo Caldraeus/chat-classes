@@ -182,6 +182,10 @@ async def on_message(message):
         
         # We reset the daily gift counter.
         bot.claimed = []
+
+        # We reset artifact usage.
+        cog = bot.get_cog('artifacts')
+        cog.used = []
         
         
         print("\n\n\n----------------Daily reset has occurred----------------\n\n\n")
@@ -205,7 +209,7 @@ async def on_message(message):
         if str(message.author.id) in bot.registered_users:
             await h.fetch_random_quest(message, bot)
             await asyncio.sleep(.1)
-            await h.on_message_quest_handler(message.author, message, bot.registered_users)
+            await h.on_message_quest_handler(message.author, message, bot.registered_users, bot)
             await asyncio.sleep(.1)
             await h.txt_achievement_handler(message.content.lower(), message.author.id, message, bot)
             await asyncio.sleep(.1)
@@ -215,6 +219,14 @@ async def on_message(message):
 @commands.guild_only()
 async def invite_link(ctx):
     await ctx.send("https://discord.com/oauth2/authorize?client_id=713506775424565370&scope=bot&permissions=8")
+
+"""
+@bot.command()
+@commands.guild_only()
+async def test(ctx):
+    origin = await h.find_origin("pacted")
+    await ctx.send(f"You started as: {origin}")
+"""
 
 ###### The following below is implemented here rather than in helper due to the nature of it's blocking commands that I need to use jishaku's stuff for 
 
@@ -235,11 +247,12 @@ async def handle_effects(message, bot): # List of effects in the readme
         for status in user_effects: # We go through each status affecting the user [NOT ALL APPLY TO ON-MESSAGE EVENTS. THEREFORE, WE NEED IF STATEMENTS]. These are applied in order
             if status[0].lower() == "shatter":
                 ### HANDLE STACKS
-                remaining_stacks = status[1]-1
-                if remaining_stacks <= 0:
-                    bot.user_status[speaker].remove(status)
-                else:
-                    status[1] -= 1
+                if len(message.content.split(" ")) != 1:
+                    remaining_stacks = status[1]-1
+                    if remaining_stacks <= 0:
+                        bot.user_status[speaker].remove(status)
+                    else:
+                        status[1] -= 1
                 ### APPLY EFFECT
                 mad_content = " "
                 if message.content != "":

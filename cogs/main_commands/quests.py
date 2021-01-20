@@ -13,7 +13,7 @@ class quests(commands.Cog):
         self.bot = bot
     pass
 
-
+    
     @commands.command()
     @commands.guild_only()
     async def quest(self, ctx):
@@ -24,7 +24,7 @@ class quests(commands.Cog):
                     if quest:
                         if quest[1] != 0: # If the user has a quest...
                             quest_id = quest[1] # Setting this as a variable to close the first connection.
-                if quest and quest[1] != 0:
+                if quest and quest[1] != 0 and quest[1] != 18:
                     async with conn.execute(f"select * from quests where quest_id = {quest_id}") as q_info:
                         quest_info = await q_info.fetchone()
                         questers = quest_info[5].split("|")
@@ -41,10 +41,25 @@ class quests(commands.Cog):
                         embed.set_thumbnail(url=quest_info[4])
                         await ctx.send(content=ctx.author.mention, embed=embed)
                     except UnboundLocalError: # This is a weird error thing. If this keeps having I'll need to figure something out.
-                        print("Something has gone wrong removing someone from a quest. Why is that?")
-                        await conn.execute(f"update users set currently_questing = 0 where id = '{ctx.author.id}';")
-                        await ctx.send("You currently do not have a quest! Get one by being active in chat!")
-                        conn.commit()
+                        print("If you're seeing this error message, you've fucked up")
+                        await ctx.send("Something broke! Message the bot creator immediately! Caldraeus#1337")
+                elif quest and quest[1] != 0 and quest[1] == 18:
+                    async with conn.execute(f"select * from quests where quest_id = {quest_id}") as q_info:
+                        quest_info = await q_info.fetchone()
+                        questers = quest_info[5].split("|")
+                    for people in questers:
+                        people = people.split(",")
+                        if people[0] == str(ctx.author.id):
+                            progress = "Waiting"
+                    
+                    try:
+                        embed = discord.Embed(title=f"{quest_info[6]}", colour=discord.Colour.from_rgb(0,0,0), description=f'*{quest_info[1]}*\nProgress: ΛƜΛɪŤɪЛƓϤØЦ尺らØЦŁ')
+                        embed.set_footer(text=f"Reward: ᛞᛖᚨᛏᚺᛞᛖᚨᛏᚺᛞᛖᚨᛏᚺᛞᛖᚨᛏᚺ", icon_url="")
+                        embed.set_thumbnail(url=quest_info[4])
+                        await ctx.send(content=ctx.author.mention, embed=embed)
+                    except SyntaxError: # This is a weird error thing. If this keeps having I'll need to figure something out.
+                        print("If you're seeing this error message, you've fucked up")
+                        await ctx.send("Something broke! Message the bot creator immediately! Caldraeus#1337")
 
                 else:
                     await ctx.send("You currently do not have a quest! Get one by being active in chat!")
@@ -58,7 +73,7 @@ class quests(commands.Cog):
                     quest = await chan.fetchone()
             if quest:
                 quest = quest[0]
-                await h.update_quest(ctx.message, quest, -1)
+                await h.update_quest(ctx.message, quest, -1, self.bot)
         except TypeError:
             await ctx.send("You have no active quest!")
 

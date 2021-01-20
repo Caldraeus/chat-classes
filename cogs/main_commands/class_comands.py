@@ -51,22 +51,25 @@ class class_comands(commands.Cog):
     @commands.command(aliases=["class"])
     @commands.guild_only()
     async def classinfo(self, ctx, *, clss = None):
-        if not clss:
-            clss = self.bot.users_classes[str(ctx.author.id)]
-        clss = clss.lower()
-        async with aiosqlite.connect('main.db') as conn:
-            async with conn.execute(f"select * from classes where class_name = '{clss}';") as cinfo:
-                class_info = await cinfo.fetchall()
-                class_info = class_info[0]
-                profile = discord.Embed(title=f"{clss.title()}'s Info", colour=discord.Colour.from_rgb(128, 128, 128), description=class_info[1])
-                profile.add_field(name="Previous Class", value=class_info[3], inline=False)
-                abilities = class_info[5].split("|")
-                final = ""
-                for abil in abilities:
-                    final+=abil+"\n"
-                profile.add_field(name="Class Abilities", value=final, inline=False)
-        
-        await ctx.send(embed=profile)
+        try:
+            if not clss:
+                clss = self.bot.users_classes[str(ctx.author.id)]
+            clss = clss.lower()
+            async with aiosqlite.connect('main.db') as conn:
+                async with conn.execute(f"select * from classes where class_name = '{clss}';") as cinfo:
+                    class_info = await cinfo.fetchall()
+                    class_info = class_info[0]
+                    profile = discord.Embed(title=f"{clss.title()}'s Info", colour=discord.Colour.from_rgb(128, 128, 128), description=class_info[1])
+                    profile.add_field(name="Previous Class", value=class_info[3], inline=False)
+                    abilities = class_info[5].split("|")
+                    final = ""
+                    for abil in abilities:
+                        final+=abil+"\n"
+                    profile.add_field(name="Class Abilities", value=final, inline=False)
+            
+            await ctx.send(embed=profile)
+        except IndexError:
+            await ctx.send("You don't have a class! Say `;start` to begin!")
     
     @commands.command(aliases=["prog"])
     @commands.guild_only()
@@ -78,11 +81,15 @@ class class_comands(commands.Cog):
                     class_info = await cinfo.fetchall()
 
             profile = discord.Embed(title=f"🌟 {clss.title()} Class Progression 🌟", colour=discord.Colour.from_rgb(255, 165, 0))
-            profile.set_footer(text=f"A lock symbol next to a class name means there's an achievement required to choose it!", icon_url="")
+            profile.set_footer(text=f"A lock symbol next to a class name means there's an achievement required to choose it! A roman numeral implies prestige level!", icon_url="")
             for potential_class in class_info:
                 classes.append(potential_class)
-                if potential_class[4] != 0: # It's an achievement locked class...
+                prestige_achs = [16]
+                prestige_levels = ['𝐈', '𝐈𝐈', "𝐈𝐈𝐈", "𝐈𝐕"] # 𝐈𝐕 𝐈𝐕𝐗
+                if potential_class[4] != 0 and potential_class[4] not in prestige_achs: # It's an achievement locked class, and not a prestige class
                     profile.add_field(name=f"🔒 | {potential_class[0].title()}", value=potential_class[1], inline=False)
+                if potential_class[4] != 0 and potential_class[4] in prestige_achs: # It's a prestige class...
+                    profile.add_field(name=f"**[ {prestige_levels[prestige_achs.index(potential_class[4])]} ]** | {potential_class[0].title()}", value=potential_class[1], inline=False)
                 elif potential_class[4] == 0:
                     profile.add_field(name=potential_class[0].title(), value=potential_class[1], inline=False)
 

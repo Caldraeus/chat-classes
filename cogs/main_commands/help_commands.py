@@ -48,7 +48,6 @@ class help_commands(commands.Cog):
             profile.add_field(name="achs {optional: @user}", value="Display someones achievements.", inline=False)
             profile.add_field(name="quest", value="Show your current quest, if you have one.", inline=False)
             profile.add_field(name="abandon", value="Abandon your current quest, if you have one.", inline=False)
-            profile.add_field(name="classup", value="Choose your next class. Only works if you're a level below a level equal to a multiple of ten and have 100% xp. (10, 20, 30...)", inline=False)
             profile.add_field(name="effects {optional: @user}", value="Display your or someone elses current status effects and their stacks.")
             profile.set_thumbnail(url="https://archive-media-0.nyafuu.org/c/image/1531/86/1531863615508.png")
             await ctx.send(embed=profile)
@@ -58,7 +57,7 @@ class help_commands(commands.Cog):
             profile.add_field(name="invite", value="Send the bots invite link.", inline=False)
             profile.add_field(name="help", value="Display the help embed.", inline=False)
             profile.add_field(name="server", value="Send the official Chat Classes server invite.", inline=False)
-            profile.add_field(name="rolover", value="Dislpay rollover timer, as well as some additional information about rollover.", inline=False)
+            profile.add_field(name="rollover", value="Dislpay rollover timer, as well as some additional information about rollover.", inline=False)
             profile.set_thumbnail(url="https://archive-media-0.nyafuu.org/c/image/1531/86/1531863615508.png")
             await ctx.send(embed=profile)
         elif module == "server":

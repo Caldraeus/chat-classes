@@ -12,6 +12,28 @@ class owner_only(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
     pass
+    
+    @commands.command()
+    @commands.is_owner()
+    async def update(self, ctx, cog, new = None):
+        if new == None
+            lists = self.bot.extensions
+            for item in lists:
+                item = item.split('.')
+                if item[-1] == cog.lower():
+                    pwd = '.'.join(item)
+                    break
+
+            try:
+                self.bot.reload_extension(str(pwd))
+                await ctx.send(f"Successfully updated `{pwd}` with [0] errors.")
+            except UnboundLocalError:
+                await ctx.send(f"❗ | Cog `{cog}` not found.")
+        else:
+            try:
+                self.bot.load_extension(cog)
+            except:
+                await ctx.send(f"Invalid path for {cog}.")
 
     @commands.command()
     @commands.guild_only()
