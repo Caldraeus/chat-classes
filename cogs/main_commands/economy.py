@@ -213,19 +213,27 @@ class economy(commands.Cog):
                             async with conn.execute(f"select * from users where id = '{ctx.author.id}';") as info:
                                 user = await info.fetchone()
                         level = user[8] - 19
-                        await h.add_gold(ctx.author.id, 100+(level*50), self.bot)
+                        await h.add_gold(ctx.author.id, 100+(level*50), self.bot, True)
                         if ctx.author.id in self.bot.server_boosters:
                             await ctx.send(f"✅ | You and Trokgroor print {2*(100+(level*50))} gold!")
                         else:
                             await ctx.send(f"✅ | You and Trokgroor print {100+(level*50)} gold!")
+                        self.bot.claimed.append(ctx.author.id)
+                    else:
+                        await h.add_gold(ctx.author.id, 100, self.bot, True)
+                        if ctx.author.id in self.bot.server_boosters:
+                            await ctx.send("✅ | You gained 200 gold!")
+                        else:
+                            await ctx.send("✅ | You gained 100 gold!")
+                        self.bot.claimed.append(ctx.author.id)
                 else:
-                    await h.add_gold(ctx.author.id, 100, self.bot)
+                    await h.add_gold(ctx.author.id, 100, self.bot, True)
                     if ctx.author.id in self.bot.server_boosters:
                         await ctx.send("✅ | You gained 200 gold!")
                     else:
                         await ctx.send("✅ | You gained 100 gold!")
                 self.bot.claimed.append(ctx.author.id)
-        except TypeError:
+        except (TypeError, KeyError) as e:
             await ctx.send("❌ | You need to run `;start` first!")
         
     @commands.command()

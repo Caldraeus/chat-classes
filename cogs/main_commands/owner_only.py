@@ -12,12 +12,42 @@ class owner_only(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
     pass
+    
+    @commands.command()
+    @commands.is_owner()
+    async def update(self, ctx, cog, new = None):
+        if new == None:
+            lists = self.bot.extensions
+            for item in lists:
+                item = item.split('.')
+                if item[-1] == cog.lower():
+                    pwd = '.'.join(item)
+                    break
+
+            try:
+                self.bot.reload_extension(str(pwd))
+                await ctx.send(f"Successfully updated `{pwd}` with [0] errors.")
+            except UnboundLocalError:
+                await ctx.send(f"❗ | Cog `{cog}` not found.")
+        else:
+            try:
+                self.bot.load_extension(cog)
+                await ctx.send(f"Loaded new cog `{cog}`.")
+            except ValueError:
+                await ctx.send(f"❗ | Invalid path for `{cog}`.")
 
     @commands.command()
     @commands.guild_only()
     @commands.is_owner()
     async def servers(self, ctx): # Just displays the amount of servers it is in... 75 here we come!
         await ctx.send(len(self.bot.guilds))
+
+    @commands.command()
+    @commands.guild_only()
+    @commands.is_owner()
+    async def testap(self, ctx): # Just displays the amount of servers it is in... 75 here we come!
+        self.bot.users_ap[str(ctx.author.id)] = 5000
+        await ctx.send("AP reset to 5000 for testing.")
 
     @commands.command()
     @commands.guild_only()

@@ -36,6 +36,7 @@ class hydromancer(commands.Cog):
 
     @commands.command()
     @commands.guild_only()
+    @commands.cooldown(2, 1, commands.BucketType.user)
     async def douse(self, ctx, target: discord.Member = None): # Shoots an arrow at someone.
         if target and target != ctx.author and target.id != 713506775424565370:
             if self.bot.users_classes[str(ctx.author.id)] == "hydromancer" or self.bot.users_classes[str(ctx.author.id)] == "multi-mage":

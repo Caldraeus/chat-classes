@@ -16,7 +16,8 @@ effect_list = {
     "drunk" : "You had a bit too much to drink...",
     "burning" : "You are on fire. Good luck.",
     "poisoned" : "Every time you make an attack, you lose an extra 2 AP!",
-    "confidence" : "Hey, you're pretty good at this! Slightly raises your critical chance."
+    "confidence" : "Hey, you're pretty good at this! Slightly raises your critical chance.",
+    "defending" : "You are prepared for someone to strike! Anyone who attacks you fails, wasting their AP."
 }
 
 base_classes = {
@@ -58,6 +59,22 @@ async def add_effect(target, bot, effect_name, amount = 1):
     if not exists:
         bot.user_status[speaker].append([effect_name.lower(), amount])
 
+async def find_origin(user_class):
+    async with aiosqlite.connect('main.db') as conn:
+        async with conn.execute(f"select class_name, preclass from classes;") as chan:
+            clss = await chan.fetchall()
+    origin = user_class
+    wcase = 0
+    b_classes = ["swordsman", "apprentice", "rogue", "archer"]
+    while origin not in b_classes:
+        wcase +=1
+        if wcase >= 10:
+            break
+        for item in clss:
+            if item[0] == origin:
+                origin = item[1]
+
+    return(origin)
 
 async def reply_check(message):
     if message.reference:
@@ -92,18 +109,77 @@ async def can_attack(user, target, ctx): # NOTE: Remember that you can't alter A
     if quest:
         quest = quest[0]
         if quest in attack_based_quests:
-            await update_quest(ctx.message, quest, 1)
+            await update_quest(ctx.message, quest, 1, ctx.bot)
     # UPDATE ATTACKING BASED QUESTS
+
+    # CHECK FOR DEFENDING AND MORE
+    """
+    Priority List
+    1. Sellsword
+    2. Status Effects
+    """
+
+    protected = bot.get_cog('sellsword').hired
+
+    if target in list(protected.values()):
+        vals = list(protected.values())
+        keys = list(protected.keys())
+        protector = keys[vals.index(target)]
+        try:
+            ss_hooks = [
+                "Right as you're about to attack, you feel a stab in your back! It's usr1, usr2's sellsword! You fall over, dead!",
+                "You attempt to kill usr2, but usr1 blocks your attack before swiftly slicing your neck! usr2 nods at usr1, and continues on their way.",
+                "Your attempt to attack usr2 is thwarted by usr1, who fires a crossbow bolt into your neck right as you're about to land your attack!",
+                "usr2 sees your attack coming, but doesn't seem worried. Perplexed, you attempt to attack anyway! As you do, you feel usr1's blade through your back! usr2 smiles at you as the world goes dark."
+            ]
+            usr1 = bot.get_user(protector)
+            usr2 = bot.get_user(target)
+            hook = random.choice(ss_hooks)
+            hook = hook.replace("usr1", f"**{usr1.name}**")
+            hook = hook.replace("usr2", f"**{usr2.display_name}**")
+            async with aiosqlite.connect('main.db') as conn:
+                async with conn.execute(f"select coolness from users where id = '{protector}';") as current_amount:
+                    coolness = await current_amount.fetchone()
+                    await conn.execute(f"update users set coolness = '{coolness[0]+100}' where id = '{protector}';")
+                    await conn.commit()
+            await ctx.send("**[BLOCKED] | **" + hook)
+        except:
+            await ctx.send("Your attempt to attack fails as their sellsword protects them, stabbing you instead!")
+        return False
+
+    if target not in bot.user_status:
+        bot.user_status[target] = []
+    user_effects = bot.user_status[target]
+    for status in user_effects: 
+        if status[0].lower() == "defending":
+            ### HANDLE STACKS
+            remaining_stacks = status[1]-1
+            if remaining_stacks <= 0:
+                bot.user_status[user].remove(status)
+            else:
+                status[1] -= 1
+            ### APPLY EFFECT
+            await ctx.send("You attempt to attack, but you cannot penetrate their defenses! Your attack fails!")
+            return False
+    # CHECK FOR DEFENDING AND MORE
 
     return True
 
-async def crit_handler(bot, attacker, defender): 
-    # Values needed for later ##############################################################
-    crit_thresh = 1                    # The number needed to roll below to get a critical #
-    crit = random.randint(1,20)        # The rolled critical chance                        #
+async def crit_handler(bot, attacker, defender, boost = None): 
+    # Values needed for later ############################################################ #
+    crit_thresh = 1                # The number needed to roll below to get a critical     #
+    crit_max = 20                  # The maximum nuber that the critical will be rolled on #
+    ###                                                                                    #
+    if boost:                                                                              #
+        if boost > 0:                                                                      #
+            crit_thresh += boost                                                           #
+        else:                                                                              #
+            crit_max += boost                                                              #
+    ###                                                                                    #
+    crit = random.randint(1,crit_max)        # The rolled critical chance                  #
     # End Values                                                                           #
-    ########################################################################################
-    ########################################################################################
+    ###################################################################################### #
+    ###################################################################################### #
     # Getting user status effects to check for critical-altering ones ###
     speaker = attacker
     if speaker in bot.user_status:
@@ -198,7 +274,7 @@ async def alter_ap(message, ap, bot):
             return False
 
 async def xp_handler(message, bot):
-    testing = True
+    testing = False
     num = random.randint(1,4)
     if num == 4:
         if str(message.author.id) in bot.registered_users:
@@ -220,7 +296,7 @@ async def xp_handler(message, bot):
                 async with aiosqlite.connect('main.db') as conn:
                     await conn.execute(f"update users set exp = {max_xp(current_lvl)} where id = '{message.author.id}'")
                     await conn.commit()
-                if message.author.id not in bot.notified and not testing:
+                if message.author.id not in bot.notified:
                     bot.notified.append(message.author.id)
                     embed = discord.Embed(title=f"✨ Level up! ✨", colour=discord.Colour.from_rgb(255, 204, 153), description=f'You can now level up to {prof[1]+1}! Good job!')
                     embed.set_thumbnail(url=message.author.avatar_url)
@@ -248,7 +324,7 @@ async def webhook_safe_check(channel): # This function should be run before any 
             return new_hook.url
 
 basic_text_quests = [1,2,3,4,5,6,15,16,17]
-async def on_message_quest_handler(user, mss, people): # This takes the message sent, checks if it's applicable to any quest. I just put it here instead of main.py honestly.
+async def on_message_quest_handler(user, mss, people, bot): # This takes the message sent, checks if it's applicable to any quest. I just put it here instead of main.py honestly.
     uid = str(user.id)
     if uid in people:
         async with aiosqlite.connect('main.db') as conn:
@@ -257,9 +333,9 @@ async def on_message_quest_handler(user, mss, people): # This takes the message 
         if quest:
             if quest[1] != 0: # If the user has a quest...
                 if quest[1] in basic_text_quests:
-                    await update_quest(mss, quest[1], 1)
+                    await update_quest(mss, quest[1], 1, bot)
 
-async def update_quest(message, quest_id, addition):
+async def update_quest(message, quest_id, addition, bot, silent = False):
     if addition > 0: # Setting addition to 0 will fail their quest.
         chan = message.channel
         user = message.author
@@ -293,24 +369,27 @@ async def update_quest(message, quest_id, addition):
                         if quest_info[2] == "coolness": # REWARD TYPES!
                             async with conn.execute(f"select coolness from users where id = '{message.author.id}'") as coolness:
                                 old_cool = await coolness.fetchone()
-                                new_cool = old_cool[0] + int(quest_info[3])
-                                await conn.execute(f"update users set coolness = {new_cool} where id = '{message.author.id}';")
-                                await conn.commit() 
-                                reward = f"+{quest_info[3]} Coolness"
+                            new_cool = old_cool[0] + int(quest_info[3])
+                            await conn.execute(f"update users set coolness = {new_cool} where id = '{message.author.id}';")
+                            await conn.commit() 
+                            reward = f"+{quest_info[3]} Coolness"
                         elif quest_info[2] == "xp": 
                             async with conn.execute(f"select exp from users where id = '{message.author.id}'") as exp:
                                 old_exp = await exp.fetchone()
-                                new_exp = old_exp[0] + int(quest_info[3])
-                                await conn.execute(f"update users set exp = {new_exp} where id = '{message.author.id}';")
-                                await conn.commit() 
-                                reward = f"+{quest_info[3]} XP"
+                            new_exp = old_exp[0] + int(quest_info[3])
+                            await conn.execute(f"update users set exp = {new_exp} where id = '{message.author.id}';")
+                            await conn.commit() 
+                            reward = f"+{quest_info[3]} XP"
                         elif quest_info[2] == "gold": 
                             async with conn.execute(f"select gold from users where id = '{message.author.id}'") as exp:
                                 old_cash = await exp.fetchone()
-                                new_cash = old_cash[0] + int(quest_info[3])
-                                await conn.execute(f"update users set gold = {new_cash} where id = '{message.author.id}';")
-                                await conn.commit() 
-                                reward = f"+{quest_info[3]} Gold"
+                            amount = int(quest_info[3])
+                            if message.author.id in bot.server_boosters and amount > 0:
+                                amount *= 2
+                            new_cash = old_cash[0] + amount
+                            await conn.execute(f"update users set gold = {new_cash} where id = '{message.author.id}';")
+                            await conn.commit() 
+                            reward = f"+{quest_info[3]} Gold"
                         else:
                             pass
 
@@ -377,11 +456,12 @@ async def update_quest(message, quest_id, addition):
             await conn.execute(f"update quests set users = '{end}' where quest_id = '{quest_id}';")
             await conn.commit()
 
-
-
-        embed = discord.Embed(title=f"Quest Failed!", colour=discord.Colour.from_rgb(166, 148, 255), description=f'**{quest_info[6]}**\n*{quest_info[1]}*')
-        embed.set_thumbnail(url=quest_info[4])
-        notif = await chan.send(content=message.author.mention, embed=embed)
+        if silent:
+            pass
+        else:
+            embed = discord.Embed(title=f"Quest Failed!", colour=discord.Colour.from_rgb(166, 148, 255), description=f'**{quest_info[6]}**\n*{quest_info[1]}*')
+            embed.set_thumbnail(url=quest_info[4])
+            await chan.send(content=message.author.mention, embed=embed)
                         
                 
 
@@ -459,15 +539,18 @@ async def add_coolness(uid, amount):
             await conn.execute(f"update users set coolness = '{coolness[0]+amount}' where id = '{uid}';")
             await conn.commit()
 
-async def add_gold(uid, amount, bot):
+async def add_gold(uid, amount, bot, debt_mode = False, purchase_mode = None):
     async with aiosqlite.connect('main.db') as conn:
         async with conn.execute(f"select gold from users where id = '{uid}';") as current_amount:
             gold = await current_amount.fetchone()
             if uid in bot.server_boosters and amount > 0:
                 amount *= 2
             final = gold[0]+amount
-            if final < 0:
+            if final < 0 and debt_mode == False and purchase_mode == None:
                 final = 0
+            if final < 0 and purchase_mode != None:
+                await purchase_mode.send("You cannot afford this!")
+                raise SyntaxError
             await conn.execute(f"update users set gold = '{final}' where id = '{uid}';")
             await conn.commit()
 
@@ -486,11 +569,11 @@ async def award_ach(ach_id, message, bot):
         
             async with conn.execute(f"select * from achievements where id = '{ach_id}'") as ach:
                 ach_info = await ach.fetchone()
-                embed = discord.Embed(title=f"Achievement Unlocked!", colour=discord.Colour.from_rgb(255,200,0), description=f'**"{ach_info[1]}"**\n*{ach_info[2]}*')
-                embed.set_thumbnail(url=ach_info[3])
-                amount = ach_info[4]
-                embed.set_footer(text=f"+{amount} Coolness", icon_url="")
-                # await asyncio.sleep(random.randint(30,100))
+            embed = discord.Embed(title=f"Achievement Unlocked!", colour=discord.Colour.from_rgb(255,200,0), description=f'**"{ach_info[1]}"**\n*{ach_info[2]}*')
+            embed.set_thumbnail(url=ach_info[3])
+            amount = ach_info[4]
+            embed.set_footer(text=f"+{amount} Coolness", icon_url="")
+            # await asyncio.sleep(random.randint(30,100))
             async with conn.execute(f"select coolness from users where id = '{uid}';") as current_amount: # Can't run the function for this due to overloading the db
                 coolness = await current_amount.fetchone()
                 await conn.execute(f"update users set coolness = '{coolness[0]+amount}' where id = '{uid}';")
@@ -513,7 +596,7 @@ async def award_ach(ach_id, message, bot):
 async def fetch_random_quest(message, bot, uid=None, override=False):
     # Random quest encounter chance time!
     if uid:
-        uid = str(uid)
+        uid = str(uid.id)
     else:
         uid = str(message.author.id)
     if uid in bot.registered_users:

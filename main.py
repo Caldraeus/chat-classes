@@ -182,6 +182,17 @@ async def on_message(message):
         
         # We reset the daily gift counter.
         bot.claimed = []
+
+        # We reset our notifcations.
+        bot.notified = []
+
+        # We reset those who are currently under some sort of protection.
+        cog = bot.get_cog('sellsword')
+        cog.hired = {}
+
+        # We reset artifact usage.
+        cog = bot.get_cog('artifacts')
+        cog.used = []
         
         
         print("\n\n\n----------------Daily reset has occurred----------------\n\n\n")
@@ -205,7 +216,7 @@ async def on_message(message):
         if str(message.author.id) in bot.registered_users:
             await h.fetch_random_quest(message, bot)
             await asyncio.sleep(.1)
-            await h.on_message_quest_handler(message.author, message, bot.registered_users)
+            await h.on_message_quest_handler(message.author, message, bot.registered_users, bot)
             await asyncio.sleep(.1)
             await h.txt_achievement_handler(message.content.lower(), message.author.id, message, bot)
             await asyncio.sleep(.1)
@@ -215,6 +226,14 @@ async def on_message(message):
 @commands.guild_only()
 async def invite_link(ctx):
     await ctx.send("https://discord.com/oauth2/authorize?client_id=713506775424565370&scope=bot&permissions=8")
+
+"""
+@bot.command()
+@commands.guild_only()
+async def test(ctx):
+    origin = await h.find_origin("pacted")
+    await ctx.send(f"You started as: {origin}")
+"""
 
 ###### The following below is implemented here rather than in helper due to the nature of it's blocking commands that I need to use jishaku's stuff for 
 
@@ -235,11 +254,12 @@ async def handle_effects(message, bot): # List of effects in the readme
         for status in user_effects: # We go through each status affecting the user [NOT ALL APPLY TO ON-MESSAGE EVENTS. THEREFORE, WE NEED IF STATEMENTS]. These are applied in order
             if status[0].lower() == "shatter":
                 ### HANDLE STACKS
-                remaining_stacks = status[1]-1
-                if remaining_stacks <= 0:
-                    bot.user_status[speaker].remove(status)
-                else:
-                    status[1] -= 1
+                if len(message.content.split(" ")) != 1:
+                    remaining_stacks = status[1]-1
+                    if remaining_stacks <= 0:
+                        bot.user_status[speaker].remove(status)
+                    else:
+                        status[1] -= 1
                 ### APPLY EFFECT
                 mad_content = " "
                 if message.content != "":
@@ -264,6 +284,8 @@ async def handle_effects(message, bot): # List of effects in the readme
                     url = await h.webhook_safe_check(message.channel)
                     clone_hook = Webhook.from_url(url, adapter=AsyncWebhookAdapter(session))
                     await clone_hook.send(content=mad_content, username=message.author.display_name, avatar_url=message.author.avatar_url, file=buff)
+                break
+                
                     
             elif status[0].lower() == "polymorph":
                 ### HANDLE STACKS
@@ -314,6 +336,7 @@ async def handle_effects(message, bot): # List of effects in the readme
                         await clone_hook.send(content=sheep_content.capitalize(), username=sheep_name, avatar_url=chosen_url)
                     except:
                         await clone_hook.send(content="Ba"*random.randint(1,20), username=sheep_name, avatar_url=chosen_url)
+                break
             elif status[0].lower() == "drunk":
                 chance = random.randint(1,5)
                 if chance == 5:
@@ -332,18 +355,23 @@ async def handle_effects(message, bot): # List of effects in the readme
                             url = await h.webhook_safe_check(message.channel)
                             clone_hook = Webhook.from_url(url, adapter=AsyncWebhookAdapter(session))
                             await clone_hook.send(content=message.content + " -hic-", username=message.author.display_name, avatar_url=message.author.avatar_url)
+                        break
                     elif chosen_effect == 2:
                         await message.channel.send(f'*{message.author.display_name} vomits all over the floor.*')
+                        break
                     elif chosen_effect == 3:
                         await message.channel.send(f'*{message.author.display_name} stumbles over their own feet, nearly falling over.*')
+                        break
                     elif chosen_effect == 3:
                         await message.channel.send(f'*{message.author.display_name} burps.*')
+                        break
                     elif chosen_effect == 4:
                         await message.delete()
                         async with aiohttp.ClientSession() as session:
                             url = await h.webhook_safe_check(message.channel)
                             clone_hook = Webhook.from_url(url, adapter=AsyncWebhookAdapter(session))
                             await clone_hook.send(content="-hic- " + message.content + " -hic-", username=message.author.display_name, avatar_url=message.author.avatar_url)
+                    break
             elif status[0].lower() == "burning":
                 ### HANDLE STACKS
                 remaining_stacks = status[1]-1
@@ -389,6 +417,7 @@ async def handle_effects(message, bot): # List of effects in the readme
                         await clone_hook.send(content=fstring, username=message.author.display_name, avatar_url=message.author.avatar_url)
                     except:
                         await clone_hook.send(content="**I AM ON FIRE HELP MEEEEEEEEEEEEEEEE**", username=message.author.display_name, avatar_url=message.author.avatar_url)
+                    break
 
 ####
 

@@ -25,6 +25,7 @@ class healer(commands.Cog):
 
     @commands.command()
     @commands.guild_only()
+    @commands.cooldown(2, 1, commands.BucketType.user)
     async def heal(self, ctx, target: discord.Member = None): 
         if target and target != ctx.author and target.id != 713506775424565370:
             if self.bot.users_classes[str(ctx.author.id)] == "healer":
