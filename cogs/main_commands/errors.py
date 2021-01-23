@@ -47,10 +47,12 @@ class CommandErrorHandler(commands.Cog):
                 pass
 
         elif isinstance(error, commands.CommandOnCooldown):
-            await ctx.send(f"{ctx.author.mention} : Slow down, hotshot.")
-            
-        print('Ignoring exception in command {}:'.format(ctx.command), file=sys.stderr)
-        traceback.print_exception(type(error), error, error.__traceback__, file=sys.stderr)
+            mss = await ctx.send(f"{ctx.author.mention} : Slow down, hotshot! Command is on cooldown!")
+            await mss.delete(delay=5)
+
+        if not isinstance(error, commands.CommandOnCooldown):
+            print('Ignoring exception in command {}:'.format(ctx.command), file=sys.stderr)
+            traceback.print_exception(type(error), error, error.__traceback__, file=sys.stderr)
     
                 
 

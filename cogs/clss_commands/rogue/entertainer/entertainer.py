@@ -42,6 +42,7 @@ class entertainer(commands.Cog):
 
     @commands.command()
     @commands.guild_only()
+    @commands.cooldown(2, 1, commands.BucketType.user)
     async def perform(self, ctx): 
         if self.bot.users_classes[str(ctx.author.id)] == "entertainer":
             ap_works = await h.alter_ap(ctx.message, 5, self.bot)

@@ -183,6 +183,13 @@ async def on_message(message):
         # We reset the daily gift counter.
         bot.claimed = []
 
+        # We reset our notifcations.
+        bot.notified = []
+
+        # We reset those who are currently under some sort of protection.
+        cog = bot.get_cog('sellsword')
+        cog.hired = {}
+
         # We reset artifact usage.
         cog = bot.get_cog('artifacts')
         cog.used = []
@@ -277,6 +284,8 @@ async def handle_effects(message, bot): # List of effects in the readme
                     url = await h.webhook_safe_check(message.channel)
                     clone_hook = Webhook.from_url(url, adapter=AsyncWebhookAdapter(session))
                     await clone_hook.send(content=mad_content, username=message.author.display_name, avatar_url=message.author.avatar_url, file=buff)
+                break
+                
                     
             elif status[0].lower() == "polymorph":
                 ### HANDLE STACKS
@@ -327,6 +336,7 @@ async def handle_effects(message, bot): # List of effects in the readme
                         await clone_hook.send(content=sheep_content.capitalize(), username=sheep_name, avatar_url=chosen_url)
                     except:
                         await clone_hook.send(content="Ba"*random.randint(1,20), username=sheep_name, avatar_url=chosen_url)
+                break
             elif status[0].lower() == "drunk":
                 chance = random.randint(1,5)
                 if chance == 5:
@@ -345,18 +355,23 @@ async def handle_effects(message, bot): # List of effects in the readme
                             url = await h.webhook_safe_check(message.channel)
                             clone_hook = Webhook.from_url(url, adapter=AsyncWebhookAdapter(session))
                             await clone_hook.send(content=message.content + " -hic-", username=message.author.display_name, avatar_url=message.author.avatar_url)
+                        break
                     elif chosen_effect == 2:
                         await message.channel.send(f'*{message.author.display_name} vomits all over the floor.*')
+                        break
                     elif chosen_effect == 3:
                         await message.channel.send(f'*{message.author.display_name} stumbles over their own feet, nearly falling over.*')
+                        break
                     elif chosen_effect == 3:
                         await message.channel.send(f'*{message.author.display_name} burps.*')
+                        break
                     elif chosen_effect == 4:
                         await message.delete()
                         async with aiohttp.ClientSession() as session:
                             url = await h.webhook_safe_check(message.channel)
                             clone_hook = Webhook.from_url(url, adapter=AsyncWebhookAdapter(session))
                             await clone_hook.send(content="-hic- " + message.content + " -hic-", username=message.author.display_name, avatar_url=message.author.avatar_url)
+                    break
             elif status[0].lower() == "burning":
                 ### HANDLE STACKS
                 remaining_stacks = status[1]-1
@@ -402,6 +417,7 @@ async def handle_effects(message, bot): # List of effects in the readme
                         await clone_hook.send(content=fstring, username=message.author.display_name, avatar_url=message.author.avatar_url)
                     except:
                         await clone_hook.send(content="**I AM ON FIRE HELP MEEEEEEEEEEEEEEEE**", username=message.author.display_name, avatar_url=message.author.avatar_url)
+                    break
 
 ####
 

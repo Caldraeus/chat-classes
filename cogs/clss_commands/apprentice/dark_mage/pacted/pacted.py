@@ -44,6 +44,7 @@ class pacted(commands.Cog):
 
     @commands.command()
     @commands.guild_only()
+    @commands.cooldown(2, 1, commands.BucketType.user)
     async def gloat(self, ctx): # Use `;gloat` for 5 AP to gain {1*(level)} stacks of **Confidence**, increasing your critical chance.
         if self.bot.users_classes[str(ctx.author.id)] == "pacted":
             uid = ctx.author.id
@@ -63,6 +64,7 @@ class pacted(commands.Cog):
     
     @commands.command()
     @commands.guild_only()
+    @commands.cooldown(2, 1, commands.BucketType.user)
     async def invoke(self, ctx): # Use `;gloat` for 5 AP to gain {1*(level)} stacks of **Confidence**, increasing your critical chance.
         if self.bot.users_classes[str(ctx.author.id)] == "pacted":
             uid = ctx.author.id
@@ -87,6 +89,7 @@ class pacted(commands.Cog):
 
     @commands.command()
     @commands.guild_only()
+    @commands.cooldown(2, 1, commands.BucketType.user)
     async def restore(self, ctx, target: discord.Member = None):
         if self.bot.users_classes[str(ctx.author.id)] == "pacted" and target and target != ctx.author:
             uid = ctx.author.id

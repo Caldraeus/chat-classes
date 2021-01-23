@@ -10,7 +10,7 @@ import aiosqlite
 from discord import Webhook, AsyncWebhookAdapter
 import aiohttp
 
-class class_comands(commands.Cog):
+class class_commands(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
     pass
@@ -32,7 +32,7 @@ class class_comands(commands.Cog):
                 else:
                     print(f"User {ctx.message.author.id} doesn't exist")
                     ### Add user to database
-                    await conn.execute(f"insert into users values('{ctx.message.author.id}', '{clss.lower()}', 0, 0, 'No skills', 0, '0', '', 1, 0, False, 0, 20)")
+                    await conn.execute(f"insert into users values('{ctx.message.author.id}', '{clss.lower()}', 0, 0, 'None', 0, '0', '', 1, 0, False, 0, 20)")
                     async with conn.execute(f"select id, class, achievements, ap from users;") as people:
                         usrs = await people.fetchall()
                         for guy in usrs:
@@ -169,4 +169,4 @@ class class_comands(commands.Cog):
 
 # A setup function the every cog has
 def setup(bot):
-    bot.add_cog(class_comands(bot))
+    bot.add_cog(class_commands(bot))

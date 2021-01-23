@@ -62,10 +62,24 @@ class swordsman(commands.Cog):
             "usr1 slashes usr2's bdypart a thousand times, turning it into small pieces.",
             "usr1 parries usr2's attack, then smashes the pommel of their katana into usr2's bdypart, causing them to stumble and fall off a cliff."
         ]
+
+        self.hooks_v = [
+            "usr1 grabs usr2's head and knees it, then tosses usr2 aside!",
+            "usr1 slams their axe into usr2's bdypart, then forces their axe through them! Brutal!",
+            "usr1 tackles usr2 and slams their axe into usr2's skull. Owch.",
+            "usr1 kicks usr2 into a wall and swings their axe overhead into usr2's bdypart. Bullseye!",
+            "usr1 shoulder slams usr2 then rips their arms off. Holy shit dude, relax.",
+            "usr1 throws their axe into usr2's bdypart, then runs up and rips it out, slamming it into their neck, beheading them. Fatality!",
+            'usr1 charges usr2, yelling "Ég ríf þig í bita!" before impaking them upon their axe and kneeing them off a cliff. Woah.',
+            'usr1 grabs usr2 by the neck and lifts them, whispering "Núna deyrðu" before throwing usr2 through a wall',
+            'usr2 tries to attack usr1, but usr1 doesn\'t even flinch. usr1 smiles. "Tidbúin að deyja?" usr1 asks before slicing usr2\'s bdypart off.',
+            "usr1 grabs usr2 by the waist and flips them upside down, then slams them into the ground, smushing them."
+        ]
     pass
 
     @commands.command(aliases=['slice'])
     @commands.guild_only()
+    @commands.cooldown(2, 1, commands.BucketType.user)
     async def slic(self, ctx, target: discord.Member = None): # Shoots an arrow at someone.
         if target and target != ctx.author and target.id != 713506775424565370:
             if self.bot.users_classes[str(ctx.author.id)] == "swordsman":
@@ -113,6 +127,54 @@ class swordsman(commands.Cog):
                         hook = "**🌸[SENBONZAKURA!]🌸** + 250 Coolness | " + hook
                         await h.add_coolness(ctx.author.id, 250)
                         await ctx.send(hook)
+            elif self.bot.users_classes[str(ctx.author.id)] == "viking":
+                ap_works = await h.alter_ap(ctx.message, 1, self.bot)
+                if ap_works and await h.can_attack(ctx.author.id, target.id, ctx):
+                    crit_check = await h.crit_handler(self.bot, ctx.author.id, target.id)
+                    body_part = random.choice(h.body_parts) 
+                    hook = random.choice(self.hooks_v)
+                    hook = hook.replace("usr1", f"**{ctx.author.display_name}**")
+                    hook = hook.replace("bdypart", body_part)
+                    hook = hook.replace("usr2", f"**{target.display_name}**")
+                    if crit_check == False:
+                        await ctx.send(hook)
+                    else:
+                        pillage_amount = random.randint(100,300)
+                        hook = f"**<:gold:801878856196685854>[PILLAGE!]<:gold:801878856196685854>** + 100 Coolness, + {pillage_amount} Gold | " + hook + f"\n\n*{target.display_name} has been pillaged!*"
+                        await h.add_coolness(ctx.author.id, 250)
+                        await h.add_gold(ctx.author.id, pillage_amount, self.bot)
+                        try:
+                            await h.add_gold(target.id, -pillage_amount, self.bot)
+                        except TypeError:
+                            pass
+                        await ctx.send(hook)
+            elif self.bot.users_classes[str(ctx.author.id)] == "sellsword":
+                protected = bot.get_cog('sellsword').hired
+                keys = list(protected.keys())
+                if ctx.author.id in keys:
+                    if protected[ctx.author.id] == target.id:
+                        await ctx.send("You cannot attack your client!")
+                    else:
+                        ap_works = await h.alter_ap(ctx.message, 1, self.bot)
+                        if ap_works and await h.can_attack(ctx.author.id, target.id, ctx):
+                            crit_check = await h.crit_handler(self.bot, ctx.author.id, target.id)
+                            body_part = random.choice(h.body_parts) 
+                            hook = random.choice(self.hooks_v)
+                            hook = hook.replace("usr1", f"**{ctx.author.display_name}**")
+                            hook = hook.replace("bdypart", body_part)
+                            hook = hook.replace("usr2", f"**{target.display_name}**")
+                            if crit_check == False:
+                                await ctx.send(hook)
+                            else:
+                                pillage_amount = random.randint(100,300)
+                                hook = f"**<:gold:801878856196685854>[PILLAGE!]<:gold:801878856196685854>** + 100 Coolness, + {pillage_amount} Gold | " + hook + f"\n\n*{target.display_name} has been pillaged!*"
+                                await h.add_coolness(ctx.author.id, 250)
+                                await h.add_gold(ctx.author.id, pillage_amount, self.bot)
+                                try:
+                                    await h.add_gold(target.id, -pillage_amount, self.bot)
+                                except TypeError:
+                                    pass
+                                await ctx.send(hook)
                         
 # A setup function the every cog has
 def setup(bot):
