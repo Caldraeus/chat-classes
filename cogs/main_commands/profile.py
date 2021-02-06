@@ -21,9 +21,9 @@ class profile(commands.Cog):
     async def profile(self, ctx, user: discord.Member = None):
         try:
             if user:
-                await ctx.send(embed=await h.genprof(user, self.bot.users_ap))
+                await ctx.send(embed=await h.genprof(user, self.bot.users_ap, self.bot))
             else:
-                await ctx.send(embed=await h.genprof(ctx.author, self.bot.users_ap))
+                await ctx.send(embed=await h.genprof(ctx.author, self.bot.users_ap, self.bot))
         except TypeError:
             await ctx.send("User does not have a profile! Run `;start` to get one!")
 

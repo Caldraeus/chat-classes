@@ -19,7 +19,7 @@ class economy(commands.Cog):
             "hot dog" : 75,
             "monster" : 125,
             "adrenaline" : 225,
-            "void" : 250,
+            "void" : 275,
             "milk" : 1000,
             "jamba juice" : 5000
         }

@@ -1,0 +1,982 @@
+[{
+    "stone":{
+        "description": "It's a stone. Also known as a rock, pebble, boulder, or if you're spicy, a mineral ball.",
+        "image_link" : "http://pixelartmaker.com/art/8fd9223acb89db4.png",
+        "sells_for" : 1,
+        "type" : "Mined Material",
+        "rarity":"Common"
+    }
+},
+{
+    "iron":{
+        "description": "It's just iron ore. Not to be confused with Eye'r Nore.",
+        "image_link" : "https://pbs.twimg.com/media/DsYe-NgWsAINl0F.png",
+        "sells_for" : 1,
+        "type" : "Mined Material",
+        "rarity":"Common"
+    }
+},
+{
+    "coal":{
+        "description": "Coal! It makes things do stuff!",
+        "image_link" : "http://pixelartmaker.com/art/d6d51ea600bc989.png",
+        "sells_for" : 0,
+        "type" : "Mined Material",
+        "rarity":"Common"
+    }
+},
+{
+    "silver":{
+        "description": "Ahhh, silver. Monsters HATE this stuff, apparently. Maybe they're more of a gold kind of people, ya know?",
+        "image_link": "https://images-wixmp-ed30a86b8c4ca887773594c2.wixmp.com/f/24de9b67-4027-4efc-809c-7fc67a042298/db1qet8-a47c09c2-e820-45dc-9396-d772cfd94e67.png?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1cm46YXBwOiIsImlzcyI6InVybjphcHA6Iiwib2JqIjpbW3sicGF0aCI6IlwvZlwvMjRkZTliNjctNDAyNy00ZWZjLTgwOWMtN2ZjNjdhMDQyMjk4XC9kYjFxZXQ4LWE0N2MwOWMyLWU4MjAtNDVkYy05Mzk2LWQ3NzJjZmQ5NGU2Ny5wbmcifV1dLCJhdWQiOlsidXJuOnNlcnZpY2U6ZmlsZS5kb3dubG9hZCJdfQ.kGXqHqAHrcs7dzNz6wAd9vz7-wGNY4IUVhhhp-eJKFk",
+        "sells_for": 1,
+        "type": "Mined Material",
+        "rarity":"Common"
+    }
+},
+{
+    "bronze":{
+        "description": "Personally, I think bronze is pretty cool. That's why in my world, bronze has some magical energy associated with it!",
+        "image_link": "https://img.icons8.com/color/452/bronze-ore.png",
+        "sells_for": 1,
+        "type": "Mined Material",
+        "rarity":"Common"
+    }
+},
+{
+    "gold":{
+        "description": "Gold has so many uses. Gold coins, for one, is my favourite use of the stuff. Paper money is cool, sure, but I want to be able to heave around a big bag of coins instead.",
+        "image_link": "https://nocitygames.com/images/gallery/Jams/LD46RockGold.png",
+        "sells_for": 1,
+        "type": "Mined Material",
+        "rarity": "Uncommon"
+    }
+},
+{
+    "sulfur":{
+        "description": "Smells bad for sure, but I'm sure you can find a use for it.",
+        "image_link": "https://static.wikia.nocookie.net/knightsandbrides/images/1/1d/Sulfur.png/revision/latest/top-crop/width/360/height/450?cb=20151004073032",
+        "sells_for": 10,
+        "type": "Mined Material",
+        "rarity": "Uncommon"
+    }
+},
+{
+    "arsenic":{
+        "description": "To be completely honest, I don't even know what this stuff is, or what it could be used for.",
+        "image_link": "https://ftbwiki.org/images/0/09/Item_Arsenic_Dust.png",
+        "sells_for": 10,
+        "type": "Mined Material",
+        "rarity": "Uncommon"
+    }
+},
+{
+    "faux gold":{
+        "description": "It's like gold, but not! However, it does conduct electricity pretty well.",
+        "image_link": "https://i.dlpng.com/static/png/6401817_preview.png",
+        "sells_for": 1,
+        "type": "Mined Material",
+        "rarity": "Uncommon"
+    }
+},
+{
+    "amber":{
+        "description": "Does anyone else want to eat it? No? Just me?",
+        "image_link": "https://i.redd.it/qlvghx7nvnh11.png",
+        "sells_for": 5,
+        "type": "Mined Material",
+        "rarity": "Rare"
+    }
+},
+{
+    "cobalt":{
+        "description": "Cobalt is blue. That's about it, so I made it glow in my world. Now cobalt glows blue.",
+        "image_link": "https://stationeers-wiki.com/images/c/c6/ItemCobaltOre.png",
+        "sells_for": 5,
+        "type": "Mined Material",
+        "rarity": "Rare"
+    }
+},
+{
+    "emerald":{
+        "description": "I hear villagers like these things. I guess I can see why.",
+        "image_link": "https://art.pixilart.com/73a3b0565601c62.png",
+        "sells_for": 20,
+        "type": "Mined Material",
+        "rarity": "Rare"
+    }
+},
+{
+    "experium":{
+        "description": "Ah, experium. Raw experience! This stuff is some crazy shit, filled with power beyond understanding.",
+        "image_link": "https://images.squarespace-cdn.com/content/v1/5aa7082296d455e0db8de7cf/1564485047131-4J2382Q09VV0JESHW34C/ke17ZwdGBToddI8pDm48kE6My2sCT0XoRp2ihMzrjg9Zw-zPPgdn4jUwVcJE1ZvWEtT5uBSRWt4vQZAgTJucoTqqXjS3CfNDSuuf31e0tVE5HSYSfpNr035aLbdwCRGZ93jz9sOtwIm5PAvoXz4h6ltO8nJtk629tZGIWiyY3XQ/potion+animation+resized.gif",
+        "sells_for": 0,
+        "type": "Mined Material",
+        "rarity": "Rare"
+    }
+},
+{
+    "reactive prism":{
+        "description": "Touching these crystals causes them to glow with a magical energy... I can see some use for these.",
+        "image_link": "https://cdn.indreams.me/fd316de5770ba9004547871793bd054c_2",
+        "sells_for": 20,
+        "type": "Mined Material",
+        "rarity": "Rare"
+    }
+},
+{
+    "diamond":{
+        "description": "Mining diamonds is considered a delicacy in some parts of the world.",
+        "image_link": "https://art.pixilart.com/fba1c6ea5de02ab.png",
+        "sells_for": 25,
+        "type": "Mined Material",
+        "rarity": "Very Rare"
+    }
+},
+{
+    "amethyst":{
+        "description": "These purple gems surge with magical power under the right circumstances. Also, they're purple, so that's pretty cool.",
+        "image_link": "https://i.redd.it/wf02ztkazl821.png",
+        "sells_for": 25,
+        "type": "Mined Material",
+        "rarity": "Very Rare"
+    }
+},
+{
+    "ruby":{
+        "description": "It's like a diamond, but instead it has some poorly written character arcs.",
+        "image_link": "http://pixelartmaker.com/art/f711c4750a2d308.png",
+        "sells_for": 25,
+        "type": "Mined Material",
+        "rarity": "Very Rare"
+    }
+},
+{
+    "mythril":{
+        "description": "A magically infused metal ore with a lot of strength.",
+        "image_link": "https://static.wikia.nocookie.net/warofthevisions_gamepedia_en/images/e/e7/Item_it_af_mat_mythril.png/revision/latest/scale-to-width-down/128?cb=20200506080530",
+        "sells_for": 15,
+        "type": "Mined Material",
+        "rarity": "Very Rare"
+    }
+},
+{
+    "magma":{
+        "description": "HOT FUCK SHIT OWCH HOW DO NOT TOUCH REGRET REGRET",
+        "image_link": "https://preview.redd.it/oixhape35id31.png?width=288&format=png&auto=webp&s=d97e53544bb9675cd0977fac1a6f115ff6a92411",
+        "sells_for": 10,
+        "type": "Mined Material",
+        "rarity": "Very Rare"
+    }
+},
+{
+    "obsidian":{
+        "description": "It's a cool rock! (Get it?)",
+        "image_link": "https://i.pinimg.com/originals/14/8e/55/148e55193f6ab08e8bfbe72c0f24aa23.png",
+        "sells_for": 15,
+        "type": "Mined Material",
+        "rarity": "Very Rare"
+    }
+},
+{
+    "black diamond":{
+        "description": "These diamonds radiate dark energy...",
+        "image_link": "https://www.harmanbeads.com/assets/images/swarovski%20products/flatbacks/2773/2773_BlackDiamond.png",
+        "sells_for": 30,
+        "type": "Mined Material",
+        "rarity": "Epic"
+    }
+},
+{
+    "lightstone":{
+        "description": "These stones radiate a bright light when in darkness.",
+        "image_link": "https://static.wikia.nocookie.net/lastoasis_gamepedia_en/images/8/88/Iron_Ore_icon.png/revision/latest/scale-to-width-down/256?cb=20200327224445",
+        "sells_for": 30,
+        "type": "Mined Material",
+        "rarity": "Epic"
+    }
+},
+{
+    "thunderstone":{
+        "description": "These stones release deafening noises when slammed together.",
+        "image_link": "https://www.khwiki.com/images/thumb/7/7d/Lightning_Stone_KHIII.png/200px-Lightning_Stone_KHIII.png",
+        "sells_for": 30,
+        "type": "Mined Material",
+        "rarity": "Epic"
+    }
+},
+{
+    "plutonium":{
+        "description": "Uranium fever has gone and got me down! Uranium fever is spreading all around! (Except, well, it's plutonium.)",
+        "image_link": "https://static.wikia.nocookie.net/frackinuniverse/images/5/58/Plutoniumore.png/revision/latest?cb=20170417180716",
+        "sells_for": 35,
+        "type": "Mined Material",
+        "rarity": "Epic"
+    }
+},
+{
+    "deepstone":{
+        "description": "This stone is cool to the touch, and makes you feel slightly depressed.",
+        "image_link": "https://static.wikia.nocookie.net/ninjago/images/2/2f/CGIDeepstone.png/revision/latest?cb=20161118034453",
+        "sells_for": 30,
+        "type": "Mined Material",
+        "rarity": "Epic"
+    }
+},
+{
+    "starbit":{
+        "description": "I saw these things in a game and decided to add them into my world. Cool, right! Look at them bounce!",
+        "image_link": "https://static.wikia.nocookie.net/supermariogalaxy/images/1/17/StarBits.png/revision/latest/scale-to-width-down/340?cb=20141220154112",
+        "sells_for": 30,
+        "type": "Mined Material",
+        "rarity": "Epic"
+    }
+},
+{
+    "blood diamond":{
+        "description": "The rarest form of diamond, these gems fill you with bloodlust when held.",
+        "image_link": "https://pics.clipartpng.com/Red_Diamond_PNG_Clipart-801.png",
+        "sells_for": 40,
+        "type": "Mined Material",
+        "rarity": "Legendary"
+    }
+},
+{
+    "dragonstone":{
+        "description": "Dragons used to rule the lands as the apex predator. Now, their bones are melded with the very earth they once rose above.",
+        "image_link": "https://oldschool.runescape.wiki/images/6/68/Dragonstone_detail.png?5421c",
+        "sells_for": 40,
+        "type": "Mined Material",
+        "rarity": "Legendary"
+    }
+},
+{
+    "moonstone":{
+        "description": "These stones seem to devour light around them. Curious.",
+        "image_link": "https://www.gia.edu/images/polished-moonstone.png",
+        "sells_for": 40,
+        "type": "Mined Material",
+        "rarity": "Legendary"
+    }
+},
+{
+    "eldritch copper":{
+        "description": "I wouldn't touch this if I were you.",
+        "image_link": "https://static.wikia.nocookie.net/technicpack/images/8/83/Cinnebar_New.png/revision/latest/scale-to-width-down/340?cb=20130101014703",
+        "sells_for": 40,
+        "type": "Mined Material",
+        "rarity": "Legendary"
+    }
+},
+{
+    "naruulite":{
+        "description": "Not sure where this stuff came from, but it's sickly in color and makes me uncomfortable.",
+        "image_link": "https://www.crimsoncoward.com/wp-content/uploads/2020/12/Tender.png",
+        "sells_for": 40,
+        "type": "Mined Material",
+        "rarity": "Legendary"
+    }
+},
+{
+    "iridium":{
+        "description": "Another radioactive material, but this one seems to be different thatn it's real world counterpart. Curious...",
+        "image_link": "https://static.wikia.nocookie.net/frackinuniverse/images/a/ab/Irradiumore.png/revision/latest?cb=20170405181959",
+        "sells_for": 45,
+        "type": "Mined Material",
+        "rarity": "Legendary"
+    }
+},
+{
+    "unobtanium":{
+        "description": "Well, whoever named it that was clearly incorrect.",
+        "image_link": "https://static.wikia.nocookie.net/azure-mines/images/9/9e/UnobtainiumIcon.png/revision/latest?cb=20201021142801",
+        "sells_for": 50,
+        "type": "Mined Material",
+        "rarity": "Whimsical"
+    }
+},
+{
+    "raw void":{
+        "description": "GET IT OFF GET T OF EFJ AJJ AH DL AN",
+        "image_link": "https://static.wikia.nocookie.net/deeprockgalactic_gamepedia_en/images/1/14/Unknown_artifact_icon.png/revision/latest/scale-to-width-down/1200?cb=20180519140040",
+        "sells_for": 50,
+        "type": "Mined Material",
+        "rarity": "Whimsical"
+    }
+},
+{
+    "jazzium":{
+        "description": "Wait... do you hear that? Is that *\"Fly Me To The Moon\"* by Frank Sinatra?",
+        "image_link": "https://images.squarespace-cdn.com/content/v1/5bb96c7d348cd90ea37f1fae/1549509299221-YAHJPBYGC5J6KA66IH46/ke17ZwdGBToddI8pDm48kBPw4N13dNaFqvN1wFuK0BxZw-zPPgdn4jUwVcJE1ZvWhcwhEtWJXoshNdA9f1qD7aKHqy_Pq5SZUkyxONRRLX6S0It3pZkr2piwbyn7VQezxUZSLJSadZMfV9Js6cjlCQ/DE01_StandingStoneGrey10x10_20%5Bstone+monument%2C+stone+slab%2C+standing+stone%2C+magic+stone%2C+stone+marker%2C+monolith%2C+megalith%2C+magic+standing+stone%2C+runed+stone%5D.png?format=300w",
+        "sells_for": 50,
+        "type": "Mined Material",
+        "rarity": "Whimsical"
+    }
+},
+{
+    "fearite":{
+        "description": "Being within a close range of this material causes you great fear.",
+        "image_link": "https://static.wikia.nocookie.net/zelda/images/f/fa/Fool%27s_Ore.gif/revision/latest/top-crop/width/360/height/450?cb=20080606135900",
+        "sells_for": 50,
+        "type": "Mined Material",
+        "rarity": "Whimsical"
+    }
+},
+{
+    "astral gem":{
+        "description": "From beyond the stars...",
+        "image_link": "https://static.wikia.nocookie.net/trove/images/b/b4/Lesser_Cosmic_Gem.png/revision/latest/scale-to-width-down/340?cb=20181205142144",
+        "sells_for": 50,
+        "type": "Mined Material",
+        "rarity": "Whimsical"
+    }
+},
+{
+    "iron ingot":{
+        "description": "Smelt some iron and BAM! Here ya go.",
+        "image_link": "https://darkandlight.wiki.fextralife.com/file/Dark-and-Light/metalingot_icon_dark-and-light-wiki.png",
+        "sells_for": 10,
+        "type": "Smelted Material",
+        "rarity": "Common"
+    }
+},
+{
+    "silver ingot":{
+        "description": "Smelt some silver and get some of this!",
+        "image_link": "https://atlas.wiki.fextralife.com/file/Atlas/silver_ingot_intermediates_resources_atlas_mmo_game_wiki_guide.png",
+        "sells_for": 10,
+        "type": "Smelted Material",
+        "rarity": "Common"
+    }
+},
+{
+    "bronze ingot":{
+        "description": "You'll never guess how this is made.",
+        "image_link": "https://images-wixmp-ed30a86b8c4ca887773594c2.wixmp.com/f/06093f70-300f-4dda-b568-ffbde00a40b5/dbwmu0u-e36b254b-1b36-4f40-b513-191f3a1eac5c.png?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1cm46YXBwOiIsImlzcyI6InVybjphcHA6Iiwib2JqIjpbW3sicGF0aCI6IlwvZlwvMDYwOTNmNzAtMzAwZi00ZGRhLWI1NjgtZmZiZGUwMGE0MGI1XC9kYndtdTB1LWUzNmIyNTRiLTFiMzYtNGY0MC1iNTEzLTE5MWYzYTFlYWM1Yy5wbmcifV1dLCJhdWQiOlsidXJuOnNlcnZpY2U6ZmlsZS5kb3dubG9hZCJdfQ.0TSGO-yt6wHXiKlKI3nWqvvHi7uR3JNy0WTAUA3jiFE",
+        "sells_for": 10,
+        "type": "Smelted Material",
+        "rarity": "Common"
+    }
+},
+{
+    "gold ingot":{
+        "description": "You'd think that this would be worth more than it is, considering the economy is built of off gold coins, and one of these makes 10 gold coins, but you can't make your own money, so this is what you get instead.",
+        "image_link": "https://static.wikia.nocookie.net/dofus/images/2/22/Gold_Ingot.png/revision/latest?cb=20120417145647",
+        "sells_for": 10,
+        "type": "Smelted Material",
+        "rarity": "Uncommon"
+    }
+},
+{
+    "faux gold ingot":{
+        "description": "This is practically worthless on it's own. Perhaps it can find a use?",
+        "image_link": "https://static.wikia.nocookie.net/dofus/images/2/22/Gold_Ingot.png/revision/latest?cb=20120417145647",
+        "sells_for": 2,
+        "type": "Smelted Material",
+        "rarity": "Uncommon"
+    }
+},
+{
+    "cobalt ingot":{
+        "description": "Now it's a blue bar that glows!",
+        "image_link": "https://static.wikia.nocookie.net/neko-bot-rpg/images/0/0c/Cobalt_Ingot.png/revision/latest?cb=20190420014952",
+        "sells_for": 10,
+        "type": "Smelted Material",
+        "rarity": "Rare"
+    }
+},
+{
+    "refined emerald":{
+        "description": "It's an emerald but better, what were you expecting?",
+        "image_link": "https://images-wixmp-ed30a86b8c4ca887773594c2.wixmp.com/i/c754fcd1-3c4b-4347-a46c-2f08107bef9b/dcmp32z-643b6abd-87d4-44ff-b614-351cdef758fe.png/v1/fill/w_340,h_260,strp/the_hesse_master_emerald_pixel_art_by_turtlemango_dcmp32z-fullview.png",
+        "sells_for": 25,
+        "type": "Smelted Material",
+        "rarity": "Rare"
+    }
+},
+{
+    "refined iridium":{
+        "description": "Now twice as wack!",
+        "image_link": "https://static.wikia.nocookie.net/thetekkit/images/1/1e/Blue_Alloy_Ingot.png/revision/latest?cb=20121011095327",
+        "sells_for": 50,
+        "type": "Smelted Material",
+        "rarity": "Legendary"
+    }
+},
+{
+    "bright ingot":{
+        "description": "These ingots glow brighter than most flames.",
+        "image_link": "https://wiki.aidancbrady.com/w/images/aidancbrady/6/6b/Glowstone_Ingot.png",
+        "sells_for": 35,
+        "type": "Smelted Material",
+        "rarity": "Epic"
+    }
+},
+{
+    "thunder ingot":{
+        "description": "Holding these ingots causes your hands to shake. Huh.",
+        "image_link": "https://static.wikia.nocookie.net/legendsofequestria/images/7/7d/Elementium_Ingot.png/revision/latest/top-crop/width/360/height/450?cb=20160729153122",
+        "sells_for": 35,
+        "type": "Smelted Material",
+        "rarity": "Epic"
+    }
+},
+{
+    "deep ingot":{
+        "description": "Someone should build a crpyt with this stuff.",
+        "image_link": "https://lh3.googleusercontent.com/Ury7bHkbHCEZ80DmhD8FRBJXz-DzK3n0qJumtTPNGNolwnVfYzHDq0AbRgxyNGTFCRGMVb28xdHqgFO6teZ9=s400",
+        "sells_for": 35,
+        "type": "Smelted Material",
+        "rarity": "Epic"
+    }
+},
+{
+    "astral ingot":{
+        "description": "It's pretty cool to get lost staring into this thing.",
+        "image_link": "https://lh3.googleusercontent.com/v4tU0oZfWjPbSR1Q3569wh9dvhvjyGgWCtG76nglPJkrxxU-OUV-VWiRhLzK5cCWtDyWTgGOS7IXnHHQSedZ4A=s400",
+        "sells_for": 35,
+        "type": "Smelted Material",
+        "rarity": "Epic"
+    }
+},
+{
+    "draconic ingot":{
+        "description": "This ingot gives off a warm temperature. The scales within it appear strong, having rose to the surface during the smelting process, changing the color of the material to a deep green.",
+        "image_link": "https://static.wikia.nocookie.net/elderscrolls/images/d/dd/Ingotorichalcum.png/revision/latest?cb=20120513025352",
+        "sells_for": 45,
+        "type": "Smelted Material",
+        "rarity": "Legendary"
+    }
+},
+{
+    "lunar ingot":{
+        "description": "It glows a faint white, reminding you of the moon.",
+        "image_link": "https://www.pngkit.com/png/full/17-176567_dusk-stone-dusk-stone-pokemon-png.png",
+        "sells_for": 45,
+        "type": "Smelted Material",
+        "rarity": "Legendary"
+    }
+},
+{
+    "lovecraftian ingot":{
+        "description": "Don't stare at it for too long.",
+        "image_link": "https://static.wikia.nocookie.net/feed-the-beast/images/5/57/Grid_Corrupted_Ingot.png/revision/latest/scale-to-width-down/32?cb=20130214161026",
+        "sells_for": 45,
+        "type": "Smelted Material",
+        "rarity": "Legendary"
+    }
+},
+{
+    "vita ingot":{
+        "description": "It pulsates with life. Are you sure you didn't cut yourself when you put this in the smelter?",
+        "image_link": "https://ftbwiki.org/images/c/c2/Item_Blood_Infused_Iron_Ingot.png",
+        "sells_for": 45,
+        "type": "Smelted Material",
+        "rarity": "Legendary"
+    }
+},
+{
+    "unobtanium ingot":{
+        "description": "Really wasn't that hard to obtain, now was it?",
+        "image_link": "https://lh3.googleusercontent.com/vR066zs8KnY7Fksgsv4mjzFX5dy0m-XG3kV4HPh09ylkrhkicTtJoIzk3zU4-vO4L8FdVAe82oAoJG8GIX9qjg",
+        "sells_for": 55,
+        "type": "Smelted Material",
+        "rarity": "Whimsical"
+    }
+},
+{
+    "jazzed up ingot":{
+        "description": "It IS *Fly Me To The Moon* by Frank Sinatra!",
+        "image_link": "https://lh3.googleusercontent.com/IsEGh53A_v7LUbxtQ0sOxqIfDgu0HchLLRhbbLs-FfqrYvYExYskUc6Ib4j4xHBei9idFFcXKdi_FdavHAujLIQ=s400",
+        "sells_for": 55,
+        "type": "Smelted Material",
+        "rarity": "Whimsical"
+    }
+},
+{
+    "ethereal ingot":{
+        "description": "Sometimes, these ingots phase through solid matter. They're cold to the touch.",
+        "image_link": "https://www.pinclipart.com/picdir/big/363-3639520_minecraft-clipart-ingot-ingot-png-download.png",
+        "sells_for": 55,
+        "type": "Smelted Material",
+        "rarity": "Whimsical"
+    }
+},
+{
+    "mythril ingot":{
+        "description": "Stronger than steel, these ingots are hard to break.",
+        "image_link": "https://images-wixmp-ed30a86b8c4ca887773594c2.wixmp.com/f/4d086fed-5119-41d8-ab25-b33faeaeb357/dcs8nfe-39ac19d8-a289-4124-b609-820dd5cfda82.png/v1/fill/w_600,h_600,strp/mythril_ingot_by_rukaanofficial_dcs8nfe-fullview.png?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1cm46YXBwOiIsImlzcyI6InVybjphcHA6Iiwib2JqIjpbW3siaGVpZ2h0IjoiPD02MDAiLCJwYXRoIjoiXC9mXC80ZDA4NmZlZC01MTE5LTQxZDgtYWIyNS1iMzNmYWVhZWIzNTdcL2RjczhuZmUtMzlhYzE5ZDgtYTI4OS00MTI0LWI2MDktODIwZGQ1Y2ZkYTgyLnBuZyIsIndpZHRoIjoiPD02MDAifV1dLCJhdWQiOlsidXJuOnNlcnZpY2U6aW1hZ2Uub3BlcmF0aW9ucyJdfQ.kLBNPMpdjqb5RKlX1gbTJbUKZoSrJeBN_D0q7bO82Ug",
+        "sells_for": 20,
+        "type": "Smelted Material",
+        "rarity": "Very Rare"
+    }
+},
+{
+    "packed obsidian":{
+        "description": "Not sure how a smelter made this, but whatever.",
+        "image_link": "https://static.wikia.nocookie.net/hexxit/images/1/18/Obsidian_Ingot_ig.png/revision/latest?cb=20140318024615",
+        "sells_for": 20,
+        "type": "Smelted Material",
+        "rarity": "Very Rare"
+    }
+},
+{
+    "stick":{
+        "description": "It's a stick. Like a log, but smaller.",
+        "image_link": "https://art.pixilart.com/acc02b109ba78f2.png",
+        "sells_for": 2,
+        "type": "Foraged Material",
+        "rarity": "Common"
+    }
+},
+{
+    "leaf":{
+        "description": "Leaf me alone!",
+        "image_link": "http://pixelartmaker.com/art/248a99e0790c2ce.png",
+        "sells_for": 1,
+        "type": "Foraged Material",
+        "rarity": "Common"
+    }
+},
+{
+    "vine":{
+        "description": "It’s a vine. Weird, seems it can only hold your attention for about 6 seconds... weird.",
+        "image_link": "https://art.pixilart.com/63f8f96334ca616.png",
+        "sells_for": 1,
+        "type": "Foraged Material",
+        "rarity": "Common"
+    }
+},
+{
+    "water":{
+        "description": "\"Wait, why do I have water in my inventory?\"\n\n\"Because you foraged and got water?\"\n\n\"I don't think that's how it works.\"",
+        "image_link": "https://art.pixilart.com/31cdac918e47499.png",
+        "sells_for": 1,
+        "type": "Foraged Material",
+        "rarity": "Common"
+    }
+},
+{
+    "berry":{
+        "description": "What kind of berry, you ask? Plant it and find out!",
+        "image_link": "http://pixelartmaker.com/art/261c31ed81a82f8.png",
+        "sells_for": 1,
+        "type": "Foraged Material",
+        "rarity": "Common"
+    }
+},
+{
+    "sapling":{
+        "description": "It's a tiny tree!",
+        "image_link": "http://pixelartmaker.com/art/1075c3b23d9f011.png",
+        "sells_for": 2,
+        "type": "Foraged Material",
+        "rarity": "Uncommon"
+    }
+},
+{
+    "raspberyy":{
+        "description": "The coolest kind of berry - the raspberry.",
+        "image_link": "https://www.raspberrypi.org/wp-content/uploads/2011/10/Raspi-PGB001.png",
+        "sells_for": 2,
+        "type": "Farmed Material",
+        "rarity": "Common"
+    }
+},
+{
+    "tree":{
+        "description": "Yes, a whole tree is in your inventory. Don't question it!",
+        "image_link": "https://i.redd.it/ijgddqh4977z.png",
+        "sells_for": 2,
+        "type": "Farmed Material",
+        "rarity": "Common"
+    }
+},
+{
+    "mushroom":{
+        "description": "Your standard mushroom, he's a pretty fungi.",
+        "image_link": "https://preview.redd.it/mgdy12z2ytt41.png?auto=webp&s=796f6b397ac4099162d174df80a077892fd4555a",
+        "sells_for": 2,
+        "type": "Foraged Material",
+        "rarity": "Uncommon"
+    }
+},
+{
+    "hearty shroom":{
+        "description": "He's not so much a fungi now. I'd say he's more of a strong guy.",
+        "image_link": "https://static.wikia.nocookie.net/zelda/images/e/e9/Breath_of_the_Wild_Mushrooms_Endura_Shroom_%28Icon%29.png/revision/latest/top-crop/width/360/height/450?cb=20170406205523",
+        "sells_for": 3,
+        "type": "Farmed Material",
+        "rarity": "Uncommon"
+    }
+},
+{
+    "wood":{
+        "description": "Use it to make stuff!",
+        "image_link": "http://pixelartmaker.com/art/61168d883bca675.png",
+        "sells_for": 2,
+        "type": "Foraged Material",
+        "rarity": "Uncommon"
+    }
+},
+{
+    "cotton":{
+        "description": "Finally! You can craft that fursuit you've been wanting!",
+        "image_link": "https://art.pixilart.com/0f9b360f663e97c.png",
+        "sells_for": 2,
+        "type": "Foraged Material",
+        "rarity": "Uncommon"
+    }
+},
+{
+    "egg":{
+        "description": "I wonder what happens when you plant one of these in the ground?",
+        "image_link": "https://www.pinclipart.com/picdir/big/68-682374_egg-balancing-by-ofirma85-fnaf-puppet-pixel-art.png",
+        "sells_for": 3,
+        "type": "Foraged Material",
+        "rarity": "Rare"
+    }
+},
+{
+    "poultry plant":{
+        "description": "...what the fuck?",
+        "image_link": "https://cdn.shopify.com/s/files/1/0331/6406/6861/products/148-00276_F2_FlowerPot_chicken_BloomingAlice_Bloomies_white_500x.png?v=1586429017",
+        "sells_for": 15,
+        "type": "Farmed Material",
+        "rarity": "Rare"
+    }
+},
+{
+    "toxinshroom":{
+        "description": "Delicious! ...wait, it was a joke!",
+        "image_link": "https://www.pinclipart.com/picdir/big/215-2151245_clipart-mushroom-7-parts-of-a-mushroom-png.png",
+        "sells_for": 5,
+        "type": "Foraged Material",
+        "rarity": "Rare"
+    }
+},
+{
+    "concentrated poison":{
+        "description": "Yikes, this stuff is strong! Careful!",
+        "image_link": "http://pixelartmaker.com/art/2982bae861e2452.png",
+        "sells_for": 15,
+        "type": "Farmed Material",
+        "rarity": "Rare"
+    }
+},
+{
+    "clover":{
+        "description": "A sign of good fortune!",
+        "image_link": "https://66.media.tumblr.com/tumblr_mahd2lV27V1rfjowdo1_500.gif",
+        "sells_for": 5,
+        "type": "Foraged Material",
+        "rarity": "Rare"
+    }
+},
+{
+    "apple":{
+        "description": "There's a lot of different types of apples, did you know that? Personally I like the red ones.",
+        "image_link": "https://i.pinimg.com/originals/3d/0e/68/3d0e680de45d884e7e0bff3b677db3fc.png",
+        "sells_for": 5,
+        "type": "Foraged Material",
+        "rarity": "Rare"
+    }
+},
+{
+    "apple tree":{
+        "description": "It's a tree with apples in it.",
+        "image_link": "http://pixelartmaker.com/art/0add3f5634e8b6a.png",
+        "sells_for": 6,
+        "type": "Farmed Material",
+        "rarity": "Rare"
+    }
+},
+{
+    "coolium fruit":{
+        "description": "Taken straight from the coolest places on earth, these fruit ooze coolness.",
+        "image_link": "https://static.wikia.nocookie.net/gdmaze/images/5/56/Fantasy_Fruit.png/revision/latest/scale-to-width-down/340?cb=20180718224945",
+        "sells_for": 0,
+        "type": "Foraged Material",
+        "rarity": "Rare"
+    }
+},
+{
+    "honey":{
+        "description": "Yes dear?",
+        "image_link": "https://cdnb.artstation.com/p/assets/images/images/020/368/149/original/tanja-heikkila-honey.gif?1567519309",
+        "sells_for": 10,
+        "type": "Foraged Material",
+        "rarity": "Very Rare"
+    }
+},
+{
+    "fossil":{
+        "description": "Remains of an ancient beast. I wonder what it could be used for?",
+        "image_link": "https://i.redd.it/gxiq8moj2jd41.png",
+        "sells_for": 10,
+        "type": "Foraged Material",
+        "rarity": "Very Rare"
+    }
+},
+{
+    "hardwood":{
+        "description": "It's like normal wood, but harder. What did you expect?",
+        "image_link": "http://pixelartmaker.com/art/60f173aa4aff13c.png",
+        "sells_for": 10,
+        "type": "Foraged Material",
+        "rarity": "Very Rare"
+    }
+},
+{
+    "pumpkin":{
+        "description": "Good for all sorts of things! And they're orange, too!",
+        "image_link": "http://pixelartmaker.com/art/a67e81a67c9feeb.png",
+        "sells_for": 4,
+        "type": "Foraged Material",
+        "rarity": "Very Rare"
+    }
+},
+{
+    "bamboo":{
+        "description": "Did you know bamboo is an invasive species?",
+        "image_link": "http://pixelartmaker.com/art/a62bac4256c85aa.png",
+        "sells_for": 4,
+        "type": "Foraged Material",
+        "rarity": "Very Rare"
+    }
+},
+{
+    "pearl":{
+        "description": "Ooo! Shiny!",
+        "image_link": "http://pixelartmaker.com/art/867e3a2c5290954.png",
+        "sells_for": 25,
+        "type": "Foraged Material",
+        "rarity": "Very Rare"
+    }
+},
+{
+    "rarity essence":{
+        "description": "It glimmers a light pink. This should be useful!",
+        "image_link": "http://pixelartmaker.com/art/06ccfe82323629b.png",
+        "sells_for": 50,
+        "type": "Farmed Material",
+        "rarity": "Very Rare"
+    }
+},
+{
+    "shell":{
+        "description": "It's a shell! Now where's that pearl...",
+        "image_link": "http://pixelartmaker.com/art/2a5ec393aee34ca.png",
+        "sells_for": 25,
+        "type": "Foraged Material",
+        "rarity": "Epic"
+    }
+},
+{
+    "life essence":{
+        "description": "If you plant one of these, you'll grow a child. That's how babies are made, after all.",
+        "image_link": "https://i.imgur.com/Z2fRilC.png",
+        "sells_for": 20,
+        "type": "Foraged Material",
+        "rarity": "Epic"
+    }
+},
+{
+    "child":{
+        "description": "Uhhhh huh.\n\nI suppose we can find a use for... it.",
+        "image_link": "https://www.goodfreephotos.com/albums/vector-images/baby-boy-sitting-vector-clipart.png",
+        "sells_for": 0,
+        "type": "Farmed Material",
+        "rarity": "Epic"
+    }
+},
+{
+    "vitashroom":{
+        "description": "This mushroom violently explodes if shook too hard. Careful, now!",
+        "image_link": "https://i.redd.it/r27e4xokcpc31.png",
+        "sells_for": 20,
+        "type": "Foraged Material",
+        "rarity": "Epic"
+    }
+},
+{
+    "strongsap":{
+        "description": "It's sticky and strong! This can be used like a glue for something, I'm sure.",
+        "image_link": "http://pixelartmaker.com/art/f044748eb340630.png",
+        "sells_for": 20,
+        "type": "Foraged Material",
+        "rarity": "Epic"
+    }
+},
+{
+    "rusted part":{
+        "description": "A remnant from a long forgotten society.",
+        "image_link": "https://i.imgur.com/gvgMRc2.png",
+        "sells_for": 30,
+        "type": "Foraged Material",
+        "rarity": "Legendary"
+    }
+},
+{
+    "strange machinery":{
+        "description": "After leaving the rusted part in the ground overnight, this was found the next morning. Curious.",
+        "image_link": "https://i.pinimg.com/originals/af/0f/86/af0f8696e6fbb0eb73ea31b3aff21576.gif",
+        "sells_for": 35,
+        "type": "Farmed Material",
+        "rarity": "Legendary"
+    }
+},
+{
+    "fallen star":{
+        "description": "So THIS is where starbits come from!",
+        "image_link": "https://dejpknyizje2n.cloudfront.net/marketplace/products/pixel-art-gold-star-sticker-1539635680.26215.png",
+        "sells_for": 30,
+        "type": "Foraged Material",
+        "rarity": "Legendary"
+    }
+},
+{
+    "lunar essence":{
+        "description": "As deep and cool as the night.",
+        "image_link": "http://pixelartmaker.com/art/897a23d26ce1039.png",
+        "sells_for": 35,
+        "type": "Farmed Material",
+        "rarity": "Legendary"
+    }
+},
+{
+    "melon":{
+        "description": "Melon. Grows into more melon.",
+        "image_link": "http://pixelartmaker.com/art/83326e67dd475c6.png",
+        "sells_for": 5,
+        "type": "Foraged Material",
+        "rarity": "Legendary"
+    }
+},
+{
+    "eldritch wood":{
+        "description": "There's something... seeping out of this wood.",
+        "image_link": "https://images-wixmp-ed30a86b8c4ca887773594c2.wixmp.com/i/312b590d-1e6b-491a-8103-669d07809952/dc7c4-649e6464-f7f0-488d-a02d-d4f8cc85a600.gif",
+        "sells_for": 20,
+        "type": "Foraged Material",
+        "rarity": "Legendary"
+    }
+},
+{
+    "luckstone":{
+        "description": "+1 to everything, baby!",
+        "image_link": "https://media-waterdeep.cursecdn.com/avatars/thumbnails/7/434/1000/1000/636284772336589393.jpeg",
+        "sells_for": 40,
+        "type": "Foraged Material",
+        "rarity": "Legendary"
+    }
+},
+{
+    "death essence":{
+        "description": "Eugh, smells of rotten flesh and the depths of a crypt. Y'know, that smell.",
+        "image_link": "https://webstockreview.net/images/death-clipart-potion-1.png",
+        "sells_for": 50,
+        "type": "Foraged Material",
+        "rarity": "Legendary"
+    }
+},
+{
+    "old scroll":{
+        "description": "Really hope this one is fireball... fuck! Truestrike again!?",
+        "image_link": "http://pixelartmaker.com/art/13c19e2ced822e7.png",
+        "sells_for": 50,
+        "type": "Foraged Material",
+        "rarity": "Legendary"
+    }
+},
+{
+    "wisp":{
+        "description": "Her name was Willow.",
+        "image_link": "https://static.wikia.nocookie.net/sonic/images/3/31/Will_o_Wisp_sonic_and_the_black_knight.png/revision/latest/top-crop/width/360/height/360?cb=20130526093948",
+        "sells_for": 50,
+        "type": "Foraged Material",
+        "rarity": "Whimsical"
+    }
+},
+{
+    "sad soul":{
+        "description": "And she was beautiful.",
+        "image_link": "https://art.pixilart.com/622ee627c42e708.png",
+        "sells_for": 100,
+        "type": "Farmed Material",
+        "rarity": "Whimsical"
+    }
+},
+{
+    "jazzshroom":{
+        "description": "Is that... *Take The \"A\" Train* by Duke Ellington...?",
+        "image_link": "https://cdn.indreams.me/420907d1b815e7d512c7c9a074e20f48_2",
+        "sells_for": 50,
+        "type": "Foraged Material",
+        "rarity": "Whimsical"
+    }
+},
+{
+    "jazzed up mushroom":{
+        "description": "Look at him go!",
+        "image_link": "https://i.pinimg.com/originals/cf/77/de/cf77deb4c6d4023ff4362b9e32888ebc.gif",
+        "sells_for": 100,
+        "type": "Farmed Material",
+        "rarity": "Whimsical"
+    }
+},
+{
+    "once-was":{
+        "description": "It's something. Not round, a bit heavier than you'd expect.",
+        "image_link": "https://upload.wikimedia.org/wikipedia/commons/thumb/5/55/Kanizsa_triangle.svg/220px-Kanizsa_triangle.svg.png",
+        "sells_for": 50,
+        "type": "Foraged Material",
+        "rarity": "Whimsical"
+    }
+},
+{
+    "now-is":{
+        "description": "I can't truly understand this item. Maybe you can.",
+        "image_link": "https://i.pinimg.com/originals/94/04/ca/9404cada13e0dbfba33f07f6b79a2a6e.png",
+        "sells_for": 100,
+        "type": "Farmed Material",
+        "rarity": "Whimsical"
+    }
+},
+{
+    "coolness essence":{
+        "description": "Raw, untapped coolness!",
+        "image_link": "https://3.bp.blogspot.com/-Ye8i02_SGzE/WHG0Tv9tFsI/AAAAAAAAXx4/01_M_cjlOroZWm9U0SY2cpWwMpxbBr_ygCK4B/s320/emoticon-cool.png",
+        "sells_for": 50,
+        "type": "Foraged Material",
+        "rarity": "Whimsical"
+    }
+},
+{
+    "dragon bones":{
+        "description": "A mighty bone from an ancient wyvern",
+        "image_link": "https://static.wikia.nocookie.net/elderscrolls/images/a/ad/TESV_Dragon_Bone.png/revision/latest?cb=20120316215755",
+        "sells_for": 50,
+        "type": "Foraged Material",
+        "rarity": "Whimsical"
+    }
+},
+{
+    "astral wood":{
+        "description": "A curious mix of the arcane and the natural world.",
+        "image_link": "https://images-wixmp-ed30a86b8c4ca887773594c2.wixmp.com/f/211be27c-db07-4df5-8c92-e97fa2db8d60/d7pe56a-9d9dd02c-862f-4a92-ba92-e57f5e34fc9f.png/v1/fill/w_600,h_600,strp/cosmic_tree_by_shinygirl11_d7pe56a-fullview.png?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1cm46YXBwOiIsImlzcyI6InVybjphcHA6Iiwib2JqIjpbW3siaGVpZ2h0IjoiPD02MDAiLCJwYXRoIjoiXC9mXC8yMTFiZTI3Yy1kYjA3LTRkZjUtOGM5Mi1lOTdmYTJkYjhkNjBcL2Q3cGU1NmEtOWQ5ZGQwMmMtODYyZi00YTkyLWJhOTItZTU3ZjVlMzRmYzlmLnBuZyIsIndpZHRoIjoiPD02MDAifV1dLCJhdWQiOlsidXJuOnNlcnZpY2U6aW1hZ2Uub3BlcmF0aW9ucyJdfQ.do_Zpm2Old8rWTUNjOXvSdzA1eIsvq1NFftTRE1mPN8",
+        "sells_for": 50,
+        "type": "Foraged Material",
+        "rarity": "Whimsical"
+    }
+},
+{
+    "meteorite":{
+        "description": "I almost forgot this one!",
+        "image_link": "https://imga.androidappsapk.co/zhZdXcmO9dgAcu27xEEIvf_tb7TMqxhqdrG5nI9ECl9NMtvJXR00_E4z4x8p7PTX_Ew=s300",
+        "sells_for": 20,
+        "type": "Foraged Material",
+        "rarity": "Epic"
+    }
+}
+]

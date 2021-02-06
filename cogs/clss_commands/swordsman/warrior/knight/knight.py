@@ -40,7 +40,7 @@ class knight(commands.Cog):
                 if ap_works and await h.can_attack(ctx.author.id, target.id, ctx):
                     if self.crusade != None:
                         crit_check = await h.crit_handler(self.bot, ctx.author.id, target.id, 9)
-                        if str(crusade[1]) == str(crusade[2]):
+                        if str(self.crusade[1]) == str(self.crusade[2]):
                             self.crusade = None
                     else:
                         crit_check = await h.crit_handler(self.bot, ctx.author.id, target.id)

@@ -1,0 +1,26 @@
+[{
+    "gunpowder":{
+        "description": "A volatile powder used in explosives.",
+        "recipe" : {
+            "coal" : 10,
+            "sulfur" : 5
+        },
+        "sells_for" : 35,
+        "type" : "Crafted Material",
+        "rarity" : "Uncommon",
+        "image_link" : "https://i.pinimg.com/originals/46/8c/e6/468ce64b7b122053ce3e2b8f5a947e2c.png"
+    }
+},
+{
+    "bomb":{
+        "description": "An explosive weapon to throw at your friends! Explodes on them, giving you some coolness!",
+        "recipe" : {
+            "gunpowder" : 5,
+            "iron ingot" : 5
+        },
+        "sells_for" : 50,
+        "type" : "Crafted Item",
+        "rarity" : "Uncommon",
+        "image_link" : "http://pixelartmaker.com/art/ca39badd392c790.png"
+    }
+}]

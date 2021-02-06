@@ -46,30 +46,33 @@ class class_commands(commands.Cog):
                     ###
                     await ctx.send(f"{ctx.author.mention}, you are {lead} {clss.lower()}. Use `;profile` to view your profile! Use `;classinfo` to see your class-specific commands!")
                     self.bot.users_classes[str(guy[0])] = clss.lower()
-                    self.bot.users_ap[str(guy[0])] = 8
+                    self.bot.users_ap[str(guy[0])] = 20
         
     @commands.command(aliases=["class"])
     @commands.guild_only()
     async def classinfo(self, ctx, *, clss = None):
-        try:
-            if not clss:
-                clss = self.bot.users_classes[str(ctx.author.id)]
-            clss = clss.lower()
-            async with aiosqlite.connect('main.db') as conn:
-                async with conn.execute(f"select * from classes where class_name = '{clss}';") as cinfo:
-                    class_info = await cinfo.fetchall()
-                    class_info = class_info[0]
-                    profile = discord.Embed(title=f"{clss.title()}'s Info", colour=discord.Colour.from_rgb(128, 128, 128), description=class_info[1])
-                    profile.add_field(name="Previous Class", value=class_info[3], inline=False)
-                    abilities = class_info[5].split("|")
-                    final = ""
-                    for abil in abilities:
-                        final+=abil+"\n"
-                    profile.add_field(name="Class Abilities", value=final, inline=False)
-            
-            await ctx.send(embed=profile)
-        except IndexError:
-            await ctx.send("You don't have a class! Say `;start` to begin!")
+        if str(ctx.author.id) in self.bot.users_classes.keys():
+            try:
+                if not clss:
+                    clss = self.bot.users_classes[str(ctx.author.id)]
+                clss = clss.lower()
+                async with aiosqlite.connect('main.db') as conn:
+                    async with conn.execute(f"select * from classes where class_name = '{clss}';") as cinfo:
+                        class_info = await cinfo.fetchall()
+                        class_info = class_info[0]
+                        profile = discord.Embed(title=f"{clss.title()}'s Info", colour=discord.Colour.from_rgb(128, 128, 128), description=class_info[1])
+                        profile.add_field(name="Previous Class", value=class_info[3], inline=False)
+                        abilities = class_info[5].split("|")
+                        final = ""
+                        for abil in abilities:
+                            final+=abil+"\n"
+                        profile.add_field(name="Class Abilities", value=final, inline=False)
+                
+                await ctx.send(embed=profile)
+            except IndexError:
+                await ctx.send("That class doesn't exist!")
+        else:
+            await ctx.send("You don't have a profile! Run `;start` to begin!")
     
     @commands.command(aliases=["prog"])
     @commands.guild_only()
