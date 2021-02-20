@@ -20,7 +20,7 @@ class forage(commands.Cog): #TODO: Implement faction race commands, and the abil
         self.growing = {}
 
         self.mine_hooks = [
-            "You find some amount stuff while foraging in the fores!",
+            "You find some amount stuff while foraging in the forest!",
             "While foraging, you found amount stuff!",
             "After a day in the forest, you find amount stuff!",
             "Nice! You found amount stuff!",
@@ -77,7 +77,6 @@ class forage(commands.Cog): #TODO: Implement faction race commands, and the abil
             "dragon bones" : None,
             "astral wood" : None
         }
-
         
     pass
 
@@ -474,8 +473,6 @@ async def update_materials(uid, material, amount_added, chan = None):
                         await conn.execute(f"update materials set amount = {current_amount+amount_added[index]} where uid = {uid} and item_name = '{mat}'")
                         await conn.commit()
 
-                    
-        
 # A setup function the every cog has
 def setup(bot):
     bot.add_cog(forage(bot))

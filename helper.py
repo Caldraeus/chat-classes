@@ -156,7 +156,7 @@ async def can_attack(user, target, ctx): # NOTE: Remember that you can't alter A
             ### HANDLE STACKS
             remaining_stacks = status[1]-1
             if remaining_stacks <= 0:
-                bot.user_status[user].remove(status)
+                bot.user_status[user].remove(status.lower())
             else:
                 status[1] -= 1
             ### APPLY EFFECT
@@ -611,8 +611,6 @@ async def award_ach(ach_id, message, bot):
             mss = await message.channel.send(content=message.author.mention, embed=embed)
             await mss.delete(delay=10)
             
-
-
 async def fetch_random_quest(message, bot, uid=None, override=False):
     # Random quest encounter chance time!
     if uid:

@@ -23,4 +23,73 @@
         "rarity" : "Uncommon",
         "image_link" : "http://pixelartmaker.com/art/ca39badd392c790.png"
     }
-}]
+},
+{
+    "arrest warrant":{
+        "description": "Man, you must have done something fucked up to get one of these. Anyway, how’s the little one?",
+        "recipe" : {
+            "child" : 1,
+            "death essence" : 1
+        },
+        "sells_for" : 500,
+        "type" : "Crafted Item",
+        "rarity" : "Legendary",
+        "image_link" : ""
+    }
+},
+{
+    "unstable void":{
+        "description": "Oh god, get it away!",
+        "recipe" : {
+            "raw void" : 5,
+            "life essence" : 1
+        },
+        "sells_for" : 1000,
+        "type" : "Crafted Item",
+        "rarity" : "Whimsical",
+        "image_link" : "http://pixelartmaker.com/art/f76023c3df8f398.png"
+    }
+},
+{
+    "branch of yggdrasil":{
+        "description": "It’s a hard and solid wood that shimmers in sunlight. For such a small twig its weight is impressive, the true meaning of the weight of the world.",
+        "recipe" : {
+            "astral wood" : 1,
+            "ethereal ingot" : 5
+        },
+        "sells_for" : 1500,
+        "type" : "Crafted Material",
+        "rarity" : "Whimsical",
+        "image_link" : ""
+    }
+},
+{
+    "fleshy machinery":{
+        "description": "This machinery is even stranger than the last. If you didn't know any better you’d say it looks... hungry...",
+        "recipe" : {
+            "strange machinery" : 1,
+            "blood diamond" : 1,
+            "child" : 1
+ 
+        },
+        "sells_for" : 2000,
+        "type" : "Crafted Item",
+        "rarity" : "Whimsical",
+        "image_link" : ""
+    }
+},
+{
+    "makeshift club":{
+        "description": "A club made from some sticks tied together with vines. It’s not that cool looking but it’ll make a fine one time use.",
+        "recipe" : {
+            "stick" : 10,
+            "vine" : 10
+ 
+        },
+        "sells_for": 0,
+        "type" : "Crafted Item",
+        "rarity" : "Common",
+        "image_link" : ""
+    }
+}
+]

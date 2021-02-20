@@ -309,7 +309,7 @@ class apprentice(commands.Cog):
                     if attacker not in self.souls:
                         self.souls[attacker] = []
                     
-                    if target.id not in self.souls[attacker] and crit_check == False:
+                    if target.id not in self.souls[attacker] and crit_check == True:
                         self.souls[attacker].append(target.id) # Alter this to make it add them to it, else change crit_check to 100 and do a mega crit.
                     elif target.id in self.souls[attacker]:
                         self.souls[attacker].remove(target.id)
