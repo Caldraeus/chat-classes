@@ -17,7 +17,8 @@ effect_list = {
     "burning" : "You are on fire. Good luck.",
     "poisoned" : "Every time you make an attack, you lose an extra 2 AP!",
     "confidence" : "Hey, you're pretty good at this! Slightly raises your critical chance.",
-    "defending" : "You are prepared for someone to strike! Anyone who attacks you fails, wasting their AP."
+    "defending" : "You are prepared for someone to strike! Anyone who attacks you fails, wasting their AP.",
+    "wooyeah" : "**<a:wooyeah:804905363140247572>WOO YEAH<a:wooyeah:804905363140247572>IM ON A ROLL<a:wooyeah:804905363140247572>**"
 }
 
 base_classes = {
@@ -155,7 +156,7 @@ async def can_attack(user, target, ctx): # NOTE: Remember that you can't alter A
             ### HANDLE STACKS
             remaining_stacks = status[1]-1
             if remaining_stacks <= 0:
-                bot.user_status[user].remove(status)
+                bot.user_status[user].remove(status.lower())
             else:
                 status[1] -= 1
             ### APPLY EFFECT
@@ -221,18 +222,37 @@ async def crit_handler(bot, attacker, defender, boost = None):
 def max_xp(lvl):
     return 20 * (lvl ^ 35) + 250 * lvl + 25
 
+def max_xp_skills(lvl):
+    return 85 * (lvl ^ 70) + 350 * lvl + 50
+
+async def give_faction_points(contributor = None, f_id = None, amount = 0):
+    async with aiosqlite.connect('unique.db') as conn:
+        async with conn.execute(f"select faction_points from factions where faction_id = {f_id}") as u_info:
+            faction_points = await u_info.fetchone()
+
+    faction_points = faction_points[0] + amount
+    if faction_points < 0:
+        faction_points = 0
+
+    async with aiosqlite.connect('unique.db') as conn:
+        await conn.execute(f"update factions set faction_points = {faction_points} where faction_id = {f_id};")
+        await conn.commit()
+
 async def alter_items(uid, ctx, bot, item, change = 1, cost = 0):
     item = item.lower()
     async with aiosqlite.connect('main.db') as conn:
-        async with conn.execute(f"select inventory, gold from users where id = '{uid}'") as u_info:
+        async with conn.execute(f"select gold from users where id = '{uid}'") as u_info:
             user_info = await u_info.fetchone()
 
-    inv = user_info[0].split("|")
-    gold = user_info[1]
+    gold = user_info[0]
     
-    for owned_item in inv:
-        new_guy = owned_item.split(",")
-        inv[inv.index(owned_item)] = new_guy
+    async with aiosqlite.connect('main.db') as conn:
+        async with conn.execute(f"select item_name, amount from inventory where uid = '{ctx.author.id}'") as u_info:
+            user_info = await u_info.fetchall()
+
+    inv = user_info
+
+# [('void', 1), ('hot dog', 5)]
 
     items = [item[0] for item in inv] # Array of just the names of the items in the 2D array.
     end = ""
@@ -241,23 +261,22 @@ async def alter_items(uid, ctx, bot, item, change = 1, cost = 0):
         await ctx.send("You cannot afford this item!")
     else:
         if item in items:
-            index = items.index(item)
-            item_amount = int(inv[index][1]) + change
-            inv[index][1] = str(item_amount)
+            indx = items.index(item.lower())
+            item_amount = int(inv[indx][1]) + change
             if item_amount >= 10:
                 await award_ach(14, ctx.message, bot)
 
-        for sublist in inv:
-            if inv.index(sublist) == len(inv)-1:
-                end += f"{','.join(sublist)}"
-            else:
-                end += f"{','.join(sublist)}|"
+            async with aiosqlite.connect('main.db') as conn:
+                await conn.execute(f"update inventory set amount = {item_amount} where uid = {uid} and item_name = '{item.lower()}';")
+                await conn.commit()
         
-        if item not in items:
-            end+=f"|{item},{change}"
+        elif item not in items:
+            async with aiosqlite.connect('main.db') as conn:
+                await conn.execute(f"insert into inventory values({ctx.author.id}, '{item.lower()}', {change});")
+                await conn.commit()
             
         async with aiosqlite.connect('main.db') as conn:
-            await conn.execute(f"update users set gold = {gold - cost}, inventory = '{end}' where id = '{uid}';")
+            await conn.execute(f"update users set gold = {gold - cost} where id = '{uid}';")
             await conn.commit()
         if cost > 0:
             await ctx.send(f"✅ | Purchase complete! Your gold balance is now {gold-cost}.")
@@ -273,15 +292,28 @@ async def alter_ap(message, ap, bot):
             await message.channel.send("You don't have enough AP to do that! Buy some refreshers from the shop, do some quests, or wait until rollover!")
             return False
 
-async def xp_handler(message, bot):
+async def xp_handler(message, bot, boost = 0):
     testing = False
-    num = random.randint(1,4)
+    if boost:
+        num = 4
+        xp_amount = boost
+        
+    else: 
+        num = random.randint(1,4)
+        if message.author.id in bot.server_boosters or message.author.id == 217288785803608074:
+            xp_amount = round(1.75*(random.randint(5,50)))
+        else:
+            xp_amount = random.randint(5,100)
+
+        if message.guild.id == 732632186204979281:
+            xp_amount *= 2
+
     if num == 4:
         if str(message.author.id) in bot.registered_users:
             async with aiosqlite.connect('main.db') as conn:
                 async with conn.execute(f"select exp, level from users where id = '{message.author.id}';") as profile:
                     prof = await profile.fetchone()
-            xp = prof[0] + random.randint(5,50)
+            xp = prof[0] + xp_amount
             current_lvl = prof[1]
             if xp >= max_xp(current_lvl) and ((prof[1]+1) % 10 != 0):
                 async with aiosqlite.connect('main.db') as conn:
@@ -300,10 +332,9 @@ async def xp_handler(message, bot):
                     bot.notified.append(message.author.id)
                     embed = discord.Embed(title=f"✨ Level up! ✨", colour=discord.Colour.from_rgb(255, 204, 153), description=f'You can now level up to {prof[1]+1}! Good job!')
                     embed.set_thumbnail(url=message.author.avatar_url)
-                    embed.set_footer(text=f"A class up is available! Run {prefix}classup when you are ready.", icon_url="https://lh3.googleusercontent.com/proxy/KbtIDDPpLGgzz6LmKyMoyYRtnXpgPHjyvr3Idg30Cff8JDcfXTiVdjl9QjGn_G_ty6ekXk29X2BwNJ8mdz-QfIHhMs7qd7HA")
+                    embed.set_footer(text=f"A class up is available! Run {prefix}classup when you are ready.", icon_url="https://lh3.googleusercontent.com/proxy/OrYbJO2bKqGtVPcWnue8XK0SRnHoC-h8VHKNTw9JoVk-k_mke8bcurTQgoKd70H_kgr9AR2CQH-GRgckkZqXbRbdf-CZgjac")
                     notif = await message.channel.send(content=f'{message.author.mention}', embed=embed)
-                    await notif.delete(delay=10)
-                
+                    await notif.delete(delay=10)    
             else:
                 async with aiosqlite.connect('main.db') as conn:
                     await conn.execute(f"update users set exp = {xp} where id = '{message.author.id}'")
@@ -539,12 +570,16 @@ async def add_coolness(uid, amount):
             await conn.execute(f"update users set coolness = '{coolness[0]+amount}' where id = '{uid}';")
             await conn.commit()
 
-async def add_gold(uid, amount, bot, debt_mode = False, purchase_mode = None):
+async def add_gold(uid, amount, bot, debt_mode = False, purchase_mode = None, boost_null = False):
     async with aiosqlite.connect('main.db') as conn:
         async with conn.execute(f"select gold from users where id = '{uid}';") as current_amount:
             gold = await current_amount.fetchone()
-            if uid in bot.server_boosters and amount > 0:
+
+            if uid in bot.server_boosters and amount > 0 and boost_null == False:
                 amount *= 2
+            else:
+                amount *= 1
+
             final = gold[0]+amount
             if final < 0 and debt_mode == False and purchase_mode == None:
                 final = 0
@@ -591,8 +626,6 @@ async def award_ach(ach_id, message, bot):
             mss = await message.channel.send(content=message.author.mention, embed=embed)
             await mss.delete(delay=10)
             
-
-
 async def fetch_random_quest(message, bot, uid=None, override=False):
     # Random quest encounter chance time!
     if uid:
@@ -632,7 +665,8 @@ async def fetch_random_quest(message, bot, uid=None, override=False):
 #########################################################
 #########################################################
 
-async def genprof(uid, aps):
+async def genprof(uid, aps, bot):
+    person = uid
     async with aiosqlite.connect('main.db') as conn:
         async with conn.execute("select count(*) from achievements;") as numcount:
             num = await numcount.fetchone()
@@ -651,6 +685,29 @@ async def genprof(uid, aps):
     ###
     profile.set_footer(text=f"Global Coolness Ranking: {await genrank(uid.id)}", icon_url="")
     profile.add_field(name="Class & Level", value=f'{user[1].title()} ║ Level {user[8]}', inline=False)
+
+    # Faction stuff
+    if person.id in bot.users_factions.keys():
+        faction = bot.users_factions[person.id]
+        cog = bot.get_cog('factions')
+        if faction in cog.factions.keys():
+            fac_info = cog.factions[faction]
+            i_rgb = fac_info[6].split("|")
+            r = int(i_rgb[0])
+            g = int(i_rgb[1])
+            b = int(i_rgb[2])
+
+            color = discord.Colour.from_rgb(r, g, b)
+            profile = discord.Embed(title=f"{uid.display_name}'s Profile", colour=color, description="")
+            profile.set_thumbnail(url=uid.avatar_url)
+            profile.set_footer(text=f"Global Coolness Ranking: {await genrank(uid.id)} | Faction: {fac_info[7]}", icon_url="")
+            profile.add_field(name="Class & Level", value=f'{user[1].title()} ║ Level {user[8]}', inline=False)
+            profile.set_image(url=fac_info[5])
+        else:
+            pass
+
+
+
     profile.add_field(name="Coolness", value=user[5])
     profile.add_field(name="Gold", value=user[3])
     profile.add_field(name="Achievements", value=f"{user_ach} of {total_achievements} Unlocked ({int((user_ach/total_achievements)*100)}%)", inline=False)

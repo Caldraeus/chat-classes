@@ -222,9 +222,9 @@ class pyromancer(commands.Cog):
                         await h.add_coolness(ctx.author.id, 100)
                         await ctx.send(hook)
                     elif crit_check == 100:
-                        hook = "**🔥[ROYAL OVERHEAT!]🔥** + 75 Coolness, + 200 Gold | " + hook
+                        hook = "**🔥[ROYAL OVERHEAT!]🔥** + 75 Coolness, + 100 Gold | " + hook
                         await h.add_coolness(ctx.author.id, 75)
-                        await h.add_gold(ctx.author.id, 200, self.bot)
+                        await h.add_gold(ctx.author.id, 100, self.bot)
                         await ctx.send(hook)
                         
 # A setup function the every cog has

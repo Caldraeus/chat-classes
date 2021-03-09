@@ -19,7 +19,7 @@ class economy(commands.Cog):
             "hot dog" : 75,
             "monster" : 125,
             "adrenaline" : 225,
-            "void" : 250,
+            "void" : 275,
             "milk" : 1000,
             "jamba juice" : 5000
         }
@@ -50,24 +50,14 @@ class economy(commands.Cog):
         if item:
             item = item.lower()
             async with aiosqlite.connect('main.db') as conn:
-                async with conn.execute(f"select inventory, gold from users where id = '{ctx.author.id}'") as u_info:
+                async with conn.execute(f"select amount from inventory where uid = {ctx.author.id} and item_name = '{item.lower()}'") as u_info:
                     user_info = await u_info.fetchone()
 
-            inv = user_info[0].split("|")
-            gold = user_info[1]
-            
-            for owned_item in inv:
-                new_guy = owned_item.split(",")
-                inv[inv.index(owned_item)] = new_guy
-            
-            end = ""
-            
-            if [''] in inv:
-                inv.remove(['']) # Temporary workaround.
-            items = [item[0] for item in inv] # Array of just the names of the items in the 2D array.
-
             if item in self.items or item in self.hidden_items:
-                if item in items:
+                if user_info != None:
+
+                    current_amount = user_info[0]
+
                     if ctx.author.id in self.bot.server_boosters:
                         max_ap = 40
                     else:
@@ -153,29 +143,17 @@ class economy(commands.Cog):
                                 
                     ####
                     ####
-                    index = items.index(item)
                     
-                    new_amount = int(inv[index][1]) - 1
+                    new_amount = current_amount - 1
                     
-                    if new_amount > 0:
-                        inv[index][1] = str(new_amount)
-                        for sublist in inv:
-                            if inv.index(sublist) == len(inv)-1:
-                                end += f"{','.join(sublist)}"
-                            else:
-                                end += f"{','.join(sublist)}|"
+                    if new_amount <= 0:
+                        async with aiosqlite.connect('main.db') as conn: # DELETE FROM table_name WHERE condition;
+                            await conn.execute(f"DELETE FROM inventory WHERE uid = {ctx.author.id} and item_name = '{item.lower()}'")
+                            await conn.commit()
                     else:
-                        for sublist in inv:
-                            if sublist[0] != item:
-                                if inv.index(sublist) == len(inv)-1:
-                                    end += f"{','.join(sublist)}"
-                                else:
-                                    end += f"{','.join(sublist)}|"
-
-
-                    async with aiosqlite.connect('main.db') as conn:
-                        await conn.execute(f"update users set inventory = '{end}' where id = '{ctx.author.id}';")
-                        await conn.commit()
+                        async with aiosqlite.connect('main.db') as conn:
+                            await conn.execute(f"update inventory set amount = {new_amount} where uid = {ctx.author.id} and item_name = '{item.lower()}';")
+                            await conn.commit()
                 else:
                     await ctx.send(f"You are not currently in posession of {item.title()}. Perhaps you made a typo?")
                
@@ -196,13 +174,14 @@ class economy(commands.Cog):
                     await ctx.send("You forgot to specify what you'd like to buy!")
             else:
                 await ctx.send("That's an invalid amount of items!")
-        except:
+        except SyntaxError:
             await ctx.send("You need to specify how many you'd like to buy! (Ex. `;buy 1 hot dog`).")
     
     @commands.command()
     @commands.guild_only()
-    async def daily(self, ctx): 
+    async def daily(self, ctx): # ctx.author.id in self.bot.users_factions.keys()
         try:
+            faction_pts = 10
             # if self.bot.users_classes[str(ctx.author.id)] == "pacted" and await h.get_demon(ctx.author.id, self.bot) == "foop":
             if ctx.author.id in self.bot.claimed: # or ctx.author.id == 340222819680124929 or ctx.author.id == 740308712450818079:
                 await ctx.send("❌ | You've already claimed your daily gift this rollover! Use `;rollover` to check when you can claim again.")
@@ -214,24 +193,54 @@ class economy(commands.Cog):
                                 user = await info.fetchone()
                         level = user[8] - 19
                         await h.add_gold(ctx.author.id, 100+(level*50), self.bot, True)
-                        if ctx.author.id in self.bot.server_boosters:
-                            await ctx.send(f"✅ | You and Trokgroor print {2*(100+(level*50))} gold!")
+                        if(ctx.author.id in self.bot.users_factions.keys()):
+                            f_id = self.bot.users_factions[ctx.author.id]
+                            if ctx.author.id in self.bot.server_boosters:
+                                await h.give_faction_points(ctx.author.id, f_id, faction_pts*2)
+                                await ctx.send(f"✅ | You and Trokgroor print {2*(100+(level*50))} gold!\n\n*(+{faction_pts*2} Faction Points!)*")
+                            else:
+                                await h.give_faction_points(ctx.author.id, f_id, faction_pts)
+                                await ctx.send(f"✅ | You and Trokgroor print {100+(level*50)} gold!\n\n*(+{faction_pts} Faction Points!)*")
                         else:
-                            await ctx.send(f"✅ | You and Trokgroor print {100+(level*50)} gold!")
+                            if ctx.author.id in self.bot.server_boosters:
+                                await ctx.send(f"✅ | You and Trokgroor print {2*(100+(level*50))} gold!")
+                            else:
+                                await ctx.send(f"✅ | You and Trokgroor print {100+(level*50)} gold!")
                         self.bot.claimed.append(ctx.author.id)
+                    else:
+                        if(ctx.author.id in self.bot.users_factions.keys()):
+                            f_id = self.bot.users_factions[ctx.author.id]
+                            await h.add_gold(ctx.author.id, 100, self.bot, True)
+                            if ctx.author.id in self.bot.server_boosters:
+                                await h.give_faction_points(ctx.author.id, f_id, faction_pts*2)
+                                await ctx.send(f"✅ | You gained 200 gold!\n\n*(+{faction_pts*2} Faction Points!)*")
+                            else:
+                                await h.give_faction_points(ctx.author.id, f_id, faction_pts)
+                                await ctx.send(f"✅ | You gained 100 gold!\n\n*(+{faction_pts} Faction Points!)*")
+                            self.bot.claimed.append(ctx.author.id)
+                        else:
+                            await h.add_gold(ctx.author.id, 100, self.bot, True)
+                            if ctx.author.id in self.bot.server_boosters:
+                                await ctx.send("✅ | You gained 200 gold!")
+                            else:
+                                await ctx.send("✅ | You gained 100 gold!")
+                            self.bot.claimed.append(ctx.author.id)
+                else:
+                    if(ctx.author.id in self.bot.users_factions.keys()):
+                        f_id = self.bot.users_factions[ctx.author.id]
+                        await h.add_gold(ctx.author.id, 100, self.bot, True)
+                        if ctx.author.id in self.bot.server_boosters:
+                            await h.give_faction_points(ctx.author.id, f_id, faction_pts*2)
+                            await ctx.send(f"✅ | You gained 200 gold!\n\n*(+{faction_pts*2} Faction Points!)*")
+                        else:
+                            await h.give_faction_points(ctx.author.id, f_id, faction_pts)
+                            await ctx.send(f"✅ | You gained 100 gold!\n\n*(+{faction_pts} Faction Points!)*")
                     else:
                         await h.add_gold(ctx.author.id, 100, self.bot, True)
                         if ctx.author.id in self.bot.server_boosters:
                             await ctx.send("✅ | You gained 200 gold!")
                         else:
                             await ctx.send("✅ | You gained 100 gold!")
-                        self.bot.claimed.append(ctx.author.id)
-                else:
-                    await h.add_gold(ctx.author.id, 100, self.bot, True)
-                    if ctx.author.id in self.bot.server_boosters:
-                        await ctx.send("✅ | You gained 200 gold!")
-                    else:
-                        await ctx.send("✅ | You gained 100 gold!")
                 self.bot.claimed.append(ctx.author.id)
         except (TypeError, KeyError) as e:
             await ctx.send("❌ | You need to run `;start` first!")

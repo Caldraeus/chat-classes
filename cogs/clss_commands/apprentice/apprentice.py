@@ -309,7 +309,7 @@ class apprentice(commands.Cog):
                     if attacker not in self.souls:
                         self.souls[attacker] = []
                     
-                    if target.id not in self.souls[attacker] and crit_check == False:
+                    if target.id not in self.souls[attacker] and crit_check == True:
                         self.souls[attacker].append(target.id) # Alter this to make it add them to it, else change crit_check to 100 and do a mega crit.
                     elif target.id in self.souls[attacker]:
                         self.souls[attacker].remove(target.id)
@@ -322,8 +322,8 @@ class apprentice(commands.Cog):
                         await h.add_coolness(ctx.author.id, 100)
                         await ctx.send(hook)
                     else:
-                        hook = "**💀[SOUL CRUSH!]💀** + 400 Coolness | " + hook
-                        await h.add_coolness(ctx.author.id, 400)
+                        hook = "**💀[SOUL CRUSH!]💀** + 250 Coolness | " + hook
+                        await h.add_coolness(ctx.author.id, 250)
                         await ctx.send(hook)
             elif self.bot.users_classes[str(ctx.author.id)] == "pacted":
                 ap_works = await h.alter_ap(ctx.message, 1, self.bot)

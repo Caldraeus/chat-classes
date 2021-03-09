@@ -36,7 +36,7 @@ class janitor(commands.Cog):
     @commands.guild_only()
     async def clean(self, ctx): # Shoots an arrow at someone.
         if self.bot.users_classes[str(ctx.author.id)] == "assistant janitor":
-            ap_works = await h.alter_ap(ctx.message, 1, self.bot)
+            ap_works = await h.alter_ap(ctx.message, 5, self.bot)
             
             if ap_works:
                 messages = await ctx.channel.history(limit=2).flatten()

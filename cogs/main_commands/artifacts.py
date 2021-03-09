@@ -153,7 +153,7 @@ class artifacts(commands.Cog):
                                     await hook.send(content=f"I assume you're here for it. The Mantle? I wish you luck, {ctx.author.mention}. It's not an easy path.", username="Sef, The Last Titan", avatar_url="https://i.imgur.com/dWkRNdQ.png")
                                 await asyncio.sleep(3)
                                 await ctx.send(f"The wall behind Sef raises slowly, revealing a long corridor. Are you ready?\n\n`Yes`\n`No`")
-                                chosen = await self.bot.wait_for('message', check=check, timeout=20)
+                                chosen = await self.bot.wait_for('message', check=check)
                                 chosen = chosen.content.lower()
                                 if chosen != "yes":
                                     raise TimeoutError
@@ -192,7 +192,7 @@ class artifacts(commands.Cog):
                                         ''')
                                         elif redirect == "black room":
                                             mss = await ctx.send('''
-    You enter the black room. Here, this is no light. However, as you trudge forward, you see five doors.
+    You enter the black room. Here, there is no light. However, as you trudge forward, you see five doors.
 
     What do you do?
 
@@ -204,7 +204,7 @@ class artifacts(commands.Cog):
     `6. Enter the black door`
                                                 
                                         ''')
-                                        chosen = await self.bot.wait_for('message', check=check, timeout=60)
+                                        chosen = await self.bot.wait_for('message', check=check, timeout=360)
                                         chosen = chosen.content.lower()
                                         redirect = await action_manager(redirect, chosen, ctx)
                                         if mss:
@@ -214,7 +214,7 @@ class artifacts(commands.Cog):
                                         hook = Webhook.from_url(url, adapter=AsyncWebhookAdapter(session))
                                         await hook.send(content="Ah... you've made it! So, what did you learn? Which Titan betrayed the others? The one different than the others?\n\n`1. Gror\n2. Fullmar\n3. Iadirix\n4. Golmex`", username="Sef, The Last Titan", avatar_url="https://i.imgur.com/dWkRNdQ.png")
                                     # Gror
-                                    chosen = await self.bot.wait_for('message', check=check, timeout=60)
+                                    chosen = await self.bot.wait_for('message', check=check, timeout=360)
                                     chosen = chosen.content.lower()
                                     if chosen != "gror":
                                         async with aiohttp.ClientSession() as session:
@@ -228,13 +228,14 @@ class artifacts(commands.Cog):
                                             hook = Webhook.from_url(url, adapter=AsyncWebhookAdapter(session))
                                             await hook.send(content="Incredible... you have the wisdom that the 12 titans lacked. Here, you deserve this.", username="Sef, The Last Titan", avatar_url="https://i.imgur.com/dWkRNdQ.png")
                                             await award_artifact(ctx, ctx.author.id, 1)
+                                            self.active.remove(ctx.author.id)
                                             await h.update_quest(ctx.message, 18, -1, self.bot, True)
                         elif quest == 2:
                             async with aiohttp.ClientSession() as session:
                                 url = await h.webhook_safe_check(ctx.channel)
                                 hook = Webhook.from_url(url, adapter=AsyncWebhookAdapter(session))
                                 await hook.send(content="Heya, chap! Looking for an artifact I see! Here, I can give you this premium artifact made just by me!\n\nTrust me! You want an artifact of this power! Truly amazing! It'll make you cool! Rich! Powerful! It'll just cost you *a whole lot!*\n\nSo? Whaddya say?\n\n`1. Yes\n2. No`", username="Xolorth", avatar_url="https://i.imgur.com/lA8qSDe.jpg")
-                            chosen = await self.bot.wait_for('message', check=check, timeout=60)
+                            chosen = await self.bot.wait_for('message', check=check, timeout=360)
                             chosen = chosen.content.lower()  
                             if chosen == "yes":
                                 async with aiohttp.ClientSession() as session:
@@ -250,8 +251,10 @@ class artifacts(commands.Cog):
                                     url = await h.webhook_safe_check(ctx.channel)
                                     hook = Webhook.from_url(url, adapter=AsyncWebhookAdapter(session))
                                     await hook.send(content="A shame! A darn shame! Oh, well! Bye now!", username="Xolorth", avatar_url="https://i.imgur.com/lA8qSDe.jpg")
-                                raise TimeoutError
+                                    self.active.remove(ctx.author.id)
+                                    await h.update_quest(ctx.message, 18, -1, self.bot)
                     except TimeoutError:
+                        self.active.remove(ctx.author.id)
                         await h.update_quest(ctx.message, 18, -1, self.bot)
             else:
                 pass
@@ -274,7 +277,7 @@ class artifacts(commands.Cog):
                     async with conn.execute(f"select * from artifacts where artifact_id = {aid};") as info:
                         artifact = await info.fetchone()
                 if artifact[0] == 1:
-                    await ctx.send("The Mantle of The Titans flows a dim green... you feel safe. (+50 Defending)")
+                    await ctx.send("The Mantle of The Titans glows a dim green... you feel safe. (+50 Defending)")
                     await h.add_effect(ctx.author, self.bot, "defending", amount = 50)
                 elif artifact[0] == 2: # Cup of Hell
                     await ctx.send("You drink from the cup of hell... it burns your throat, your stomach... everything! (+666 Coolness | +666 Gold | +666 Burning)")

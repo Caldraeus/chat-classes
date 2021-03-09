@@ -20,7 +20,7 @@ class help_commands(commands.Cog):
     @commands.command()
     @commands.guild_only()
     async def server(self, ctx):
-        await ctx.send("Join the official server here!\n\nhttps://discord.gg/JRxUGCA")
+        await ctx.send("Join the official server here!\n\nhttps://discord.gg/729Tq6TCxe")
 
     @commands.command()
     @commands.guild_only()
