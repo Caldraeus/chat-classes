@@ -322,8 +322,8 @@ class apprentice(commands.Cog):
                         await h.add_coolness(ctx.author.id, 100)
                         await ctx.send(hook)
                     else:
-                        hook = "**💀[SOUL CRUSH!]💀** + 400 Coolness | " + hook
-                        await h.add_coolness(ctx.author.id, 400)
+                        hook = "**💀[SOUL CRUSH!]💀** + 250 Coolness | " + hook
+                        await h.add_coolness(ctx.author.id, 250)
                         await ctx.send(hook)
             elif self.bot.users_classes[str(ctx.author.id)] == "pacted":
                 ap_works = await h.alter_ap(ctx.message, 1, self.bot)

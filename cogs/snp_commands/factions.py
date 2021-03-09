@@ -156,10 +156,38 @@ class factions(commands.Cog): #TODO: Implement faction race commands, and the ab
         await ctx.send("Role and temp channels created. Manual setup required for channels and role position.")
 
         
+    @commands.command(aliases=["topf"])
+    @commands.guild_only()
+    async def topfactions(self, ctx):
+        async with aiosqlite.connect('unique.db') as conn:
+            async with conn.execute(f"SELECT faction_name, faction_points FROM factions ORDER BY faction_points DESC;") as count:
+                info = await count.fetchall()
         
+        final = ""
+        num = 1
+        for faction in info:
+            if num == 6:
+                break
+            else:
+                final += f"#{num} - {faction[0]} - {faction[1]} FP\n\n"
+                num+=1
+
+        profile = discord.Embed(title=f"🛡️ The Coolest Factions 🛡️", colour=discord.Colour.from_rgb(255,0,0), description=final)
+        profile.set_thumbnail(url="http://pixelartmaker.com/art/346bdb0be18bdb3.png")
+    
+        await ctx.send(embed=profile)
 
     @commands.command()
-    @commands.guild_only() # Each artifact in game has a unique quest attributed to it. Theses unique quests are coded here.
+    @commands.guild_only()
+    async def contribute(self, ctx, amount: int, *, item: str):
+        if item.lower() in list(list(zip(*self.bot.get_cog('crafting').materials_data))[0]):
+            await ctx.send(f"You contribute {amount} **{item.title()}** to your faction! Thanks!")
+        else:
+            await ctx.send("That isn't a real material! Make sure to check your spelling!")
+
+
+    @commands.command()
+    @commands.guild_only()
     @commands.is_owner()
     async def delfaction(self, ctx, f_id: int = 0, mem = None):
         if f_id in self.factions.keys():
@@ -225,7 +253,7 @@ class factions(commands.Cog): #TODO: Implement faction race commands, and the ab
             await ctx.send("Invalid faction ID")
 
     @commands.command()
-    @commands.guild_only() # Each artifact in game has a unique quest attributed to it. Theses unique quests are coded here.
+    @commands.guild_only() 
     @is_in_guild(732632186204979281)
     @is_in_chan()
     async def joinfaction(self, ctx, f_id: int = 0):
@@ -282,6 +310,22 @@ class factions(commands.Cog): #TODO: Implement faction race commands, and the ab
                             async with aiosqlite.connect('unique.db') as conn:
                                 await conn.execute(f"insert into faction_members values({ctx.message.author.id}, {f_id}, 0)")
                                 await conn.commit()
+
+                            async with aiosqlite.connect('unique.db') as conn:
+                                async with conn.execute(f"SELECT intro_mss_id FROM factions WHERE faction_id = {f_id}") as f_info:
+                                    faction_info = await f_info.fetchone()
+
+                            message_id = int(faction_info[0])
+                            intro_chan = self.bot.get_channel(802653320450801734)
+                            mss = await intro_chan.fetch_message(message_id)
+                            embed = mss.embeds[0]
+
+                            async with aiosqlite.connect('unique.db') as conn:
+                                        async with conn.execute(f"SELECT COUNT(*) FROM faction_members WHERE faction_in = {f_id};") as count:
+                                            members = await count.fetchall()
+
+                            embed.set_field_at(0, name = "Members", value = members[0][0], inline=False)
+                            await mss.edit(embed=embed)
                             await ctx.send(f"<:check_yes:802233343704956968> | Congrats! You are now part of **{self.factions[f_id][7]}**!")
                         except SyntaxError:
                             await ctx.send("You do not meet the faction's requirements.")
@@ -293,6 +337,80 @@ class factions(commands.Cog): #TODO: Implement faction race commands, and the ab
                 await ctx.send("❌ | You are already in a faction. Wait until the grace period to leave your current faction!")
         else:
             await ctx.send("❌ | You must run `;start` first!")
+
+class MaterialError(Exception):
+    pass
+
+async def update_materials(uid, material, amount_added, chan = None):
+    if type(material) == str:
+        material = material.title()
+        async with aiosqlite.connect('snp.db') as conn:
+            async with conn.execute(f"SELECT amount FROM materials WHERE uid = {uid} and item_name = '{material}';") as count:
+                current_amount = await count.fetchall()
+        if current_amount == []:
+            if amount_added < 0:
+                raise MaterialError
+            else:
+                async with aiosqlite.connect('snp.db') as conn:
+                    await conn.execute(f"insert into materials values({uid}, '{material}', {amount_added})")
+                    await conn.commit()
+        else:
+            current_amount = current_amount[0][0]
+            if current_amount == 0:
+                if amount_added < 0:
+                    raise MaterialError
+                else:
+                    async with aiosqlite.connect('snp.db') as conn:
+                        await conn.execute(f"update materials set amount = {amount_added} where uid = {uid} and item_name = '{material}'")
+                        await conn.commit()
+            else:
+                if current_amount+amount_added < 0:
+                    raise MaterialError
+                else:
+                    async with aiosqlite.connect('snp.db') as conn:
+                        await conn.execute(f"update materials set amount = {current_amount+amount_added} where uid = {uid} and item_name = '{material}'")
+                        await conn.commit()
+    elif type(material) == list:
+        for mat in material: # check if they have enough of each, raise an error if they don't
+            index = material.index(mat)
+            mat = mat.title()
+            
+            async with aiosqlite.connect('snp.db') as conn:
+                async with conn.execute(f"SELECT amount FROM materials WHERE uid = {uid} and item_name = '{mat}';") as count:
+                    current_amount = await count.fetchall()
+            if current_amount == []:
+                if amount_added[index] < 0:
+                    raise MaterialError
+            else:
+                current_amount = current_amount[0][0]
+                if current_amount == 0:
+                    if amount_added[index] < 0:
+                        raise MaterialError
+                else:
+                    if current_amount+amount_added[index] < 0:
+                        raise MaterialError
+        
+        for mat in material: # Now apply them
+            index = material.index(mat)
+            mat = mat.title()
+            async with aiosqlite.connect('snp.db') as conn:
+                async with conn.execute(f"SELECT amount FROM materials WHERE uid = {uid} and item_name = '{mat}';") as count:
+                    current_amount = await count.fetchall()
+            if current_amount == []:
+                async with aiosqlite.connect('snp.db') as conn:
+                    await conn.execute(f"insert into materials values({uid}, '{mat}', {amount_added[index]})")
+                    await conn.commit()
+            else:
+                current_amount = current_amount[0][0]
+                if current_amount == 0:
+                    async with aiosqlite.connect('snp.db') as conn:
+                        await conn.execute(f"update materials set amount = {amount_added[index]} where uid = {uid} and item_name = '{mat}'")
+                        await conn.commit()
+                else:
+                    async with aiosqlite.connect('snp.db') as conn:
+                        await conn.execute(f"update materials set amount = {current_amount+amount_added[index]} where uid = {uid} and item_name = '{mat}'")
+                        await conn.commit()
+
 
 # A setup function the every cog has
 def setup(bot):

@@ -219,7 +219,6 @@ async def update_materials(uid, material, amount_added):
                     async with aiosqlite.connect('snp.db') as conn:
                         await conn.execute(f"update materials set amount = {current_amount+amount_added[index]} where uid = {uid} and item_name = '{mat}'")
                         await conn.commit()
-
                     
         
 # A setup function the every cog has

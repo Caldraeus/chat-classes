@@ -49,7 +49,7 @@ class utils(commands.Cog): #TODO: Implement faction race commands, and the abili
                 self.bot.server_boosters.append(homie.id)
 
             async with aiosqlite.connect("main.db") as conn: # Second thing we do on a reset is give everyone back their action points
-                async with conn.execute(f"select id, class, achievements, ap from users;") as people:
+                async with conn.execute(f"select id, class, achievements from users;") as people:
                     usrs = await people.fetchall()
                     for guy in usrs:
                         try:

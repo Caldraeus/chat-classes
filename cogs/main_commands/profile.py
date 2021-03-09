@@ -50,20 +50,16 @@ class profile(commands.Cog):
         # embed.set_author(name="author name", url="https://discordapp.com", icon_url="https://cdn.discordapp.com/embed/avatars/0.png")
         if str(ctx.author.id) in self.bot.registered_users:
             async with aiosqlite.connect('main.db') as conn:
-                async with conn.execute(f"select inventory, gold from users where id = '{ctx.author.id}'") as u_info:
-                    user_info = await u_info.fetchone()
+                async with conn.execute(f"select item_name, amount from inventory where uid = '{ctx.author.id}'") as u_info:
+                    user_info = await u_info.fetchall()
 
-            inv = user_info[0].split("|")
-            gold = user_info[1]
-            
-            for owned_item in inv:
-                new_guy = owned_item.split(",")
-                inv[inv.index(owned_item)] = new_guy
+            inv = user_info
             
             final_list = ""
             num = 1
-            for item in inv:
-                if item != ['']:
+            # [('void', 1), ('hot dog', 5)]
+            if inv != []:
+                for item in inv:
                     final_list += f"{num}. **{item[0].title()}** × {item[1]}\n\n"
                     num += 1
             

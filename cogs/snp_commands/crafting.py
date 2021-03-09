@@ -65,10 +65,8 @@ class crafting(commands.Cog): #TODO: Implement faction race commands, and the ab
     async def craft(self, ctx, amount: int, *, item):
         pass # await update_materials(ctx.author.id, ["coal", material], [-smelting_cost, -amount], ctx)         
 
-
 class MaterialError(Exception):
     pass
-
 
 async def update_materials(uid, material, amount_added, chan = None):
     if type(material) == str:
@@ -139,7 +137,6 @@ async def update_materials(uid, material, amount_added, chan = None):
                     async with aiosqlite.connect('snp.db') as conn:
                         await conn.execute(f"update materials set amount = {current_amount+amount_added[index]} where uid = {uid} and item_name = '{mat}'")
                         await conn.commit()
-
                     
         
 # A setup function the every cog has

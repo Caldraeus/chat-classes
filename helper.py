@@ -225,18 +225,34 @@ def max_xp(lvl):
 def max_xp_skills(lvl):
     return 85 * (lvl ^ 70) + 350 * lvl + 50
 
+async def give_faction_points(contributor = None, f_id = None, amount = 0):
+    async with aiosqlite.connect('unique.db') as conn:
+        async with conn.execute(f"select faction_points from factions where faction_id = {f_id}") as u_info:
+            faction_points = await u_info.fetchone()
+
+    faction_points = faction_points[0] + amount
+    if faction_points < 0:
+        faction_points = 0
+
+    async with aiosqlite.connect('unique.db') as conn:
+        await conn.execute(f"update factions set faction_points = {faction_points} where faction_id = {f_id};")
+        await conn.commit()
+
 async def alter_items(uid, ctx, bot, item, change = 1, cost = 0):
     item = item.lower()
     async with aiosqlite.connect('main.db') as conn:
-        async with conn.execute(f"select inventory, gold from users where id = '{uid}'") as u_info:
+        async with conn.execute(f"select gold from users where id = '{uid}'") as u_info:
             user_info = await u_info.fetchone()
 
-    inv = user_info[0].split("|")
-    gold = user_info[1]
+    gold = user_info[0]
     
-    for owned_item in inv:
-        new_guy = owned_item.split(",")
-        inv[inv.index(owned_item)] = new_guy
+    async with aiosqlite.connect('main.db') as conn:
+        async with conn.execute(f"select item_name, amount from inventory where uid = '{ctx.author.id}'") as u_info:
+            user_info = await u_info.fetchall()
+
+    inv = user_info
+
+# [('void', 1), ('hot dog', 5)]
 
     items = [item[0] for item in inv] # Array of just the names of the items in the 2D array.
     end = ""
@@ -245,23 +261,22 @@ async def alter_items(uid, ctx, bot, item, change = 1, cost = 0):
         await ctx.send("You cannot afford this item!")
     else:
         if item in items:
-            index = items.index(item)
-            item_amount = int(inv[index][1]) + change
-            inv[index][1] = str(item_amount)
+            indx = items.index(item.lower())
+            item_amount = int(inv[indx][1]) + change
             if item_amount >= 10:
                 await award_ach(14, ctx.message, bot)
 
-        for sublist in inv:
-            if inv.index(sublist) == len(inv)-1:
-                end += f"{','.join(sublist)}"
-            else:
-                end += f"{','.join(sublist)}|"
+            async with aiosqlite.connect('main.db') as conn:
+                await conn.execute(f"update inventory set amount = {item_amount} where uid = {uid} and item_name = '{item.lower()}';")
+                await conn.commit()
         
-        if item not in items:
-            end+=f"|{item},{change}"
+        elif item not in items:
+            async with aiosqlite.connect('main.db') as conn:
+                await conn.execute(f"insert into inventory values({ctx.author.id}, '{item.lower()}', {change});")
+                await conn.commit()
             
         async with aiosqlite.connect('main.db') as conn:
-            await conn.execute(f"update users set gold = {gold - cost}, inventory = '{end}' where id = '{uid}';")
+            await conn.execute(f"update users set gold = {gold - cost} where id = '{uid}';")
             await conn.commit()
         if cost > 0:
             await ctx.send(f"✅ | Purchase complete! Your gold balance is now {gold-cost}.")

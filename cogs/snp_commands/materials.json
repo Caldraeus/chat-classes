@@ -575,7 +575,7 @@
     }
 },
 {
-    "raspberyy":{
+    "raspberry":{
         "description": "The coolest kind of berry - the raspberry.",
         "image_link": "https://www.raspberrypi.org/wp-content/uploads/2011/10/Raspi-PGB001.png",
         "sells_for": 2,

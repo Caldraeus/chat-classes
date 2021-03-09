@@ -26,7 +26,7 @@
 },
 {
     "arrest warrant":{
-        "description": "Man, you must have done something fucked up to get one of these. Anyway, how’s the little one?",
+        "description": "Man, you must have done something fucked up to get one of these. Anyway, how's the little one?",
         "recipe" : {
             "child" : 1,
             "death essence" : 1

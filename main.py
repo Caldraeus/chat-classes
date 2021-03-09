@@ -95,7 +95,7 @@ async def on_ready():
         bot.users_factions[int(person[0])] = int(person[1])
 
 
-    async with aiosqlite.connect('main.db') as conn: # This code makes sure the bot is enabled, then also makes sure that the bot is in an enabled channel
+    async with aiosqlite.connect('main.db') as conn: 
         # This also preloads some of the db.
         async with conn.execute(f"select * from servers;") as servers:
             servs = await servers.fetchall()
@@ -104,7 +104,7 @@ async def on_ready():
                 banned = serv[1].split('|')
                 for item in banned:
                     bot.banned_channels.append(item)
-        async with conn.execute(f"select id, class, achievements, ap from users;") as people:
+        async with conn.execute(f"select id, class, achievements from users;") as people:
             usrs = await people.fetchall()
             for guy in usrs:
                 user_ach = guy[2].split("|")
