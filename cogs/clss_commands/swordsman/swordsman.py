@@ -86,6 +86,27 @@ class swordsman(commands.Cog):
             "usr1 pushes their thumb into usr2's eye before slicing their bdypart off!",
             "usr1 kicks usr2 in the shin before cutting them in half."
         ]
+
+        self.hooks_shg = [
+            "usr1 throws a blade into usr2, then kicks it through them! Brutal!",
+            "usr1 kicks usr2, then slams a warbanner into their chest!",
+            "usr1 rips out usr2's bdypart, then crushes it! Owch!",
+            "usr1 swings their blade into usr2's bdypart, then kicks them away!",
+            "usr1 slams a warbanner into usr2's bdypart, then yells out a warcry!",
+            "usr1 kicks usr2 into a pit, then plants a warbanner!",
+            "usr1 slams an elbow into usr2's bdypart, then spears them through a warbanner!",
+            "usr1 runs at usr2, yelling 「喰らえ」as they ram usr2 through with a warbanner! Owch!"
+        ]
+
+        self.hooks_sb = [
+            "usr1 throws their katana into usr2's soul, then rends it from them!",
+            "usr1 uses the spirit of fire to set their katana ablaze, then slices cleanly through usr2's bdypart!",
+            "usr1 throws the spirit of dust into usr2's eyes, then slams them through a wall before finishing them off with their katana!",
+            "usr1 enters the ethereal plane, then jumps out behind usr2, slicing off usr2's bdypart!",
+            "usr1 uses the spirit of water to weave around usr2's attacks, then slices usr2's bdypart clean off!",
+            "usr1 summons a massive spirit blade, then slices usr2 into a thousand bits! Owie!",
+            "usr1 drags usr2 into the spirit realm, cuts their limbs off, then leaves them behind. Brutal stuff, usr1. Brutal stuff."
+        ]
     pass
 
     @commands.command(aliases=['slice'])
@@ -195,6 +216,67 @@ class swordsman(commands.Cog):
                             hook = "**✨[CRITICAL]✨** + 100 Coolness | " + hook
                             await h.add_coolness(ctx.author.id, 100)
                             await ctx.send(hook)
+            elif self.bot.users_classes[str(ctx.author.id)] == "shogun":
+                ap_works = await h.alter_ap(ctx.message, 1, self.bot)
+                if ap_works and await h.can_attack(ctx.author.id, target.id, ctx):
+                    crit_check = await h.crit_handler(self.bot, ctx.author.id, target.id)
+                    body_part = random.choice(h.body_parts)
+                    hook = random.choice(self.hooks_shg)
+                    hook = hook.replace("usr1", f"**{ctx.author.display_name}**")
+                    hook = hook.replace("bdypart", body_part)
+                    hook = hook.replace("usr2", f"**{target.display_name}**")
+                    if crit_check == False:
+                        await ctx.send(hook)
+                    else:
+                        members = ctx.guild.members
+                        chosen_members = []
+                        random.shuffle(members)
+                        for member in members:
+                            if len(chosen_members) == 3:
+                                break
+                            else:
+                                if str(member.id) in self.bot.registered_users.keys():
+                                    chosen_members.append(member)
+                        try:
+                            hook = "**🌸[CRITICAL STRIKE!]🌸** + 150 Coolness | " + hook + f"\n\nYour battle prowess inspires **{chosen_members[0].display_name}, {chosen_members[1].display_name},** and **{chosen_members[2].display_name}**!"
+                        except:
+                            hook = "**🌸[CRITICAL STRIKE!]🌸** + 150 Coolness | " + hook + f"\n\nUnfortunately, there's no one around to inspire..."
+                        await h.add_coolness(ctx.author.id, 150)
+                        await ctx.send(hook)
+                        for member in chosen_members:
+                            await h.add_effect(member, self.bot, "inspired", amount = 5)
+            elif self.bot.users_classes[str(ctx.author.id)] == "master samurai":
+                ap_works = await h.alter_ap(ctx.message, 1, self.bot)
+                if ap_works and await h.can_attack(ctx.author.id, target.id, ctx):
+                    crit_check = await h.crit_handler(self.bot, ctx.author.id, target.id)
+                    body_part = random.choice(h.body_parts)
+                    hook = random.choice(self.hooks_s)
+                    hook = hook.replace("usr1", f"**{ctx.author.display_name}**")
+                    hook = hook.replace("bdypart", body_part)
+                    hook = hook.replace("usr2", f"**{target.display_name}**")
+                    if crit_check == False:
+                        await ctx.send(hook)
+                    else:
+                        hook = "**🌸[SENBONZAKURA!]🌸** + 500 Coolness | " + hook
+                        await h.add_coolness(ctx.author.id, 500)
+                        await ctx.send(hook)
+            elif self.bot.users_classes[str(ctx.author.id)] == "spirit blade":
+                ap_works = await h.alter_ap(ctx.message, 1, self.bot)
+                if ap_works and await h.can_attack(ctx.author.id, target.id, ctx):
+                    crit_check = await h.crit_handler(self.bot, ctx.author.id, target.id)
+                    body_part = random.choice(h.body_parts)
+                    hook = random.choice(self.hooks_sb)
+                    hook = hook.replace("usr1", f"**{ctx.author.display_name}**")
+                    hook = hook.replace("bdypart", body_part)
+                    hook = hook.replace("usr2", f"**{target.display_name}**")
+                    if crit_check == False:
+                        await ctx.send(hook)
+                    else:
+                        hook = "**🌸[CRITICAL!]🌸** + 100 Coolness | " + hook + f"\n\n*{ctx.author.display_name} activates their spirit shroud!*"
+                        await h.add_coolness(ctx.author.id, 100)
+                        await ctx.send(hook)
+                        await h.add_effect(ctx.author, self.bot, "shrouded", amount = 10)
+                
                         
 # A setup function the every cog has
 def setup(bot):

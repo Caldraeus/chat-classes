@@ -17,8 +17,10 @@ effect_list = {
     "burning" : "You are on fire. Good luck.",
     "poisoned" : "Every time you make an attack, you lose an extra 2 AP!",
     "confidence" : "Hey, you're pretty good at this! Slightly raises your critical chance.",
+    "inspired" : "You're amazing! Good job! Considerably raises your critical chance.",
     "defending" : "You are prepared for someone to strike! Anyone who attacks you fails, wasting their AP.",
-    "wooyeah" : "**<a:wooyeah:804905363140247572>WOO YEAH<a:wooyeah:804905363140247572>IM ON A ROLL<a:wooyeah:804905363140247572>**"
+    "wooyeah" : "**<a:wooyeah:804905363140247572>WOO YEAH<a:wooyeah:804905363140247572>IM ON A ROLL<a:wooyeah:804905363140247572>**",
+    "shrouded" : "You're covered in some sort of shroud! It's harder for enemies to get a crit on you!"
 }
 
 base_classes = {
@@ -170,18 +172,42 @@ async def crit_handler(bot, attacker, defender, boost = None):
     # Values needed for later ############################################################ #
     crit_thresh = 1                # The number needed to roll below to get a critical     #
     crit_max = 20                  # The maximum nuber that the critical will be rolled on #
-    ###                                                                                    #
+    ########################################################################################
+    # We will now check for the person being attacked's status effects, to see if they have#
+    # some sort of protective status effect.                                               #
+    ########################################################################################
+    
+    speaker = defender
+    force_crit = None
+    if speaker in bot.user_status:
+        user_effects = bot.user_status[speaker]
+        for status in user_effects: # We go through each status affecting the user [NOT ALL APPLY TO ON-MESSAGE EVENTS. THEREFORE, WE NEED IF STATEMENTS]. These are applied in order
+            if status[0].lower() == "shrouded":
+                crit_max += 10
+                force_crit = random.randint(1,crit_max) 
+                ### HANDLE STACKS
+                if not(force_crit <= crit_thresh):
+                    remaining_stacks = status[1]-1
+                    if remaining_stacks <= 0:
+                        bot.user_status[speaker].remove(status)
+                    else:
+                        status[1] -= 1
+    ### Now we check for the rest of the stuff                                             #
     if boost:                                                                              #
         if boost > 0:                                                                      #
             crit_thresh += boost                                                           #
         else:                                                                              #
             crit_max += boost                                                              #
     ###                                                                                    #
-    crit = random.randint(1,crit_max)        # The rolled critical chance                  #
+    if force_crit != None:
+        crit = force_crit
+    else:
+        crit = random.randint(1,crit_max)        # The rolled critical chance              #
     # End Values                                                                           #
     ###################################################################################### #
     ###################################################################################### #
-    # Getting user status effects to check for critical-altering ones ###
+    # Getting user status effects to check for critical-altering ones ### 
+    # THESE ARE FOR POSITIVE EFFECTS #
     speaker = attacker
     if speaker in bot.user_status:
         user_effects = bot.user_status[speaker]
@@ -195,9 +221,17 @@ async def crit_handler(bot, attacker, defender, boost = None):
                         bot.user_status[speaker].remove(status)
                     else:
                         status[1] -= 1
+            elif status[0].lower() == "inspired":
+                crit_thresh += 8
+                ### HANDLE STACKS
+                if crit <= crit_thresh:
+                    remaining_stacks = status[1]-1
+                    if remaining_stacks <= 0:
+                        bot.user_status[speaker].remove(status)
+                    else:
+                        status[1] -= 1
     # End Status Effect Check ############################################
     ######################################################################
-
     if crit <= crit_thresh:
         ########################################################################################
         # This is for classes that have "when someone gets a crit on you" effects. #############

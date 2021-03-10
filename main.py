@@ -161,11 +161,12 @@ async def on_guild_remove(guild):
 async def invite_link(ctx):
     await ctx.send("https://discord.com/oauth2/authorize?client_id=713506775424565370&scope=bot&permissions=8")
 
+
 """
 @bot.command()
 @commands.guild_only()
 async def test(ctx):
-    origin = await h.find_origin("pacted")
+    origin = await h.find_origin("shogun")
     await ctx.send(f"You started as: {origin}")
 """
 
