@@ -45,6 +45,18 @@ class rogue(commands.Cog):
             "usr1 follows usr2 to their car and sneaks into the trunk. Once usr2 arrives home, usr1 jumps out and stabs them before stealing their car.",
             "usr1 pretends to be a homeless guy and scams usr2. Oh, then stabs them. Like 15 times. It was a bit unnecessary, really."
         ]
+
+        self.hooks_t = [
+            "usr1 cons usr2 with a really obviously fake story. C'mon, usr2, you're smarter than this!",
+            "usr1 stabs usr2 in the neck and takes their wallet.",
+            "usr1 jumps usr2 in the alley and takes their lunch money!",
+            "usr1 knocks usr2 out, extracts their bdypart, and sells it on the black market.",
+            "usr1 kicks usr2 in the stomach before taking the cash from usr2's back pocket, and running.",
+            "usr2 is walking home when they realise their wallet is missing! usr1 hides in a bush, holding usr2's wallet, and chuckles.",
+            "usr1 throws pocket sand into usr2's eyes and steals their bdypart. Aw snap!",
+            "usr1 trips usr2 and steals their credit card information. Time for vbucks!",
+            "usr1 kicks usr2 into a wall, stabs them, and steals their pants. Damn, that sucks."
+        ]
     pass
 
     @commands.command()
@@ -80,6 +92,44 @@ class rogue(commands.Cog):
                         await ctx.send(hook)
                     else:
                         hook = "**✨[CRITICAL]✨** + 100 Coolness | " + hook
+                        await h.add_coolness(ctx.author.id, 100)
+                        await ctx.send(hook)
+            elif self.bot.users_classes[str(ctx.author.id)] == "thief":
+                ap_works = await h.alter_ap(ctx.message, 1, self.bot)
+                if ap_works and await h.can_attack(ctx.author.id, target.id, ctx):
+                    crit_check = await h.crit_handler(self.bot, ctx.author.id, target.id)
+                    body_part = random.choice(h.body_parts)
+                    hook = random.choice(self.hooks_t)
+                    hook = hook.replace("usr1", f"**{ctx.author.display_name}**")
+                    hook = hook.replace("bdypart", body_part)
+                    hook = hook.replace("usr2", f"**{target.display_name}**")
+                    if crit_check == False:
+                        await ctx.send(hook)
+                    else:
+                        steal_chance = random.randint(1,10)
+                        hook = "**✨[CRITICAL]✨** + 100 Coolness | " + hook
+
+                        if steal_chance == 1:
+                            try:
+                                async with aiosqlite.connect('main.db') as conn:
+                                    async with conn.execute(f"select item_name from inventory where uid = {target.id};") as chan:
+                                        stuff = await chan.fetchall()
+
+                                stolen_item = random.choice(stuff[0])
+                                
+                                await h.remove_items(target.id, self.bot, stolen_item, 1)
+                                await h.alter_items(ctx.author.id, ctx, self.bot, stolen_item, change = 1)
+                                hook += f"\n\n*{ctx.author.display_name} steals {target.display_name}'s **{stolen_item}**!*"
+                            except IndexError:
+                                pass
+                        else:
+                            await h.add_gold(ctx.author.id, 200, self.bot)
+                            try:
+                                await h.add_gold(target.id, -200, self.bot)
+                                hook += f"\n\n*{ctx.author.display_name} steals 200 gold from {target.display_name}!*"
+                            except TypeError:
+                                hook += f"\n\n*{ctx.author.display_name} gives 200 gold to {target.display_name}, then instantly steals it!*"
+
                         await h.add_coolness(ctx.author.id, 100)
                         await ctx.send(hook)
                         

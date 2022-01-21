@@ -12,7 +12,6 @@ from discord import Webhook, AsyncWebhookAdapter
 from asyncio.exceptions import TimeoutError
 import sqlite3
 from datetime import datetime
-from Fortuna import RelativeWeightedChoice
 
 class mining(commands.Cog): #TODO: Implement faction race commands, and the ability to set faction requirements.
     def __init__(self, bot):

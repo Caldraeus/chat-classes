@@ -169,7 +169,6 @@ class class_commands(commands.Cog):
             await ctx.send("Sorry, you can't change classes yet! Come back when you're higher level.")
 
 
-
 # A setup function the every cog has
 def setup(bot):
     bot.add_cog(class_commands(bot))

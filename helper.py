@@ -20,7 +20,25 @@ effect_list = {
     "inspired" : "You're amazing! Good job! Considerably raises your critical chance.",
     "defending" : "You are prepared for someone to strike! Anyone who attacks you fails, wasting their AP.",
     "wooyeah" : "**<a:wooyeah:804905363140247572>WOO YEAH<a:wooyeah:804905363140247572>IM ON A ROLL<a:wooyeah:804905363140247572>**",
-    "shrouded" : "You're covered in some sort of shroud! It's harder for enemies to get a crit on you!"
+    "shrouded" : "You're covered in some sort of shroud! It's harder for enemies to get a crit on you!",
+    "energized" : "You're powered up! Your next action will cost 0 AP!"
+}
+
+effects_positive = {
+    "confidence",
+    "inspired",
+    "defending",
+    "shrouded",
+    "energized"
+}
+
+effects_negative = {
+    "shatter",
+    "polymorph",
+    "drunk",
+    "burning",
+    "poisoned",
+    "wooyeah"
 }
 
 base_classes = {
@@ -85,6 +103,14 @@ async def reply_check(message):
     else:
         return False
 
+async def handle_stacks(bot, status, user):
+    ### HANDLE STACKS
+    remaining_stacks = status[1]-1
+    if remaining_stacks <= 0:
+        bot.user_status[user].remove(status)
+    else:
+        status[1] -= 1
+
 async def can_attack(user, target, ctx): # NOTE: Remember that you can't alter AP of those who have no profile in CC... Also, target may not always exist
     bot = ctx.bot
     if user not in bot.user_status:
@@ -92,12 +118,7 @@ async def can_attack(user, target, ctx): # NOTE: Remember that you can't alter A
     user_effects = bot.user_status[user]
     for status in user_effects: 
         if status[0].lower() == "poisoned":
-            ### HANDLE STACKS
-            remaining_stacks = status[1]-1
-            if remaining_stacks <= 0:
-                bot.user_status[user].remove(status)
-            else:
-                status[1] -= 1
+            await handle_stacks(bot, status, user)
             ### APPLY EFFECT
             uid = str(user)
             balance = (bot.users_ap[uid] - 2)
@@ -155,12 +176,7 @@ async def can_attack(user, target, ctx): # NOTE: Remember that you can't alter A
     user_effects = bot.user_status[target]
     for status in user_effects: 
         if status[0].lower() == "defending":
-            ### HANDLE STACKS
-            remaining_stacks = status[1]-1
-            if remaining_stacks <= 0:
-                bot.user_status[user].remove(status.lower())
-            else:
-                status[1] -= 1
+            await handle_stacks(bot, status, user)
             ### APPLY EFFECT
             await ctx.send("You attempt to attack, but you cannot penetrate their defenses! Your attack fails!")
             return False
@@ -187,18 +203,14 @@ async def crit_handler(bot, attacker, defender, boost = None):
                 force_crit = random.randint(1,crit_max) 
                 ### HANDLE STACKS
                 if not(force_crit <= crit_thresh):
-                    remaining_stacks = status[1]-1
-                    if remaining_stacks <= 0:
-                        bot.user_status[speaker].remove(status)
-                    else:
-                        status[1] -= 1
-    ### Now we check for the rest of the stuff                                             #
+                    await handle_stacks(bot, status, speaker)
+    ### Now we check for the rest of the stuff # # # # # # # # # # # # # # # # # # # # # # #
     if boost:                                                                              #
         if boost > 0:                                                                      #
             crit_thresh += boost                                                           #
         else:                                                                              #
             crit_max += boost                                                              #
-    ###                                                                                    #
+    ## # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
     if force_crit != None:
         crit = force_crit
     else:
@@ -216,20 +228,12 @@ async def crit_handler(bot, attacker, defender, boost = None):
                 crit_thresh += 4
                 ### HANDLE STACKS
                 if crit <= crit_thresh:
-                    remaining_stacks = status[1]-1
-                    if remaining_stacks <= 0:
-                        bot.user_status[speaker].remove(status)
-                    else:
-                        status[1] -= 1
+                    await handle_stacks(bot, status, speaker)
             elif status[0].lower() == "inspired":
                 crit_thresh += 8
                 ### HANDLE STACKS
                 if crit <= crit_thresh:
-                    remaining_stacks = status[1]-1
-                    if remaining_stacks <= 0:
-                        bot.user_status[speaker].remove(status)
-                    else:
-                        status[1] -= 1
+                    await handle_stacks(bot, status, speaker)
     # End Status Effect Check ############################################
     ######################################################################
     if crit <= crit_thresh:
@@ -271,6 +275,34 @@ async def give_faction_points(contributor = None, f_id = None, amount = 0):
     async with aiosqlite.connect('unique.db') as conn:
         await conn.execute(f"update factions set faction_points = {faction_points} where faction_id = {f_id};")
         await conn.commit()
+
+async def remove_items(uid, bot, item_name, amount = 1, exact_mode = False): # If "exact_mode" is on, this becomes a return function that will return true if it sucessfully removes EXACTLY X items, false if it cannot.
+    item = item_name.lower()
+    async with aiosqlite.connect('main.db') as conn:
+        async with conn.execute(f"select amount from inventory where uid = {uid} and item_name = '{item.lower()}'") as u_info:
+            user_info = await u_info.fetchone()
+    current_amount = user_info[0]
+    final_amount = current_amount - amount
+    if exact_mode:
+        if final_amount < 0:
+            return False
+        else:
+            async with aiosqlite.connect('main.db') as conn:
+                await conn.execute(f"update inventory set amount = {final_amount} where uid = {uid} and item_name = '{item.lower()}';")
+                await conn.commit()
+            return True
+            
+    else:
+        if final_amount <= 0:
+            async with aiosqlite.connect('main.db') as conn: # DELETE FROM table_name WHERE condition;
+                await conn.execute(f"DELETE FROM inventory WHERE uid = {uid} and item_name = '{item.lower()}'")
+                await conn.commit()
+        else:
+            async with aiosqlite.connect('main.db') as conn:
+                await conn.execute(f"update inventory set amount = {final_amount} where uid = {uid} and item_name = '{item.lower()}';")
+                await conn.commit()
+
+
 
 async def alter_items(uid, ctx, bot, item, change = 1, cost = 0):
     item = item.lower()
@@ -315,7 +347,7 @@ async def alter_items(uid, ctx, bot, item, change = 1, cost = 0):
         if cost > 0:
             await ctx.send(f"✅ | Purchase complete! Your gold balance is now {gold-cost}.")
 
-async def alter_ap(message, ap, bot):
+async def alter_ap(message, ap, bot): # Used to remove AP from users.
     if str(message.author.id) in bot.registered_users:
         uid = str(message.author.id)
         balance = (bot.users_ap[uid] - ap)

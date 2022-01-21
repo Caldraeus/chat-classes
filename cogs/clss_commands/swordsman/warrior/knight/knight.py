@@ -1,13 +1,15 @@
-import discord
-from discord.ext import commands
-import helper as h
-from discord.ext.commands.cooldowns import BucketType
-import random
 import math
 import os
+import random
+import time
+
 import aiohttp
 import aiosqlite
-import time
+import discord
+import helper as h
+from discord.ext import commands
+from discord.ext.commands.cooldowns import BucketType
+
 
 class knight(commands.Cog):
     def __init__(self, bot):
@@ -32,7 +34,7 @@ class knight(commands.Cog):
     @commands.command()
     @commands.guild_only()
     @commands.cooldown(2, 1, commands.BucketType.user)
-    async def slash(self, ctx, target: discord.Member = None): # Shoots an arrow at someone.
+    async def slash(self, ctx, target: discord.Member = None): # Honestly dont remember what this does to work but it works
         if target and target != ctx.author and target.id != 713506775424565370:
             if self.bot.users_classes[str(ctx.author.id)] == "knight":
                 ap_works = await h.alter_ap(ctx.message, 1, self.bot)
@@ -52,7 +54,7 @@ class knight(commands.Cog):
                     if crit_check == False:
                         await ctx.send(hook)
                     else:
-                        crusade_chance = random.randint(1,8)
+                        crusade_chance = random.randint(1,6)
                         if crusade_chance == 1 and self.crusade == None:
                             og_time = time.strftime("%H:%M")
                             end_time = og_time.split(":")
@@ -70,7 +72,7 @@ class knight(commands.Cog):
 
     @commands.command()
     @commands.guild_only()
-    async def crusade(self, ctx, target: discord.Member = None): # Shoots an arrow at someone.
+    async def crusade(self, ctx, target: discord.Member = None): 
         if self.bot.users_classes[str(ctx.author.id)] == "knight":
             if self.crusade != None:
                 await ctx.send(f"**Crusade** is active! This crusade was started by {self.crusade[0]} at `{self.crusade[1]}` and will end at `{self.crusade[2]}` (EST).")

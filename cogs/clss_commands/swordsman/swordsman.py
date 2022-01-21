@@ -107,7 +107,16 @@ class swordsman(commands.Cog):
             "usr1 summons a massive spirit blade, then slices usr2 into a thousand bits! Owie!",
             "usr1 drags usr2 into the spirit realm, cuts their limbs off, then leaves them behind. Brutal stuff, usr1. Brutal stuff."
         ]
-    pass
+
+        self.hooks_swash = [
+            "usr1 throws their katana into usr2's soul, then rends it from them!",
+            "usr1 uses the spirit of fire to set their katana ablaze, then slices cleanly through usr2's bdypart!",
+            "usr1 throws the spirit of dust into usr2's eyes, then slams them through a wall before finishing them off with their katana!",
+            "usr1 enters the ethereal plane, then jumps out behind usr2, slicing off usr2's bdypart!",
+            "usr1 uses the spirit of water to weave around usr2's attacks, then slices usr2's bdypart clean off!",
+            "usr1 summons a massive spirit blade, then slices usr2 into a thousand bits! Owie!",
+            "usr1 drags usr2 into the spirit realm, cuts their limbs off, then leaves them behind. Brutal stuff, usr1. Brutal stuff."
+        ]
 
     @commands.command(aliases=['slice'])
     @commands.guild_only()
@@ -276,6 +285,29 @@ class swordsman(commands.Cog):
                         await h.add_coolness(ctx.author.id, 100)
                         await ctx.send(hook)
                         await h.add_effect(ctx.author, self.bot, "shrouded", amount = 10)
+            elif self.bot.users_classes[str(ctx.author.id)] == "swashbuckler":
+                ap_works = await h.alter_ap(ctx.message, 1, self.bot)
+                if ap_works and await h.can_attack(ctx.author.id, target.id, ctx):
+                    crit_check = await h.crit_handler(self.bot, ctx.author.id, target.id)
+                    body_part = random.choice(h.body_parts)
+                    hook = random.choice(self.hooks_swash)
+                    hook = hook.replace("usr1", f"**{ctx.author.display_name}**")
+                    hook = hook.replace("bdypart", body_part)
+                    hook = hook.replace("usr2", f"**{target.display_name}**")
+                    if crit_check == False:
+                        await ctx.send(hook)
+                    else:
+                        members = ctx.guild.members
+                        random.shuffle(members)
+                        members.remove(ctx.author)
+                        
+                        try:
+                            hook = "**☠️[CRITICAL!]☠️** + 100 Coolness | " + hook + f"\n\nYour ship's cannons fire upon **{members[0].display_name}** and **{members[1].display_name}**, earning you an additional 50 coolness!"
+                        except:
+                            hook = "**☠️[CRITICAL!]☠️** + 100 Coolness | " + hook + f"\n\nYour ship's cannons don't fire..."
+                        
+                        await h.add_coolness(ctx.author.id, 150)
+                        await ctx.send(hook)
                 
                         
 # A setup function the every cog has

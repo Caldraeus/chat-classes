@@ -115,7 +115,7 @@ class myriad(commands.Cog): #TODO: Implement faction race commands, and the abil
                 self.force_jackpot = False
                 slot_1 = '<a:jackpot:804920508982099988>'
                 slot_2 = '<a:jackpot:804920508982099988>'
-                slot_3 = '<a:jackpot:804920508982099988>y'
+                slot_3 = '<a:jackpot:804920508982099988>'
             else:
                 if rig_chance != 1:
                     slot_1 = random.choice(slots)

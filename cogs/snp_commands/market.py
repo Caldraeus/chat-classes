@@ -39,15 +39,6 @@ class market(commands.Cog):
     @commands.command()
     @commands.guild_only()
     @is_in_guild(732632186204979281)
-    async def trade(self, ctx, target: discord.Member = None):
-        if target and target != ctx.author and (str(target.id) in list(self.bot.registered_users.keys())):
-            await ctx.send("Valid trade target")
-        else:
-            await ctx.send("Invalid trading target! You must target a user registered in the bot.")
-
-    @commands.command()
-    @commands.guild_only()
-    @is_in_guild(732632186204979281)
     async def market(self, ctx, *, item: str = None):
         if item != None and item.lower() in self.materials:
             async with aiosqlite.connect('unique.db') as conn: # This should've been in SNP.db but I made an oopsie. No worries, though.

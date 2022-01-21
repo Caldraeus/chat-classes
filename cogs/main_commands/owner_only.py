@@ -64,14 +64,6 @@ class owner_only(commands.Cog):
             await h.fetch_random_quest(ctx.message, self.bot, target, override=True)
         else:
             await h.fetch_random_quest(ctx.message, self.bot, override=True)
-    
-    @commands.command()
-    @commands.is_owner()
-    async def release(self, ctx, version, *, notes):
-        channel = self.bot.get_channel(734108098129821757)
-        embed = discord.Embed(title=f"❗ Version {version} Released! ❗", colour=discord.Colour.from_rgb(255,0,0), description=notes)
-        mss = await channel.send(content="╱╲╱╲╱╲╱╲╱╲╱╲╱╲╱╲╱╲\n\n<@&738883975954563132>\n\n", embed=embed)
-        await mss.publish()
 
     @commands.command()
     @commands.is_owner()

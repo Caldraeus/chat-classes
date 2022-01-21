@@ -29,6 +29,15 @@ class help_commands(commands.Cog):
         difference = int(difference.total_seconds()/3600) # There has to be a better way of doing this.
         await ctx.send(f"**Hours Until Rollover:** {difference}\n\n*What is rollover? Rollover hapens once every 24 hours. It resets all users AP, as well as their daily gold gift.*")
 
+    @commands.command()
+    @commands.guild_only()
+    async def statuses(self, ctx):
+        profile = discord.Embed(title=f"Chat Classes Status Effects", colour=discord.Colour.from_rgb(255,165,0), description="")
+        profile.set_footer(text=f"Did you mean to check your current status effects? Run ;effects instead.", icon_url="")
+        for key in h.effect_list:
+            profile.add_field(name=key.title(), value=h.effect_list[key], inline=False)
+        await ctx.send(embed=profile)
+
     @commands.command(aliases=['h'])
     @commands.guild_only()
     async def help(self, ctx, module = "modules"):
@@ -58,6 +67,7 @@ class help_commands(commands.Cog):
             profile.add_field(name="help", value="Display the help embed.", inline=False)
             profile.add_field(name="server", value="Send the official Chat Classes server invite.", inline=False)
             profile.add_field(name="rollover", value="Dislpay rollover timer, as well as some additional information about rollover.", inline=False)
+            profile.add_field(name="statuses", value="Dislpay a list of all status effects.", inline=False)
             profile.set_thumbnail(url="https://archive-media-0.nyafuu.org/c/image/1531/86/1531863615508.png")
             await ctx.send(embed=profile)
         elif module == "server":

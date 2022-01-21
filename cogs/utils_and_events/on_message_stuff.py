@@ -118,11 +118,7 @@ async def handle_effects(message, bot): # List of effects in the readme
             if status[0].lower() == "shatter":
                 ### HANDLE STACKS
                 if len(message.content.split(" ")) != 1:
-                    remaining_stacks = status[1]-1
-                    if remaining_stacks <= 0:
-                        bot.user_status[speaker].remove(status)
-                    else:
-                        status[1] -= 1
+                    await h.handle_stacks(bot, status, speaker)
                 ### APPLY EFFECT
                 mad_content = " "
                 if message.content != "":
@@ -152,11 +148,7 @@ async def handle_effects(message, bot): # List of effects in the readme
                     
             elif status[0].lower() == "polymorph":
                 ### HANDLE STACKS
-                remaining_stacks = status[1]-1
-                if remaining_stacks <= 0:
-                    bot.user_status[speaker].remove(status)
-                else:
-                    status[1] -= 1
+                await h.handle_stacks(bot, status, speaker)
                 ### APPLY EFFECT
                 
                 urls = [
@@ -205,11 +197,7 @@ async def handle_effects(message, bot): # List of effects in the readme
                 chance = random.randint(1,5)
                 if chance == 5:
                     ### HANDLE STACKS
-                    remaining_stacks = status[1]-1
-                    if remaining_stacks <= 0:
-                        bot.user_status[speaker].remove(status)
-                    else:
-                        status[1] -= 1
+                    await h.handle_stacks(bot, status, speaker)
                     ### APPLY EFFECT
                     chosen_effect = random.randint(1,4)
                     
@@ -238,11 +226,7 @@ async def handle_effects(message, bot): # List of effects in the readme
                     break
             elif status[0].lower() == "wooyeah":
                 ### HANDLE STACKS
-                remaining_stacks = status[1]-1
-                if remaining_stacks <= 0:
-                    bot.user_status[speaker].remove(status)
-                else:
-                    status[1] -= 1
+                await h.handle_stacks(bot, status, speaker)
                 ### APPLY EFFECT
                 async with aiohttp.ClientSession() as session:
                     url = await h.webhook_safe_check(message.channel)
@@ -255,11 +239,7 @@ async def handle_effects(message, bot): # List of effects in the readme
                     break
             elif status[0].lower() == "burning":
                 ### HANDLE STACKS
-                remaining_stacks = status[1]-1
-                if remaining_stacks <= 0:
-                    bot.user_status[speaker].remove(status)
-                else:
-                    status[1] -= 1
+                await h.handle_stacks(bot, status, speaker)
                 ### APPLY EFFECT
 
                 fstring = "🔥 "
@@ -298,7 +278,7 @@ async def handle_effects(message, bot): # List of effects in the readme
                         await clone_hook.send(content=fstring, username=message.author.display_name, avatar_url=message.author.avatar_url)
                     except:
                         await clone_hook.send(content="**I AM ON FIRE HELP MEEEEEEEEEEEEEEEE**", username=message.author.display_name, avatar_url=message.author.avatar_url)
-                    break
+
 # A setup function the every cog has
 def setup(bot):
     bot.add_cog(utils(bot))

@@ -21,7 +21,12 @@ class economy(commands.Cog):
             "adrenaline" : 225,
             "void" : 275,
             "milk" : 1000,
-            "jamba juice" : 5000
+            "jamba juice" : 5000,
+            "snake oil" : 10
+        }
+
+        self.items_trader = {
+            "snake oil"
         }
 
         self.hidden_items = {
@@ -43,7 +48,12 @@ class economy(commands.Cog):
             embed.add_field(name=f"Milk | {self.items.get('milk')} G", value="A powerful liquid... milk. Removes up to 100 stacks of your most recent status effect when consumed!", inline=False)
             embed.add_field(name=f"Jamba Juice | {self.items.get('jamba juice')} G", value="The *most* powerful and holy liquid... jamba juice! Removes all status effects, good or bad, when consumed!", inline=False)
             await ctx.send(embed=embed)
-
+        if page == "trader":
+            embed = discord.Embed(title=f"💸 Trader Shop 💸", colour=discord.Colour.from_rgb(166, 148, 255))
+            embed.set_thumbnail(url="https://img.icons8.com/cotton/2x/shop--v3.png")
+            embed.add_field(name=f"Snake Oil | {self.items.get('snake oil')} G", value=f'Snake oil! Super useful, very needed!', inline=False)
+            await ctx.send(embed=embed)
+            
     @commands.command()
     @commands.guild_only()
     async def use(self, ctx, *, item: str = None):
@@ -128,7 +138,7 @@ class economy(commands.Cog):
                                     removed = self.bot.user_status[speaker][0][1] + 100
                                     self.bot.user_status[speaker].remove(self.bot.user_status[speaker][0])
                                 else:
-                                    removed_amount = 100
+                                    removed = 100
                                 await ctx.send(f"🥛 | You drink a cold glass of milk. You feel a lot better! (-{removed} {effect_cleansing.title()})") 
                             except IndexError:
                                 await ctx.send(f"🥛 | You drink a cold glass of milk. You don't feel any different.")
@@ -139,6 +149,13 @@ class economy(commands.Cog):
                             self.bot.user_status[speaker] = []
                         else:
                             self.bot.user_status[speaker] = []
+                    elif item == "snake oil": # Gives a random status effect
+                        chosen_status = random.choice(list(h.effect_list.keys()))
+                        amount = random.randint(1, 10)
+
+                        await ctx.send(f"🐍 | You drink your delicious and useful snake oil! Wait, what the hell was in this stuff!? (+{amount} **{chosen_status.title()}**)")
+                        await h.add_effect(ctx.author, self.bot, chosen_status, amount)
+                        
 
                                 
                     ####
@@ -165,8 +182,13 @@ class economy(commands.Cog):
             if amount >= 1:
                 item = item.lower()
                 if item:
-                    if item in self.items:  
+                    if item in self.items and item not in self.items_trader:  
                         await h.alter_items(ctx.author.id, ctx, self.bot, item.lower(), amount, self.items[item.lower()]*amount)
+                    elif item in self.items and item in self.items_trader:  
+                        if self.bot.users_classes[str(ctx.author.id)] == "trader":
+                            await h.alter_items(ctx.author.id, ctx, self.bot, item.lower(), amount, self.items[item.lower()]*amount)
+                        else:
+                            await ctx.send("⚠️ | Hey, you can't buy this item! Come back when you're a trader or higher!")
                     else:
                         await ctx.send("That item doesn't exist. Did you make a typo?")
                     
