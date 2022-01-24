@@ -7,7 +7,6 @@ from discord.ext.commands.cooldowns import BucketType
 import aiosqlite
 import asyncio
 import random
-from discord import Webhook, AsyncWebhookAdapter
 import aiohttp
 from PIL import Image
 
@@ -396,7 +395,7 @@ async def xp_handler(message, bot, boost = 0):
                     await conn.execute(f"update users set level = {current_lvl + 1} where id = '{message.author.id}'")
                     await conn.commit()
                 embed = discord.Embed(title=f"✨ Level up! ✨", colour=discord.Colour.from_rgb(255, 204, 153), description=f'You are now level {prof[1]+1}! Good job!')
-                embed.set_thumbnail(url=message.author.avatar_url)
+                embed.set_thumbnail(url=message.author.display_avatar.url)
                 notif = await message.channel.send(content=message.author.mention, embed=embed)
                 await notif.delete(delay=10)
             elif xp >= max_xp(current_lvl) and ((prof[1]+1) % 10 == 0):
@@ -406,7 +405,7 @@ async def xp_handler(message, bot, boost = 0):
                 if message.author.id not in bot.notified:
                     bot.notified.append(message.author.id)
                     embed = discord.Embed(title=f"✨ Level up! ✨", colour=discord.Colour.from_rgb(255, 204, 153), description=f'You can now level up to {prof[1]+1}! Good job!')
-                    embed.set_thumbnail(url=message.author.avatar_url)
+                    embed.set_thumbnail(url=message.author.display_avatar.url)
                     embed.set_footer(text=f"A class up is available! Run {prefix}classup when you are ready.", icon_url="https://lh3.googleusercontent.com/proxy/OrYbJO2bKqGtVPcWnue8XK0SRnHoC-h8VHKNTw9JoVk-k_mke8bcurTQgoKd70H_kgr9AR2CQH-GRgckkZqXbRbdf-CZgjac")
                     notif = await message.channel.send(content=f'{message.author.mention}', embed=embed)
                     await notif.delete(delay=10)    
@@ -751,7 +750,7 @@ async def genprof(uid, aps, bot):
             user = await info.fetchone()
 
     profile = discord.Embed(title=f"{uid.display_name}'s Profile", colour=discord.Colour(0x6eaf0b), description="")
-    profile.set_thumbnail(url=uid.avatar_url)
+    profile.set_thumbnail(url=uid.display_avatar.url)
     ###
     user_ach = user[6].split("|")
     user_ach = len(user_ach)-1
@@ -774,7 +773,7 @@ async def genprof(uid, aps, bot):
 
             color = discord.Colour.from_rgb(r, g, b)
             profile = discord.Embed(title=f"{uid.display_name}'s Profile", colour=color, description="")
-            profile.set_thumbnail(url=uid.avatar_url)
+            profile.set_thumbnail(url=uid.display_avatar.url)
             profile.set_footer(text=f"Global Coolness Ranking: {await genrank(uid.id)} | Faction: {fac_info[7]}", icon_url="")
             profile.add_field(name="Class & Level", value=f'{user[1].title()} ║ Level {user[8]}', inline=False)
             profile.set_image(url=fac_info[5])

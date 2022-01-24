@@ -154,7 +154,7 @@ class profile(commands.Cog):
                         """
         if final_list != "":
             profile = discord.Embed(title=f"{target.display_name}'s Achievements", colour=discord.Colour.from_rgb(255,69,0), description=final_list)
-            profile.set_thumbnail(url=target.avatar_url)
+            profile.set_thumbnail(url=target.display_avatar.url)
             profile.add_field(name="Total", value=f"{user_ach} of {total_achievements} Unlocked ({int((user_ach/total_achievements)*100)}%)", inline=False)
             await ctx.send(embed=profile)
                     

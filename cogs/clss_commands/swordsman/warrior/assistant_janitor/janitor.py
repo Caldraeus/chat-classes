@@ -9,7 +9,6 @@ import aiohttp
 import aiosqlite
 import time
 from better_profanity import profanity
-from discord import Webhook, AsyncWebhookAdapter
 import aiohttp
 
 class janitor(commands.Cog):
@@ -46,8 +45,8 @@ class janitor(commands.Cog):
                     if message_checking.author != ctx.author:
                         async with aiohttp.ClientSession() as session:
                             url = await h.webhook_safe_check(ctx.channel)
-                            hook = Webhook.from_url(url, adapter=AsyncWebhookAdapter(session))
-                            await hook.send(content=profanity.censor(message_checking.content, "○"), username=author.display_name, avatar_url=author.avatar_url)
+                            hook = discord.Webhook.from_url(url, session=session)
+                            await hook.send(content=profanity.censor(message_checking.content, "○"), username=author.display_name, avatar_url=author.display_avatar.url)
                         await message_checking.delete()
                         await messages[0].delete()
                         await h.add_coolness(ctx.author.id, 1000)

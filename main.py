@@ -12,7 +12,6 @@ import sys, traceback
 from os import listdir
 from os.path import isfile, join
 from discord.utils import find
-from discord import Webhook, AsyncWebhookAdapter
 import aiohttp
 import random
 import os

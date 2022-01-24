@@ -8,7 +8,6 @@ import os
 import aiohttp
 import aiosqlite
 import asyncio
-from discord import Webhook, AsyncWebhookAdapter
 from asyncio.exceptions import TimeoutError
 import sqlite3
 from datetime import datetime
@@ -100,16 +99,6 @@ class utils(commands.Cog): #TODO: Implement faction race commands, and the abili
             await asyncio.sleep(.1)
             await h.xp_handler(message,self.bot)
 
-@executor_function # makes sync int
-def shatter_image(url):
-    with Image.open(requests.get(url, stream=True).raw) as im:
-        im = ImageOps.mirror(im)
-        buff = BytesIO()
-        im.save(buff, 'png')
-    buff.seek(0)
-    return buff
-
-
 async def handle_effects(message, bot): # List of effects in the readme
     speaker = message.author.id
     if speaker in bot.user_status:
@@ -129,20 +118,13 @@ async def handle_effects(message, bot): # List of effects in the readme
                         mad_content = mad_content.join(content)
                         if mad_content != message.content or all(x==content[0] for x in content) == True:
                             break
-                if message.attachments != []:
-                    if len(message.attachments) == 1:
-                        buff = await shatter_image(url=message.attachments[0].url)
-                        buff = discord.File(fp=buff, filename='fucked_image.png')
-                    else:
-                        buff = None
-                else:
-                    buff = None
 
                 await message.delete()
                 async with aiohttp.ClientSession() as session:
                     url = await h.webhook_safe_check(message.channel)
-                    clone_hook = Webhook.from_url(url, adapter=AsyncWebhookAdapter(session))
-                    await clone_hook.send(content=mad_content, username=message.author.display_name, avatar_url=message.author.avatar_url, file=buff)
+                    clone_hook = discord.Webhook.from_url(url, session=session)
+                    await message.channel.send("Error")
+                    await clone_hook.send(content=mad_content, username=message.author.display_name, avatar_url=message.author.display_avatar.url)
                 break
                 
                     
@@ -186,7 +168,7 @@ async def handle_effects(message, bot): # List of effects in the readme
                 await message.delete()
                 async with aiohttp.ClientSession() as session:
                     url = await h.webhook_safe_check(message.channel)
-                    clone_hook = Webhook.from_url(url, adapter=AsyncWebhookAdapter(session))
+                    clone_hook = discord.Webhook.from_url(url, session=session)
                     
                     try:
                         await clone_hook.send(content=sheep_content.capitalize(), username=sheep_name, avatar_url=chosen_url)
@@ -205,8 +187,8 @@ async def handle_effects(message, bot): # List of effects in the readme
                         await message.delete()
                         async with aiohttp.ClientSession() as session:
                             url = await h.webhook_safe_check(message.channel)
-                            clone_hook = Webhook.from_url(url, adapter=AsyncWebhookAdapter(session))
-                            await clone_hook.send(content=message.content + " -hic-", username=message.author.display_name, avatar_url=message.author.avatar_url)
+                            clone_hook = discord.Webhook.from_url(url, session=session)
+                            await clone_hook.send(content=message.content + " -hic-", username=message.author.display_name, avatar_url=message.author.display_avatar.url)
                         break
                     elif chosen_effect == 2:
                         await message.channel.send(f'*{message.author.display_name} vomits all over the floor.*')
@@ -221,8 +203,8 @@ async def handle_effects(message, bot): # List of effects in the readme
                         await message.delete()
                         async with aiohttp.ClientSession() as session:
                             url = await h.webhook_safe_check(message.channel)
-                            clone_hook = Webhook.from_url(url, adapter=AsyncWebhookAdapter(session))
-                            await clone_hook.send(content="-hic- " + message.content + " -hic-", username=message.author.display_name, avatar_url=message.author.avatar_url)
+                            clone_hook = discord.Webhook.from_url(url, session=session)
+                            await clone_hook.send(content="-hic- " + message.content + " -hic-", username=message.author.display_name, avatar_url=message.author.display_avatar.url)
                     break
             elif status[0].lower() == "wooyeah":
                 ### HANDLE STACKS
@@ -230,11 +212,11 @@ async def handle_effects(message, bot): # List of effects in the readme
                 ### APPLY EFFECT
                 async with aiohttp.ClientSession() as session:
                     url = await h.webhook_safe_check(message.channel)
-                    clone_hook = Webhook.from_url(url, adapter=AsyncWebhookAdapter(session))
+                    clone_hook = discord.Webhook.from_url(url, session=session)
                     try:
-                        await clone_hook.send(content=fancy.bold(message.content), username=message.author.display_name, avatar_url=message.author.avatar_url)
+                        await clone_hook.send(content=fancy.bold(message.content), username=message.author.display_name, avatar_url=message.author.display_avatar.url)
                     except:
-                        await clone_hook.send(content="wooyeah", username=message.author.display_name, avatar_url=message.author.avatar_url)
+                        await clone_hook.send(content="wooyeah", username=message.author.display_name, avatar_url=message.author.display_avatar.url)
                     await message.delete()
                     break
             elif status[0].lower() == "burning":
@@ -273,11 +255,11 @@ async def handle_effects(message, bot): # List of effects in the readme
                 await message.delete()
                 async with aiohttp.ClientSession() as session:
                     url = await h.webhook_safe_check(message.channel)
-                    clone_hook = Webhook.from_url(url, adapter=AsyncWebhookAdapter(session))
+                    clone_hook = discord.Webhook.from_url(url, session=session)
                     try:
-                        await clone_hook.send(content=fstring, username=message.author.display_name, avatar_url=message.author.avatar_url)
+                        await clone_hook.send(content=fstring, username=message.author.display_name, avatar_url=message.author.display_avatar.url)
                     except:
-                        await clone_hook.send(content="**I AM ON FIRE HELP MEEEEEEEEEEEEEEEE**", username=message.author.display_name, avatar_url=message.author.avatar_url)
+                        await clone_hook.send(content="**I AM ON FIRE HELP MEEEEEEEEEEEEEEEE**", username=message.author.display_name, avatar_url=message.author.display_avatar.url)
 
 # A setup function the every cog has
 def setup(bot):

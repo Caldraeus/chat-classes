@@ -8,7 +8,6 @@ import os
 import aiohttp
 import aiosqlite
 import asyncio
-from discord import Webhook, AsyncWebhookAdapter
 from asyncio.exceptions import TimeoutError
 
 class artifacts(commands.Cog):
@@ -140,10 +139,10 @@ class artifacts(commands.Cog):
                             ###
                             async with aiohttp.ClientSession() as session:
                                 url = await h.webhook_safe_check(ctx.channel)
-                                hook = Webhook.from_url(url, adapter=AsyncWebhookAdapter(session))
+                                hook = discord.Webhook.from_url(url, session=session)
                                 async with aiohttp.ClientSession() as session:
                                     url = await h.webhook_safe_check(ctx.channel)
-                                    hook = Webhook.from_url(url, adapter=AsyncWebhookAdapter(session))
+                                    hook = discord.Webhook.from_url(url, session=session)
                                     await hook.send(content="...", username="Sef, The Last Titan", avatar_url="https://i.imgur.com/dWkRNdQ.png")
                                     await asyncio.sleep(6.5)
                                     await hook.send(content="Interesting...", username="Sef, The Last Titan", avatar_url="https://i.imgur.com/dWkRNdQ.png")
@@ -211,7 +210,7 @@ class artifacts(commands.Cog):
                                             await mss.delete()
                                     async with aiohttp.ClientSession() as session:
                                         url = await h.webhook_safe_check(ctx.channel)
-                                        hook = Webhook.from_url(url, adapter=AsyncWebhookAdapter(session))
+                                        hook = discord.Webhook.from_url(url, session=session)
                                         await hook.send(content="Ah... you've made it! So, what did you learn? Which Titan betrayed the others? The one different than the others?\n\n`1. Gror\n2. Fullmar\n3. Iadirix\n4. Golmex`", username="Sef, The Last Titan", avatar_url="https://i.imgur.com/dWkRNdQ.png")
                                     # Gror
                                     chosen = await self.bot.wait_for('message', check=check, timeout=360)
@@ -219,13 +218,13 @@ class artifacts(commands.Cog):
                                     if chosen != "gror":
                                         async with aiohttp.ClientSession() as session:
                                             url = await h.webhook_safe_check(ctx.channel)
-                                            hook = Webhook.from_url(url, adapter=AsyncWebhookAdapter(session))
+                                            hook = discord.Webhook.from_url(url, session=session)
                                             await hook.send(content="Tragic... throughout all that, you couldn't see the truth. You are blind just like they were. Goodbye.", username="Sef, The Last Titan", avatar_url="https://i.imgur.com/dWkRNdQ.png")
                                         raise TimeoutError
                                     else:
                                         async with aiohttp.ClientSession() as session:
                                             url = await h.webhook_safe_check(ctx.channel)
-                                            hook = Webhook.from_url(url, adapter=AsyncWebhookAdapter(session))
+                                            hook = discord.Webhook.from_url(url, session=session)
                                             await hook.send(content="Incredible... you have the wisdom that the 12 titans lacked. Here, you deserve this.", username="Sef, The Last Titan", avatar_url="https://i.imgur.com/dWkRNdQ.png")
                                             await award_artifact(ctx, ctx.author.id, 1)
                                             self.active.remove(ctx.author.id)
@@ -233,14 +232,14 @@ class artifacts(commands.Cog):
                         elif quest == 2:
                             async with aiohttp.ClientSession() as session:
                                 url = await h.webhook_safe_check(ctx.channel)
-                                hook = Webhook.from_url(url, adapter=AsyncWebhookAdapter(session))
+                                hook = discord.Webhook.from_url(url, session=session)
                                 await hook.send(content="Heya, chap! Looking for an artifact I see! Here, I can give you this premium artifact made just by me!\n\nTrust me! You want an artifact of this power! Truly amazing! It'll make you cool! Rich! Powerful! It'll just cost you *a whole lot!*\n\nSo? Whaddya say?\n\n`1. Yes\n2. No`", username="Xolorth", avatar_url="https://i.imgur.com/lA8qSDe.jpg")
                             chosen = await self.bot.wait_for('message', check=check, timeout=360)
                             chosen = chosen.content.lower()  
                             if chosen == "yes":
                                 async with aiohttp.ClientSession() as session:
                                     url = await h.webhook_safe_check(ctx.channel)
-                                    hook = Webhook.from_url(url, adapter=AsyncWebhookAdapter(session))
+                                    hook = discord.Webhook.from_url(url, session=session)
                                     await hook.send(content="Really? Now hot dog, you've got a sharp eye! I'll just take **6660 Coolness** and **6660 Gold!** Enjoy, my fleshy fella!", username="Xolorth", avatar_url="https://i.imgur.com/lA8qSDe.jpg")
                                 await h.add_coolness(ctx.author.id, -6660)
                                 await h.add_gold(ctx.author.id, -6660, self.bot, True)
@@ -249,7 +248,7 @@ class artifacts(commands.Cog):
                             else:
                                 async with aiohttp.ClientSession() as session:
                                     url = await h.webhook_safe_check(ctx.channel)
-                                    hook = Webhook.from_url(url, adapter=AsyncWebhookAdapter(session))
+                                    hook = discord.Webhook.from_url(url, session=session)
                                     await hook.send(content="A shame! A darn shame! Oh, well! Bye now!", username="Xolorth", avatar_url="https://i.imgur.com/lA8qSDe.jpg")
                                     self.active.remove(ctx.author.id)
                                     await h.update_quest(ctx.message, 18, -1, self.bot)

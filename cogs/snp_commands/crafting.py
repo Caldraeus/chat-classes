@@ -8,7 +8,6 @@ import os
 import aiohttp
 import aiosqlite
 import asyncio
-from discord import Webhook, AsyncWebhookAdapter
 from asyncio.exceptions import TimeoutError
 import sqlite3
 from datetime import datetime

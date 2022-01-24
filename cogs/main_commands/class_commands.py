@@ -7,7 +7,6 @@ import math
 import os
 import aiohttp
 import aiosqlite
-from discord import Webhook, AsyncWebhookAdapter
 import aiohttp
 
 class class_commands(commands.Cog):
