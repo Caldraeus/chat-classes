@@ -1,3 +1,4 @@
+from json.encoder import INFINITY
 import discord
 from discord.ext import commands
 import helper as h
@@ -10,6 +11,7 @@ import aiosqlite
 import matplotlib.pyplot as plt
 from jishaku.functools import executor_function
 from io import BytesIO
+import asyncio
 
 class economy(commands.Cog):
     def __init__(self, bot):
@@ -46,7 +48,7 @@ class economy(commands.Cog):
             embed.add_field(name=f"Adrenaline | {self.items.get('adrenaline')} G", value="A pure vial of adrenaline. Very strong. Restores 10 AP.")
             embed.add_field(name=f"Void | {self.items.get('void')} G", value="Holy shit, where did I get this stuff? Restores 20 AP, but applies 20 stacks of shatter!", inline=False)
             embed.add_field(name=f"Milk | {self.items.get('milk')} G", value="A powerful liquid... milk. Removes up to 100 stacks of your most recent status effect when consumed!", inline=False)
-            embed.add_field(name=f"Jamba Juice | {self.items.get('jamba juice')} G", value="The *most* powerful and holy liquid... jamba juice! Removes all status effects, good or bad, when consumed!", inline=False)
+            embed.add_field(name=f"Jamba Juice | {self.items.get('jamba juice')} G", value="The *most* powerful and holy liquid... jamba juice! Removes all negative status effects when used!", inline=False)
             await ctx.send(embed=embed)
         if page == "trader":
             embed = discord.Embed(title=f"💸 Trader Shop 💸", colour=discord.Colour.from_rgb(166, 148, 255))
@@ -75,6 +77,10 @@ class economy(commands.Cog):
                     #### Item handling. This, unfortunately, is going to be a very long if statement mess. Since I plan to add a large variety of items, with many different effects, it has to be this way.
                     ####
                     
+                    speaker = ctx.author.id
+                    negative_effects = h.effects_negative
+                    positive_effects= h.effects_positive
+
                     if item == "coffee":
                         await ctx.send("☕ | You drink your coffee... it's delicious! Now you have a bit more energy. (+2 AP).")
                         new_ap = self.bot.users_ap[str(ctx.author.id)] + 2
@@ -126,7 +132,6 @@ class economy(commands.Cog):
                         self.bot.users_ap[str(ctx.author.id)] = new_ap
                         await h.add_effect(ctx.author, self.bot, "shatter", 20)
                     elif item == "milk":
-                        speaker = ctx.author.id
                         if speaker not in self.bot.user_status:
                             self.bot.user_status[speaker] = []
                             await ctx.send(f"🥛 | You drink a cold glass of milk. You don't feel any different.")
@@ -143,21 +148,21 @@ class economy(commands.Cog):
                             except IndexError:
                                 await ctx.send(f"🥛 | You drink a cold glass of milk. You don't feel any different.")
                     elif item == "jamba juice":
-                        await ctx.send("<:jambajuice:798725534472339516> | You drink a delicous jamba juice! You feel a helluva lot better! (Status effects cleansed)")
-                        speaker = ctx.author.id
-                        if speaker not in self.bot.user_status:
-                            self.bot.user_status[speaker] = []
+                        if speaker in self.bot.user_status:
+                            for status in self.bot.user_status[speaker]:
+                                if status[0] in negative_effects:
+                                    await h.handle_stacks(self.bot, status, speaker, INFINITY)
+                                    await asyncio.sleep(0.1)
+                            await ctx.send("<:jambajuice:798725534472339516> | You drink a delicous jamba juice! You feel great! (Negative status effects cleansed).")
                         else:
-                            self.bot.user_status[speaker] = []
+                            await ctx.send("<:jambajuice:798725534472339516> | You drink a delicous jamba juice! ... but nothing happens.")
                     elif item == "snake oil": # Gives a random status effect
                         chosen_status = random.choice(list(h.effect_list.keys()))
                         amount = random.randint(1, 10)
 
                         await ctx.send(f"🐍 | You drink your delicious and useful snake oil! Wait, what the hell was in this stuff!? (+{amount} **{chosen_status.title()}**)")
                         await h.add_effect(ctx.author, self.bot, chosen_status, amount)
-                        
-
-                                
+    
                     ####
                     ####
                     

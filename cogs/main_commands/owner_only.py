@@ -83,6 +83,12 @@ class owner_only(commands.Cog):
 
     @commands.command()
     @commands.is_owner()
+    async def givegold(self, ctx, target: discord.User, amount: int):
+        await h.add_gold(target.id, amount, self.bot, boost_null=True)
+        await ctx.send(f"✅ | Granted {amount} G to user {target.display_name}.")
+
+    @commands.command()
+    @commands.is_owner()
     async def setcoolness(self, ctx, target: discord.User, coolness):
         async with aiosqlite.connect('main.db') as conn:
             await conn.execute(f"update users set coolness = {coolness} where id = '{target.id}'")

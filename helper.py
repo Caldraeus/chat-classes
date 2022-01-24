@@ -1,3 +1,4 @@
+from curses import nocbreak
 import grequests
 import math
 import discord
@@ -103,13 +104,13 @@ async def reply_check(message):
     else:
         return False
 
-async def handle_stacks(bot, status, user):
+async def handle_stacks(bot, status, user_id, amount_removed = 1):
     ### HANDLE STACKS
-    remaining_stacks = status[1]-1
+    remaining_stacks = status[1]-amount_removed
     if remaining_stacks <= 0:
-        bot.user_status[user].remove(status)
+        bot.user_status[user_id].remove(status)
     else:
-        status[1] -= 1
+        status[1] -= amount_removed
 
 async def can_attack(user, target, ctx): # NOTE: Remember that you can't alter AP of those who have no profile in CC... Also, target may not always exist
     bot = ctx.bot
@@ -176,7 +177,7 @@ async def can_attack(user, target, ctx): # NOTE: Remember that you can't alter A
     user_effects = bot.user_status[target]
     for status in user_effects: 
         if status[0].lower() == "defending":
-            await handle_stacks(bot, status, user)
+            await handle_stacks(bot, status, target)
             ### APPLY EFFECT
             await ctx.send("You attempt to attack, but you cannot penetrate their defenses! Your attack fails!")
             return False
@@ -184,7 +185,7 @@ async def can_attack(user, target, ctx): # NOTE: Remember that you can't alter A
 
     return True
 
-async def crit_handler(bot, attacker, defender, boost = None): 
+async def crit_handler(bot, attacker_id, defender_id, boost = None): 
     # Values needed for later ############################################################ #
     crit_thresh = 1                # The number needed to roll below to get a critical     #
     crit_max = 20                  # The maximum nuber that the critical will be rolled on #
@@ -193,7 +194,7 @@ async def crit_handler(bot, attacker, defender, boost = None):
     # some sort of protective status effect.                                               #
     ########################################################################################
     
-    speaker = defender
+    speaker = defender_id
     force_crit = None
     if speaker in bot.user_status:
         user_effects = bot.user_status[speaker]
@@ -220,7 +221,7 @@ async def crit_handler(bot, attacker, defender, boost = None):
     ###################################################################################### #
     # Getting user status effects to check for critical-altering ones ### 
     # THESE ARE FOR POSITIVE EFFECTS #
-    speaker = attacker
+    speaker = attacker_id
     if speaker in bot.user_status:
         user_effects = bot.user_status[speaker]
         for status in user_effects: # We go through each status affecting the user [NOT ALL APPLY TO ON-MESSAGE EVENTS. THEREFORE, WE NEED IF STATEMENTS]. These are applied in order
@@ -239,17 +240,17 @@ async def crit_handler(bot, attacker, defender, boost = None):
     if crit <= crit_thresh:
         ########################################################################################
         # This is for classes that have "when someone gets a crit on you" effects. #############
-        if str(defender) in bot.users_classes:
-            if bot.users_classes[str(defender)] == "pacted":
-                if await get_demon(defender, bot) == "minehart":
+        if str(defender_id) in bot.users_classes:
+            if bot.users_classes[str(defender_id)] == "pacted":
+                if await get_demon(defender_id, bot) == "minehart":
                     async with aiosqlite.connect('main.db') as conn:
-                        async with conn.execute(f"select * from users where id = '{defender}';") as info:
+                        async with conn.execute(f"select * from users where id = '{defender_id}';") as info:
                             user = await info.fetchone()
                     level = user[8] - 19
 
                     amount = 2*level    
                     cog = bot.get_cog('pacted')
-                    cog.minehart[defender] = cog.minehart[defender] + amount
+                    cog.minehart[defender_id] = cog.minehart[defender_id] + amount
 
         ########################################################################################
         ########################################################################################
@@ -349,6 +350,14 @@ async def alter_items(uid, ctx, bot, item, change = 1, cost = 0):
 
 async def alter_ap(message, ap, bot): # Used to remove AP from users.
     if str(message.author.id) in bot.registered_users:
+        speaker = message.author.id
+        if speaker in bot.user_status:
+            user_effects = bot.user_status[speaker]
+            for status in user_effects: 
+                if status[0].lower() == "energized": # Cost no AP to do their next action.
+                    await handle_stacks(bot, status, message.author.id)
+                    return True
+                    
         uid = str(message.author.id)
         balance = (bot.users_ap[uid] - ap)
         if balance >= 0:

@@ -26,7 +26,7 @@ class trader(commands.Cog):
                         
 # A setup function the every cog has
 def setup(bot):
-    bot.add_cog(trader(bot))
+    bot.add_cog(trader(bot)) 
 
 """
 chosen = await self.bot.wait_for('message', check=check, timeout=360)

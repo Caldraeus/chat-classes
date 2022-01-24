@@ -109,13 +109,14 @@ class swordsman(commands.Cog):
         ]
 
         self.hooks_swash = [
-            "usr1 throws their katana into usr2's soul, then rends it from them!",
-            "usr1 uses the spirit of fire to set their katana ablaze, then slices cleanly through usr2's bdypart!",
-            "usr1 throws the spirit of dust into usr2's eyes, then slams them through a wall before finishing them off with their katana!",
-            "usr1 enters the ethereal plane, then jumps out behind usr2, slicing off usr2's bdypart!",
-            "usr1 uses the spirit of water to weave around usr2's attacks, then slices usr2's bdypart clean off!",
-            "usr1 summons a massive spirit blade, then slices usr2 into a thousand bits! Owie!",
-            "usr1 drags usr2 into the spirit realm, cuts their limbs off, then leaves them behind. Brutal stuff, usr1. Brutal stuff."
+            "usr1 swings their cutlass directly into usr2's bdypart! Owch!",
+            "usr1 raids usr2's home, stabbing them in the process!",
+            "usr1 rams their pirate ship into usr2! How? I don't know!",
+            "usr1 throws sand into usr2's eye before slicing them in the bdypart!",
+            "usr1 smashes a bottle o' rum over usr2's head, then stabs them in the bdypart. Owch!",
+            "usr1 trips usr2 before plunging their cutlass into usr2's bdypart!",
+            "usr1's crew beats up usr2! Take that, usr2!",
+            "\"Yo ho, yo ho!\" usr1 sings as they stab usr2 in the bdypart. How poetic!"
         ]
 
     @commands.command(aliases=['slice'])
@@ -299,7 +300,7 @@ class swordsman(commands.Cog):
                     else:
                         members = ctx.guild.members
                         random.shuffle(members)
-                        members.remove(ctx.author)
+                        members.remove(ctx.author) # Don't want people shooting themself
                         
                         try:
                             hook = "**☠️[CRITICAL!]☠️** + 100 Coolness | " + hook + f"\n\nYour ship's cannons fire upon **{members[0].display_name}** and **{members[1].display_name}**, earning you an additional 50 coolness!"
