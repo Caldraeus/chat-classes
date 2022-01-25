@@ -87,7 +87,7 @@ class class_commands(commands.Cog):
             for potential_class in class_info:
                 classes.append(potential_class)
                 prestige_achs = [16]
-                prestige_levels = ['𝐈', '𝐈𝐈', "𝐈𝐈𝐈", "𝐈𝐕"] # 𝐈𝐕 𝐈𝐕𝐗
+                prestige_levels = ['𝐈', '𝐈𝐈', "𝐈𝐈𝐈", "𝐈𝐕"] # 𝐈𝐕𝐗
                 if potential_class[4] != 0 and potential_class[4] not in prestige_achs: # It's an achievement locked class, and not a prestige class
                     profile.add_field(name=f"🔒 | {potential_class[0].title()}", value=potential_class[1], inline=False)
                 if potential_class[4] != 0 and potential_class[4] in prestige_achs: # It's a prestige class...

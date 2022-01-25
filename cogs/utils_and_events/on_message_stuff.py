@@ -97,7 +97,7 @@ class utils(commands.Cog): #TODO: Implement faction race commands, and the abili
             await asyncio.sleep(.1)
             await h.txt_achievement_handler(message.content.lower(), message.author.id, message,self.bot)
             await asyncio.sleep(.1)
-            await h.xp_handler(message,self.bot)
+            await h.xp_handler(message.author, message, self.bot)
 
 async def handle_effects(message, bot): # List of effects in the readme
     speaker = message.author.id

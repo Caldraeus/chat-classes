@@ -162,7 +162,7 @@ class mining(commands.Cog): #TODO: Implement faction race commands, and the abil
                             while ctx.author.id in self.smelting:
                                 self.smelting.remove(ctx.author.id)
                             if material == "Experium":
-                                await h.xp_handler(ctx.message, self.bot, boost = amount)
+                                await h.xp_handler(ctx.author, ctx.message, self.bot, boost = amount)
                             else:
                                 await update_materials(ctx.author.id, new_material, amount, ctx)
                         else:

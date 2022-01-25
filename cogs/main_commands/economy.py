@@ -16,6 +16,7 @@ import asyncio
 class economy(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
+
         self.items = {
             "coffee" : 50,
             "hot dog" : 75,
@@ -24,11 +25,13 @@ class economy(commands.Cog):
             "void" : 275,
             "milk" : 1000,
             "jamba juice" : 5000,
-            "snake oil" : 10
+            "snake oil" : 10,
+            "nft": 50
         }
 
         self.items_trader = {
-            "snake oil"
+            "snake oil",
+            "nft"
         }
 
         self.hidden_items = {
@@ -54,6 +57,7 @@ class economy(commands.Cog):
             embed = discord.Embed(title=f"💸 Trader Shop 💸", colour=discord.Colour.from_rgb(166, 148, 255))
             embed.set_thumbnail(url="https://img.icons8.com/cotton/2x/shop--v3.png")
             embed.add_field(name=f"Snake Oil | {self.items.get('snake oil')} G", value=f'Snake oil! Super useful, very needed!', inline=False)
+            embed.add_field(name=f"NFT | {self.items.get('nft')} G", value=f'Ah, a Non-Fungible Token! Use to gain some gold! ... probably.', inline=False)
             await ctx.send(embed=embed)
             
     @commands.command()
@@ -162,6 +166,22 @@ class economy(commands.Cog):
 
                         await ctx.send(f"🐍 | You drink your delicious and useful snake oil! Wait, what the hell was in this stuff!? (+{amount} **{chosen_status.title()}**)")
                         await h.add_effect(ctx.author, self.bot, chosen_status, amount)
+                    elif item == "nft": # 80% chance to gain gold, 20% chance to lose gold.
+                        if self.bot.users_classes[str(ctx.author.id)] == "trader":
+                            await ctx.send("Woah there buddy, as a Trader, you wouldn't lay a finger on NFT's, since they're a scam and all. Try selling them to someone instead!")
+                        else:
+                            amount = random.randint(100, 500)
+                            chance = random.randint(1, 100)
+
+                            if chance <= 20:
+                                await ctx.send(f"🐒 | You take your NFT and... oh shit, you got scammed! You lose {amount} G.\n\nAnd for even trying to use an NFT, you also lose that same amount in coolness.")
+                                await h.add_gold(ctx.author.id, -amount, self.bot)
+                            else:
+                                await ctx.send(f"🐒 | You take your NFT and... do whatever people do with NFT's! It's a success! You gain {amount} G.\n\nBut honestly? NFT's suck. That's why you just lost that same amount in coolness.")
+                                await h.add_gold(ctx.author.id, amount, self.bot)
+
+                            await h.add_coolness(ctx.author.id, -amount)
+                        
     
                     ####
                     ####
@@ -201,7 +221,7 @@ class economy(commands.Cog):
                     await ctx.send("You forgot to specify what you'd like to buy!")
             else:
                 await ctx.send("That's an invalid amount of items!")
-        except SyntaxError:
+        except ValueError:
             await ctx.send("You need to specify how many you'd like to buy! (Ex. `;buy 1 hot dog`).")
     
     @commands.command()

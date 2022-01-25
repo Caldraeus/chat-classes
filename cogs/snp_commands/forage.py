@@ -126,9 +126,9 @@ class forage(commands.Cog): #TODO: Implement faction race commands, and the abil
                         while ctx.author.id in self.growing:
                             self.growing.remove(ctx.author.id)
                         if material == "coolium fruit":
-                            await h.xp_handler(ctx.message, self.bot, boost = amount)
+                            await h.xp_handler(ctx.author, ctx.message, self.bot, boost = amount)
                         elif material == "coolness essence":
-                            await h.xp_handler(ctx.message, self.bot, boost = amount*5)
+                            await h.xp_handler(ctx.author, ctx.message, self.bot, boost = amount*5)
                         else:
                             await update_materials(ctx.author.id, new_material, round(amount*1.5), ctx)
                     else:

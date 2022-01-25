@@ -113,7 +113,7 @@ class boxer(commands.Cog):
                         combo = 0
 
                     if combo >= 10:
-                        await h.award_ach(17, ctx.message, self.bot)
+                        await h.award_ach(17, ctx.message.channel, ctx.author, self.bot)
 
                     hook = random.choice(self.hooks_ma)
                     crit_check = await h.crit_handler(self.bot, ctx.author.id, target.id, boost = combo)

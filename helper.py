@@ -1,5 +1,4 @@
 from curses import nocbreak
-import grequests
 import math
 import discord
 from discord.ext import commands
@@ -313,7 +312,7 @@ async def alter_items(uid, ctx, bot, item, change = 1, cost = 0):
     gold = user_info[0]
     
     async with aiosqlite.connect('main.db') as conn:
-        async with conn.execute(f"select item_name, amount from inventory where uid = '{ctx.author.id}'") as u_info:
+        async with conn.execute(f"select item_name, amount from inventory where uid = '{uid}'") as u_info:
             user_info = await u_info.fetchall()
 
     inv = user_info
@@ -330,7 +329,7 @@ async def alter_items(uid, ctx, bot, item, change = 1, cost = 0):
             indx = items.index(item.lower())
             item_amount = int(inv[indx][1]) + change
             if item_amount >= 10:
-                await award_ach(14, ctx.message, bot)
+                await award_ach(14, ctx.message.channel, ctx.author, bot) 
 
             async with aiosqlite.connect('main.db') as conn:
                 await conn.execute(f"update inventory set amount = {item_amount} where uid = {uid} and item_name = '{item.lower()}';")
@@ -338,7 +337,7 @@ async def alter_items(uid, ctx, bot, item, change = 1, cost = 0):
         
         elif item not in items:
             async with aiosqlite.connect('main.db') as conn:
-                await conn.execute(f"insert into inventory values({ctx.author.id}, '{item.lower()}', {change});")
+                await conn.execute(f"insert into inventory values({uid}, '{item.lower()}', {change});")
                 await conn.commit()
             
         async with aiosqlite.connect('main.db') as conn:
@@ -366,15 +365,14 @@ async def alter_ap(message, ap, bot): # Used to remove AP from users.
             await message.channel.send("You don't have enough AP to do that! Buy some refreshers from the shop, do some quests, or wait until rollover!")
             return False
 
-async def xp_handler(message, bot, boost = 0):
-    testing = False
+async def xp_handler(target, message, bot, boost = 0):
     if boost:
         num = 4
         xp_amount = boost
         
     else: 
         num = random.randint(1,4)
-        if message.author.id in bot.server_boosters or message.author.id == 217288785803608074:
+        if target.id in bot.server_boosters or target.id == 217288785803608074:
             xp_amount = round(1.75*(random.randint(5,50)))
         else:
             xp_amount = random.randint(5,100)
@@ -383,16 +381,16 @@ async def xp_handler(message, bot, boost = 0):
             xp_amount *= 2
 
     if num == 4:
-        if str(message.author.id) in bot.registered_users:
+        if str(target.id) in bot.registered_users:
             async with aiosqlite.connect('main.db') as conn:
-                async with conn.execute(f"select exp, level from users where id = '{message.author.id}';") as profile:
+                async with conn.execute(f"select exp, level from users where id = '{target.id}';") as profile:
                     prof = await profile.fetchone()
             xp = prof[0] + xp_amount
             current_lvl = prof[1]
             if xp >= max_xp(current_lvl) and ((prof[1]+1) % 10 != 0):
                 async with aiosqlite.connect('main.db') as conn:
-                    await conn.execute(f"update users set exp = 0 where id = '{message.author.id}'")
-                    await conn.execute(f"update users set level = {current_lvl + 1} where id = '{message.author.id}'")
+                    await conn.execute(f"update users set exp = 0 where id = '{target.id}'")
+                    await conn.execute(f"update users set level = {current_lvl + 1} where id = '{target.id}'")
                     await conn.commit()
                 embed = discord.Embed(title=f"✨ Level up! ✨", colour=discord.Colour.from_rgb(255, 204, 153), description=f'You are now level {prof[1]+1}! Good job!')
                 embed.set_thumbnail(url=message.author.display_avatar.url)
@@ -400,10 +398,10 @@ async def xp_handler(message, bot, boost = 0):
                 await notif.delete(delay=10)
             elif xp >= max_xp(current_lvl) and ((prof[1]+1) % 10 == 0):
                 async with aiosqlite.connect('main.db') as conn:
-                    await conn.execute(f"update users set exp = {max_xp(current_lvl)} where id = '{message.author.id}'")
+                    await conn.execute(f"update users set exp = {max_xp(current_lvl)} where id = '{target.id}'")
                     await conn.commit()
-                if message.author.id not in bot.notified:
-                    bot.notified.append(message.author.id)
+                if target.id not in bot.notified:
+                    bot.notified.append(target.id)
                     embed = discord.Embed(title=f"✨ Level up! ✨", colour=discord.Colour.from_rgb(255, 204, 153), description=f'You can now level up to {prof[1]+1}! Good job!')
                     embed.set_thumbnail(url=message.author.display_avatar.url)
                     embed.set_footer(text=f"A class up is available! Run {prefix}classup when you are ready.", icon_url="https://lh3.googleusercontent.com/proxy/OrYbJO2bKqGtVPcWnue8XK0SRnHoC-h8VHKNTw9JoVk-k_mke8bcurTQgoKd70H_kgr9AR2CQH-GRgckkZqXbRbdf-CZgjac")
@@ -411,7 +409,7 @@ async def xp_handler(message, bot, boost = 0):
                     await notif.delete(delay=10)    
             else:
                 async with aiosqlite.connect('main.db') as conn:
-                    await conn.execute(f"update users set exp = {xp} where id = '{message.author.id}'")
+                    await conn.execute(f"update users set exp = {xp} where id = '{target.id}'")
                     await conn.commit()
                     
 
@@ -567,10 +565,6 @@ async def update_quest(message, quest_id, addition, bot, silent = False):
             embed = discord.Embed(title=f"Quest Failed!", colour=discord.Colour.from_rgb(166, 148, 255), description=f'**{quest_info[6]}**\n*{quest_info[1]}*')
             embed.set_thumbnail(url=quest_info[4])
             await chan.send(content=message.author.mention, embed=embed)
-                        
-                
-
-
 
 ###################################################################
 ###################################################################
@@ -644,7 +638,7 @@ async def add_coolness(uid, amount):
             await conn.execute(f"update users set coolness = '{coolness[0]+amount}' where id = '{uid}';")
             await conn.commit()
 
-async def add_gold(uid, amount, bot, debt_mode = False, purchase_mode = None, boost_null = False):
+async def add_gold(uid, amount, bot, debt_mode = False, purchase_mode = None, boost_null = False): # Purchase mode isn't a bool, it's a channel.
     async with aiosqlite.connect('main.db') as conn:
         async with conn.execute(f"select gold from users where id = '{uid}';") as current_amount:
             gold = await current_amount.fetchone()
@@ -663,8 +657,14 @@ async def add_gold(uid, amount, bot, debt_mode = False, purchase_mode = None, bo
             await conn.execute(f"update users set gold = '{final}' where id = '{uid}';")
             await conn.commit()
 
-async def award_ach(ach_id, message, bot):
-    uid = message.author.id
+async def get_gold(uid):
+    async with aiosqlite.connect('main.db') as conn:
+        async with conn.execute(f"select gold from users where id = '{uid}';") as current_amount:
+            gold = await current_amount.fetchone()
+    return gold[0]
+
+async def award_ach(ach_id, channel, user, bot, delete_notif = True):
+    uid = user.id
     unlocked = bot.registered_users[str(uid)]
     if ach_id not in unlocked:
         async with aiosqlite.connect('main.db') as conn:
@@ -682,7 +682,6 @@ async def award_ach(ach_id, message, bot):
             embed.set_thumbnail(url=ach_info[3])
             amount = ach_info[4]
             embed.set_footer(text=f"+{amount} Coolness", icon_url="")
-            # await asyncio.sleep(random.randint(30,100))
             async with conn.execute(f"select coolness from users where id = '{uid}';") as current_amount: # Can't run the function for this due to overloading the db
                 coolness = await current_amount.fetchone()
                 await conn.execute(f"update users set coolness = '{coolness[0]+amount}' where id = '{uid}';")
@@ -697,10 +696,11 @@ async def award_ach(ach_id, message, bot):
                         
                         bot.registered_users[guy[0]] = unlocked
 
-            mss = await message.channel.send(content=message.author.mention, embed=embed)
-            await mss.delete(delay=10)
+            mss = await channel.send(content=user.mention, embed=embed)
+            if delete_notif:
+                await mss.delete(delay=10)
             
-async def fetch_random_quest(message, bot, uid=None, override=False):
+async def fetch_random_quest(message, bot, uid=None, override=False): # This code is from 2019.
     # Random quest encounter chance time!
     if uid:
         uid = str(uid.id)
@@ -779,8 +779,6 @@ async def genprof(uid, aps, bot):
             profile.set_image(url=fac_info[5])
         else:
             pass
-
-
 
     profile.add_field(name="Coolness", value=user[5])
     profile.add_field(name="Gold", value=user[3])

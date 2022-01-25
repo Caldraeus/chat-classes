@@ -2,7 +2,7 @@
 My main discord bot right now. Require the following packages.
 
 * aiosqlite `pip3 install aiosqlite`
-* Discord.py `pip3 install -U discord.py`
+* Pycord, a Discord.py Fork `pip install -U git+https://github.com/Pycord-Development/pycord`
 * Jishaku's Extensions `pip install -U git+https://github.com/Gorialis/jishaku`
 * Better Profanity `pip3 install better-profanity`
 

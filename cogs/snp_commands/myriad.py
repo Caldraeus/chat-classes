@@ -26,30 +26,29 @@ class myriad(commands.Cog): #TODO: Implement faction race commands, and the abil
             '💀' : [0.05, 0.025, 0],
             '💀' : [0.05, 0.025, 0],
             '💀' : [0.05, 0.025, 0],
-            '💀' : [0.05, 0.025, 0],
-            '💀' : [0.05, 0.025, 0],
-            '💀' : [0.05, 0.025, 0],
-            '💀' : [0.05, 0.025, 0],
+            '🥓' : [1.5, 2, 3.5],
+            '🥓' : [1.5, 2, 3.5],
             '🥓' : [1.5, 2, 3.5],
             '🥓' : [1.5, 2, 3.5],
             '🔥' : [.5, .25, 0.125],
             '🔥' : [.5, .25, 0.125],
             '🔥' : [.5, .25, 0.125],
-            '<a:wooyeah:804905363140247572>' : [1.5, 3, 5.5],
+            '<a:wooyeah:804905363140247572>' : [2, 3, 5.5],
             '🍇' : [0.5, 0.3, 1.5],
             '🍇' : [0.5, 0.3, 1.5],
             '🍇' : [0.5, 0.3, 1.5],
             '🍇' : [0.5, 0.3, 1.5],
             '🍄' : [1, 1.5, 2.75],
             '🍋' : [1.75, 2, 2.25],
-            '<a:jackpot:804920508982099988>' : [0, 2, 'jackpot'],
+            '<a:jackpot:804920508982099988>' : [2, 4, 'jackpot'],
+            '<a:jackpot:804920508982099988>' : [2, 4, 'jackpot'],
             '🍆' : [0.0125, 0.00625, 0.003125],
             '🍆' : [0.0125, 0.00625, 0.003125],
             '🍆' : [0.0125, 0.00625, 0.003125],
             '<:zombo:804914906012319754>' : [1, 0.5, 0.25],
-            '🍌' : [.5,.5,5],
-            '🍌' : [.5,.5,5],
-            '🍌' : [.5,.5,5],
+            '🍌' : [.5, 1,5],
+            '🍌' : [.5, 1,5],
+            '🍌' : [.5, 1,5],
         }   
 
         self.jackpot = 100000
@@ -108,7 +107,7 @@ class myriad(commands.Cog): #TODO: Implement faction race commands, and the abil
 
             results = {}
 
-            rig_chance = random.randint(1,15)
+            rig_chance = random.randint(1,25)
 
             if self.force_jackpot == True:
                 self.force_jackpot = False
@@ -294,8 +293,6 @@ class myriad(commands.Cog): #TODO: Implement faction race commands, and the abil
                     self.gambling.remove(ctx.author.id)
             except SyntaxError:
                 pass
-
-        
         
 # A setup function the every cog has
 def setup(bot):
@@ -329,14 +326,11 @@ def gen_fake_hand(start, deck, hand):
     if amount_remaining <= 10:
         hand.append(amount_remaining)
 
-
     else:
         if 10 in deck:
-            #deck.remove(10)
             hand.append(10)
         else:
             if 9 in deck:
-                #deck.remove(9)
                 deck.append(9)
     
     return hand
