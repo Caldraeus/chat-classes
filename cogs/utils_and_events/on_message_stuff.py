@@ -1,3 +1,4 @@
+from xml.dom.minidom import Attr
 import discord
 from discord.ext import commands
 import helper as h
@@ -14,8 +15,6 @@ from datetime import datetime
 import json
 from datetime import datetime  
 from datetime import timedelta  
-from PIL import Image, ImageOps
-import requests
 from jishaku.functools import executor_function
 from io import BytesIO
 from fancy_text import fancy
@@ -77,6 +76,10 @@ class utils(commands.Cog): #TODO: Implement faction race commands, and the abili
             cog = self.bot.get_cog('artifacts')
             cog.used = []
             
+            # We reset any other class-specific things.
+            cog = self.bot.get_cog('rogue')
+            cog.nomad_homes = {} 
+            
             
             print("\n\n\n----------------Daily reset has occurred----------------\n\n\n")
         else:
@@ -86,7 +89,7 @@ class utils(commands.Cog): #TODO: Implement faction race commands, and the abili
 
         try:
             if context.command == None and str(message.channel.id) not in self.bot.banned_channels:
-                await handle_effects(message,self.bot)
+                await handle_effects(message,self.bot) 
         except:
             pass
 
@@ -98,6 +101,16 @@ class utils(commands.Cog): #TODO: Implement faction race commands, and the abili
             await h.txt_achievement_handler(message.content.lower(), message.author.id, message,self.bot)
             await asyncio.sleep(.1)
             await h.xp_handler(message.author, message, self.bot)
+            
+            try:
+                for person in self.bot.pending_achievements.keys():
+                    if person.id == message.author.id: # Pending achievement
+                        mss = await message.channel.send(content=message.author.mention, embed=self.bot.pending_achievements[person])
+                        del self.bot.pending_achievements[person]
+                        await mss.delete(delay=10)
+            except AttributeError:
+                pass
+
 
 async def handle_effects(message, bot): # List of effects in the readme
     speaker = message.author.id
@@ -123,7 +136,6 @@ async def handle_effects(message, bot): # List of effects in the readme
                 async with aiohttp.ClientSession() as session:
                     url = await h.webhook_safe_check(message.channel)
                     clone_hook = discord.Webhook.from_url(url, session=session)
-                    await message.channel.send("Error")
                     await clone_hook.send(content=mad_content, username=message.author.display_name, avatar_url=message.author.display_avatar.url)
                 break
                 

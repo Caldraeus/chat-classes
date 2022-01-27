@@ -167,7 +167,7 @@ async def can_attack(user, target, ctx): # NOTE: Remember that you can't alter A
                     await conn.commit()
             await ctx.send("**[BLOCKED] | **" + hook)
         except:
-            await ctx.send("Your attempt to attack fails as their sellsword protects them, stabbing you instead!")
+            await ctx.send("**[BLOCKED] | **Your attempt to attack fails as their sellsword protects them, stabbing you instead!")
         return False
 
     if target not in bot.user_status:
@@ -183,34 +183,56 @@ async def can_attack(user, target, ctx): # NOTE: Remember that you can't alter A
 
     return True
 
-async def crit_handler(bot, attacker_id, defender_id, boost = None): 
+async def crit_handler(bot, attacker_usr, defender_usr, channel, boost = 0): 
+    defender_id = defender_usr.id
+    attacker_id = attacker_usr.id
     # Values needed for later ############################################################ #
     crit_thresh = 1                # The number needed to roll below to get a critical     #
     crit_max = 20                  # The maximum nuber that the critical will be rolled on #
     ########################################################################################
+    # NOTE: A critical is whenever the random number is equal to "1" (by default)
+
+    # Check if channel is a nomad channel. If so, alter boost by -5.
+    if channel in bot.get_cog('rogue').nomad_homes.values():
+        boost -= 5
+
+    ### Now we check for the rest of the stuff # # # # # # # # # # # # # # # # # # # # # # #                                                                        #
+    if boost > 0:                                                                          #
+        crit_thresh += boost                                                               #
+    else:                                                                                  #
+        crit_max += boost                                                                  #
+    ## # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+    ########################################################################################
     # We will now check for the person being attacked's status effects, to see if they have#
     # some sort of protective status effect.                                               #
     ########################################################################################
-    
+
     speaker = defender_id
     force_crit = None
     if speaker in bot.user_status:
         user_effects = bot.user_status[speaker]
         for status in user_effects: # We go through each status affecting the user [NOT ALL APPLY TO ON-MESSAGE EVENTS. THEREFORE, WE NEED IF STATEMENTS]. These are applied in order
-            if status[0].lower() == "shrouded":
+            if status[0].lower() == "shrouded": # Increase the critical threshold, then see if a crit was scored. If one wasn't, decrease user stacks.
                 crit_max += 10
                 force_crit = random.randint(1,crit_max) 
                 ### HANDLE STACKS
                 if not(force_crit <= crit_thresh):
                     await handle_stacks(bot, status, speaker)
-    ### Now we check for the rest of the stuff # # # # # # # # # # # # # # # # # # # # # # #
-    if boost:                                                                              #
-        if boost > 0:                                                                      #
-            crit_thresh += boost                                                           #
-        else:                                                                              #
-            crit_max += boost                                                              #
-    ## # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-    if force_crit != None:
+
+    speaker = defender_id
+    force_crit = None
+    if speaker in bot.user_status:
+        user_effects = bot.user_status[speaker]
+        for status in user_effects: # We go through each status affecting the user [NOT ALL APPLY TO ON-MESSAGE EVENTS. THEREFORE, WE NEED IF STATEMENTS]. These are applied in order
+            if status[0].lower() == "shrouded": # Increase the critical threshold, then see if a crit was scored. If one wasn't, decrease user stacks.
+                crit_max += 10
+                force_crit = random.randint(1,crit_max) 
+                ### HANDLE STACKS
+                if not(force_crit <= crit_thresh):
+                    await handle_stacks(bot, status, speaker)
+
+
+    if force_crit != None:                       # For shrouded and similar effects, we check for crit early.
         crit = force_crit
     else:
         crit = random.randint(1,crit_max)        # The rolled critical chance              #
@@ -628,7 +650,7 @@ async def txt_achievement_handler(content, uid, message_obj, bot): # This is goi
     # Above determines which achievement has been obtained. Below takes that id and sends the embed as well as awarding the achievement.
     
     if ach_id != 0 and ach_id not in unlocked:
-        await award_ach(ach_id, message_obj, bot)
+        await award_ach(ach_id, message_obj.channel, message_obj.author, bot)
 
 
 async def add_coolness(uid, amount):
@@ -637,8 +659,9 @@ async def add_coolness(uid, amount):
             coolness = await current_amount.fetchone()
             await conn.execute(f"update users set coolness = '{coolness[0]+amount}' where id = '{uid}';")
             await conn.commit()
+    
 
-async def add_gold(uid, amount, bot, debt_mode = False, purchase_mode = None, boost_null = False): # Purchase mode isn't a bool, it's a channel.
+async def add_gold(uid, amount, bot, debt_mode = False, purchase_mode = None, boost_null = False): # Purchase mode isn't a bool, it's a context object.
     async with aiosqlite.connect('main.db') as conn:
         async with conn.execute(f"select gold from users where id = '{uid}';") as current_amount:
             gold = await current_amount.fetchone()
@@ -662,6 +685,12 @@ async def get_gold(uid):
         async with conn.execute(f"select gold from users where id = '{uid}';") as current_amount:
             gold = await current_amount.fetchone()
     return gold[0]
+
+async def get_coolness(uid):
+    async with aiosqlite.connect('main.db') as conn:
+        async with conn.execute(f"select coolness from users where id = '{uid}';") as current_amount:
+            coolness = await current_amount.fetchone()
+    return coolness[0]
 
 async def award_ach(ach_id, channel, user, bot, delete_notif = True):
     uid = user.id
@@ -696,14 +725,17 @@ async def award_ach(ach_id, channel, user, bot, delete_notif = True):
                         
                         bot.registered_users[guy[0]] = unlocked
 
-            mss = await channel.send(content=user.mention, embed=embed)
-            if delete_notif:
-                await mss.delete(delay=10)
+            if channel == None: # Create a new pending notification. This shouldn't cause multiple to appear, because we actually give them achievement, then just wait to notify them until they speak.
+                bot.pending_achievements[user] = embed
+            else:
+                mss = await channel.send(content=user.mention, embed=embed)
+                if delete_notif:
+                    await mss.delete(delay=10)
             
-async def fetch_random_quest(message, bot, uid=None, override=False): # This code is from 2019.
+async def fetch_random_quest(message, bot, user=None, override=False): # This code is from 2019.
     # Random quest encounter chance time!
-    if uid:
-        uid = str(uid.id)
+    if user:
+        uid = str(user.id)
     else:
         uid = str(message.author.id)
     if uid in bot.registered_users:
@@ -732,6 +764,9 @@ async def fetch_random_quest(message, bot, uid=None, override=False): # This cod
                             embed.set_footer(text=f"Reward: {quest_info[2].title()} ({quest_info[3]})", icon_url="")
                             notif = await message.channel.send(content=message.author.mention, embed=embed)
                             await notif.delete(delay=5)
+                            return True
+                        elif override == True:
+                            await message.channel.send("You already have a quest!")
 
 #########################################################
 #########################################################
@@ -739,7 +774,7 @@ async def fetch_random_quest(message, bot, uid=None, override=False): # This cod
 #########################################################
 #########################################################
 
-async def genprof(uid, aps, bot):
+async def genprof(uid, aps, bot): # Generates the user profile
     person = uid
     async with aiosqlite.connect('main.db') as conn:
         async with conn.execute("select count(*) from achievements;") as numcount:

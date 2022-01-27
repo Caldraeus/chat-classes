@@ -140,7 +140,7 @@ class terramancer(commands.Cog):
                         crit_check = 100
 
                     if crit_check != 100:
-                        crit_check = await h.crit_handler(self.bot, ctx.author.id, target.id)
+                        crit_check = await h.crit_handler(self.bot, ctx.author, target, ctx.channel)
 
                     hook = hook.replace("usr1", f"**{ctx.author.display_name}**")
                     hook = hook.replace("bdypart", body_part)
@@ -177,7 +177,7 @@ class terramancer(commands.Cog):
                         crit_check = 100
 
                     if crit_check != 100:
-                        crit_check = await h.crit_handler(self.bot, ctx.author.id, target.id)
+                        crit_check = await h.crit_handler(self.bot, ctx.author, target, ctx.channel)
 
                     hook = hook.replace("usr1", f"**{ctx.author.display_name}**")
                     hook = hook.replace("bdypart", body_part)
@@ -215,7 +215,7 @@ class terramancer(commands.Cog):
                         crit_check = 100
 
                     if crit_check != 100:
-                        crit_check = await h.crit_handler(self.bot, ctx.author.id, target.id)
+                        crit_check = await h.crit_handler(self.bot, ctx.author, target, ctx.channel)
 
                     hook = hook.replace("usr1", f"**{ctx.author.display_name}**")
                     hook = hook.replace("bdypart", body_part)
@@ -254,7 +254,7 @@ class terramancer(commands.Cog):
                         crit_check = 100
 
                     if crit_check != 100:
-                        crit_check = await h.crit_handler(self.bot, ctx.author.id, target.id)
+                        crit_check = await h.crit_handler(self.bot, ctx.author, target, ctx.channel)
 
                     hook = hook.replace("usr1", f"**{ctx.author.display_name}**")
                     hook = hook.replace("bdypart", body_part)

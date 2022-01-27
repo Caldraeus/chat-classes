@@ -167,6 +167,15 @@ class class_commands(commands.Cog):
         else:
             await ctx.send("Sorry, you can't change classes yet! Come back when you're higher level.")
 
+    @commands.command()
+    @commands.guild_only()
+    async def origin(self, ctx, *, _class):
+        origin = await h.find_origin(_class.lower())
+        if origin == _class.lower():
+            await ctx.send("That's an origin class, or doesn't exist!")
+        else:
+            await ctx.send(f"Original Class: {origin.title()}")
+
 
 # A setup function the every cog has
 def setup(bot):

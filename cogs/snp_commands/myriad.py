@@ -158,7 +158,7 @@ class myriad(commands.Cog): #TODO: Implement faction race commands, and the abil
                         payout_change = self.slot_values[item]
                         payout_change = payout_change[amount-1]
                         wager += wager*payout_change
-                        await h.add_effect(ctx.author, self.bot, "wooyeah", amount = amount*3)
+                        await h.add_effect(ctx.author, self.bot, "wooyeah", amount = amount*2)
                     if item != "<a:jackpot:804920508982099988>":
                         payout_change = self.slot_values[item]
                         payout_change = payout_change[amount-1]

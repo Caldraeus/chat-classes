@@ -64,7 +64,7 @@ class hydromancer(commands.Cog):
                         waterlevels[ctx.author.id] = 0
 
                     if crit_check != 100:
-                        crit_check = await h.crit_handler(self.bot, ctx.author.id, target.id)
+                        crit_check = await h.crit_handler(self.bot, ctx.author, target, ctx.channel)
 
                     body_part = random.choice(h.body_parts)
                     hook = hook.replace("usr1", f"**{ctx.author.display_name}**")
@@ -114,7 +114,7 @@ class hydromancer(commands.Cog):
                     hook = hook.replace("usr2", f"**{target.display_name}**")
 
                     if crit_check != 100:
-                        crit_check = await h.crit_handler(self.bot, ctx.author.id, target.id)
+                        crit_check = await h.crit_handler(self.bot, ctx.author, target, ctx.channel)
                     
                     if crit_check == False:
                         await ctx.send(hook)

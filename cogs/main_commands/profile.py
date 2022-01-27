@@ -95,11 +95,14 @@ class profile(commands.Cog):
             elif user != None and user.id is ctx.message.author.id:
                 final+=f"**#{i+1 - amount_skipped} - {user.name} - {stuff[i][5]} Coolness**\n\n"
                 in_top = True
+
+                # Just some achievement handling
                 if i+1 == 1: 
                     await h.award_ach(13, ctx.message.channel, ctx.author, self.bot)
                     await h.award_ach(12, ctx.message.channel, ctx.author, self.bot)
                 else:
                     await h.award_ach(12, ctx.message.channel, ctx.author, self.bot)
+
                 i += 1
             elif user == None:
                 i += 1
@@ -126,6 +129,9 @@ class profile(commands.Cog):
         ###
         
         await ctx.send(embed=profile)
+
+        if (await h.get_coolness(ctx.author.id) <= -1000):
+            await h.award_ach(19, ctx.message.channel, ctx.author, self.bot)
 
     @commands.command(aliases=["achs"])
     @commands.guild_only()

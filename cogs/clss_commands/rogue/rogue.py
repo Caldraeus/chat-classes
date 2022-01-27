@@ -57,7 +57,12 @@ class rogue(commands.Cog):
             "usr1 trips usr2 and steals their credit card information. Time for vbucks!",
             "usr1 kicks usr2 into a wall, stabs them, and steals their pants. Damn, that sucks."
         ]
-    pass
+    
+        self.hooks_n = [
+            "usr1 throws sand at usr2, then throws their scimitar at them."
+        ]
+
+        self.nomad_homes = {}
 
     @commands.command()
     @commands.guild_only()
@@ -67,7 +72,7 @@ class rogue(commands.Cog):
             if self.bot.users_classes[str(ctx.author.id)] == "rogue":
                 ap_works = await h.alter_ap(ctx.message, 1, self.bot)
                 if ap_works and await h.can_attack(ctx.author.id, target.id, ctx):
-                    crit_check = await h.crit_handler(self.bot, ctx.author.id, target.id)
+                    crit_check = await h.crit_handler(self.bot, ctx.author, target, ctx.channel)
                     body_part = random.choice(h.body_parts)
                     hook = random.choice(self.hooks)
                     hook = hook.replace("usr1", f"**{ctx.author.display_name}**")
@@ -82,7 +87,7 @@ class rogue(commands.Cog):
             elif self.bot.users_classes[str(ctx.author.id)] == "criminal":
                 ap_works = await h.alter_ap(ctx.message, 1, self.bot)
                 if ap_works and await h.can_attack(ctx.author.id, target.id, ctx):
-                    crit_check = await h.crit_handler(self.bot, ctx.author.id, target.id)
+                    crit_check = await h.crit_handler(self.bot, ctx.author, target, ctx.channel)
                     body_part = random.choice(h.body_parts)
                     hook = random.choice(self.hooks_c)
                     hook = hook.replace("usr1", f"**{ctx.author.display_name}**")
@@ -97,7 +102,7 @@ class rogue(commands.Cog):
             elif self.bot.users_classes[str(ctx.author.id)] == "thief":
                 ap_works = await h.alter_ap(ctx.message, 1, self.bot)
                 if ap_works and await h.can_attack(ctx.author.id, target.id, ctx):
-                    crit_check = await h.crit_handler(self.bot, ctx.author.id, target.id)
+                    crit_check = await h.crit_handler(self.bot, ctx.author, target, ctx.channel)
                     body_part = random.choice(h.body_parts)
                     hook = random.choice(self.hooks_t)
                     hook = hook.replace("usr1", f"**{ctx.author.display_name}**")
@@ -130,6 +135,29 @@ class rogue(commands.Cog):
                             except TypeError:
                                 hook += f"\n\n*{ctx.author.display_name} gives 200 gold to {target.display_name}, then instantly steals it!*"
 
+                        await h.add_coolness(ctx.author.id, 100)
+                        await ctx.send(hook)
+            elif self.bot.users_classes[str(ctx.author.id)] == "nomad": 
+                ap_works = await h.alter_ap(ctx.message, 1, self.bot)
+                if ap_works and await h.can_attack(ctx.author.id, target.id, ctx):
+                    if ctx.author.id in self.nomad_homes.keys():
+                        if self.nomad_homes[ctx.author.id] == ctx.channel:
+                            boost = 9
+                            
+                    crit_check = await h.crit_handler(self.bot, ctx.author, target, ctx.channel, boost)
+                    body_part = random.choice(h.body_parts)
+                    hook = random.choice(self.hooks_n)
+                    hook = hook.replace("usr1", f"**{ctx.author.display_name}**")
+                    hook = hook.replace("bdypart", body_part)
+                    hook = hook.replace("usr2", f"**{target.display_name}**")
+                    if crit_check == False:
+                        await ctx.send(hook)
+                    else:
+                        if ctx.author.id in self.nomad_homes.keys() or ctx.channel in self.nomad_homes.values():
+                            hook = "**✨[CRITICAL]✨** + 100 Coolness | " + hook
+                        else:
+                            hook = "**✨[CRITICAL]✨** + 100 Coolness | " + hook + f"\n\n*🚩 | **{ctx.author.display_name}** claims this channel as their home!*"
+                            self.nomad_homes[ctx.author.id] = ctx.channel
                         await h.add_coolness(ctx.author.id, 100)
                         await ctx.send(hook)
                         
