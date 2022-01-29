@@ -234,7 +234,6 @@ async def crit_handler(bot, attacker_usr, defender_usr, channel, boost = 0):
                 if not(force_crit <= crit_thresh):
                     await handle_stacks(bot, status, speaker)
 
-
     if force_crit != None:                       # For shrouded and similar effects, we check for crit early.
         crit = force_crit
     else:
@@ -277,7 +276,7 @@ async def crit_handler(bot, attacker_usr, defender_usr, channel, boost = 0):
 
         ########################################################################################
         ########################################################################################
-        return True
+                return True
     else:
         return False
 
@@ -325,8 +324,6 @@ async def remove_items(uid, bot, item_name, amount = 1, exact_mode = False): # I
             async with aiosqlite.connect('main.db') as conn:
                 await conn.execute(f"update inventory set amount = {final_amount} where uid = {uid} and item_name = '{item.lower()}';")
                 await conn.commit()
-
-
 
 async def alter_items(uid, ctx, bot, item, change = 1, cost = 0):
     item = item.lower()
