@@ -36,7 +36,8 @@ class utils(commands.Cog): #TODO: Implement faction race commands, and the abili
             self.bot.reset_time = difference
 
 
-        if datetime.now().replace(hour=0, minute=0, second=0, microsecond=0) >= self.bot.tomorrow:
+        if datetime.now().replace(hour=0, minute=0, second=0, microsecond=0) >= self.bot.tomorrow or self.bot.force_reset == True:
+            self.bot.force_reset = False
             self.bot.tomorrow = datetime.now().replace(hour=0, minute=0, second=0, microsecond=0) + timedelta(days=1) 
 
             # First, we update our homies.
@@ -78,7 +79,7 @@ class utils(commands.Cog): #TODO: Implement faction race commands, and the abili
             
             # We reset any other class-specific things.
             cog = self.bot.get_cog('rogue')
-            cog.nomad_homes = {} 
+            cog.nomad_homes = {}
             
             
             print("\n\n\n----------------Daily reset has occurred----------------\n\n\n")

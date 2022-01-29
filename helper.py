@@ -193,8 +193,11 @@ async def crit_handler(bot, attacker_usr, defender_usr, channel, boost = 0):
     # NOTE: A critical is whenever the random number is equal to "1" (by default)
 
     # Check if channel is a nomad channel. If so, alter boost by -5.
-    if channel in bot.get_cog('rogue').nomad_homes.values():
-        boost -= 5
+    if str(defender_id) in bot.users_classes:
+        if bot.users_classes[str(defender_id)] == "nomad":
+            if channel in bot.get_cog('rogue').nomad_homes.values():
+                if bot.get_cog('rogue').nomad_homes[defender_usr] == channel: # ctx.author
+                    boost -= 5
 
     ### Now we check for the rest of the stuff # # # # # # # # # # # # # # # # # # # # # # #                                                                        #
     if boost > 0:                                                                          #

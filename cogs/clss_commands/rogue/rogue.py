@@ -59,7 +59,14 @@ class rogue(commands.Cog):
         ]
     
         self.hooks_n = [
-            "usr1 throws sand at usr2, then throws their scimitar at them."
+            "usr1 throws sand at usr2, then throws their scimitar at them.",
+            "usr1 kicks usr2 into a cactus. Owch!",
+            "usr1 throws a cactus into usr2's bdypart. Rude.",
+            "usr1 fights usr2 for a while before delivering the killing blow to their bdypart. Fatality!",
+            "usr1 kicks some sand up at usr2 before stabbing them through the bdrpart. Rough.",
+            "usr1 drops a house on usr2. What? Isn't that what Nomad's do?",
+            "usr1 throws their scimitar through usr2's bdypart. Owch!",
+            "usr1 trips usr2, then plunges their scimitar into their bdypart."
         ]
 
         self.nomad_homes = {}
@@ -140,10 +147,14 @@ class rogue(commands.Cog):
             elif self.bot.users_classes[str(ctx.author.id)] == "nomad": 
                 ap_works = await h.alter_ap(ctx.message, 1, self.bot)
                 if ap_works and await h.can_attack(ctx.author.id, target.id, ctx):
-                    if ctx.author.id in self.nomad_homes.keys():
-                        if self.nomad_homes[ctx.author.id] == ctx.channel:
+                    if ctx.author in self.nomad_homes.keys():
+                        if self.nomad_homes[ctx.author] == ctx.channel:
                             boost = 9
-                            
+                        else:
+                            boost = 0
+                    else:
+                        boost = 0
+
                     crit_check = await h.crit_handler(self.bot, ctx.author, target, ctx.channel, boost)
                     body_part = random.choice(h.body_parts)
                     hook = random.choice(self.hooks_n)
@@ -153,11 +164,11 @@ class rogue(commands.Cog):
                     if crit_check == False:
                         await ctx.send(hook)
                     else:
-                        if ctx.author.id in self.nomad_homes.keys() or ctx.channel in self.nomad_homes.values():
+                        if ctx.author in self.nomad_homes.keys() or ctx.channel in self.nomad_homes.values():
                             hook = "**✨[CRITICAL]✨** + 100 Coolness | " + hook
                         else:
                             hook = "**✨[CRITICAL]✨** + 100 Coolness | " + hook + f"\n\n*🚩 | **{ctx.author.display_name}** claims this channel as their home!*"
-                            self.nomad_homes[ctx.author.id] = ctx.channel
+                            self.nomad_homes[ctx.author] = ctx.channel
                         await h.add_coolness(ctx.author.id, 100)
                         await ctx.send(hook)
                         

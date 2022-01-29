@@ -43,6 +43,7 @@ bot.claimed = []
 bot.users_factions = {}
 bot.tomorrow = bot.tomorrow = datetime.now().replace(hour=0, minute=0, second=0, microsecond=0) + timedelta(days=1)
 bot.pending_achievements = []
+bot.force_reset = False
 
 # custom achievement, and when data wipes, 10k starting gold
 

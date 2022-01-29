@@ -95,6 +95,12 @@ class owner_only(commands.Cog):
             await conn.commit()
         await ctx.send("✅ | Targets coolness has been altered with [0] errors.")
 
+    @commands.command()
+    @commands.is_owner()
+    async def reset(self, ctx):
+        await ctx.send("Forcing daily reset. Check console log for errors.")
+        self.bot.force_reset = True
+
 # A setup function the every cog has
 def setup(bot):
     bot.add_cog(owner_only(bot))
