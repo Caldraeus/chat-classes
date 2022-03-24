@@ -8,6 +8,7 @@ My main discord bot right now. Require the following packages.
 * Gevent `pip3 install gevent`
 * PIL (Python Image Library) `pip3 install PIL`
 * Fancy Text `pip3 install fancy-text`
+* MatPlotLib `pip3 install matplotlib`
 
 That's all that needs to be installed if I recall correctly.
 
