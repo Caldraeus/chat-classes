@@ -1,3 +1,4 @@
+from email import message
 from json.encoder import INFINITY
 import discord
 from discord.ext import commands
@@ -37,7 +38,14 @@ class economy(commands.Cog):
         }
 
         self.hidden_items = {
-            "demon cookie" : 500
+            "demon cookie" : 500,
+            "scrap": 1,
+            "boom bot" : 0,
+            "gold spitter" : 0,
+            "goober gobber" : 0,
+            "fredster" : 0,
+            "scrapbot" : 0,
+            "yoinker" : 0
         }
 
     @commands.command()
@@ -68,11 +76,24 @@ class economy(commands.Cog):
     async def use(self, ctx, *, item: str = None):
         if item:
             item = item.lower()
+
+            try:
+                target = ctx.message.mentions[0]
+                
+                str_mention = str(target.mention)
+
+                item = item.replace(str_mention, "").strip()
+                item = item.replace(str_mention[:2] + "!" + str_mention[2:], "").strip()
+            except IndexError:
+                target = None
+
             async with aiosqlite.connect('main.db') as conn:
                 async with conn.execute(f"select amount from inventory where uid = {ctx.author.id} and item_name = '{item.lower()}'") as u_info:
                     user_info = await u_info.fetchone()
 
             if item in self.items or item in self.hidden_items:
+
+
                 if user_info != None:
 
                     current_amount = user_info[0]
@@ -83,36 +104,44 @@ class economy(commands.Cog):
                         max_ap = 20
                     #### Item handling. This, unfortunately, is going to be a very long if statement mess. Since I plan to add a large variety of items, with many different effects, it has to be this way.
                     ####
+
+                    # NOTE: You'll notice I remove the item in each individual if statement. This is because of how some
+                    # items are only removed after a delayed effect, etc.
                     
                     speaker = ctx.author.id
                     negative_effects = h.effects_negative
                     positive_effects= h.effects_positive
 
                     if item == "coffee":
+                        await h.remove_items(speaker, self.bot, item.lower(), 1)
                         await ctx.send("☕ | You drink your coffee... it's delicious! Now you have a bit more energy. (+2 AP).")
                         new_ap = self.bot.users_ap[str(ctx.author.id)] + 2
                         if new_ap > max_ap:
                             new_ap = max_ap
                         self.bot.users_ap[str(ctx.author.id)] = new_ap
                     elif item == "monster":
+                        await h.remove_items(speaker, self.bot, item.lower(), 1)
                         await ctx.send("<:monster:739176788629913739> | You drink your monster energy... it's energizing! Now you have a bit more energy. (+6 AP).")
                         new_ap = self.bot.users_ap[str(ctx.author.id)] + 6
                         if new_ap > max_ap:
                             new_ap = max_ap
                         self.bot.users_ap[str(ctx.author.id)] = new_ap
                     elif item == "adrenaline":
+                        await h.remove_items(speaker, self.bot, item.lower(), 1)
                         await ctx.send("💉 | You inject a vial of pure adrenaline... WOOO! **NOW YOU HAVE A LOT MORE ENERGY!**. (+10 AP).")
                         new_ap = self.bot.users_ap[str(ctx.author.id)] + 10
                         if new_ap > max_ap:
                             new_ap = max_ap
                         self.bot.users_ap[str(ctx.author.id)] = new_ap
                     elif item == "demon cookie":
+                        await h.remove_items(speaker, self.bot, item.lower(), 1)
                         await ctx.send("🍪 | You munch on Lord Greymuul's homemade chocolate chip cookies... Wait a minute, these are raisins! How demonic! You're filled with rage. (+20 AP).")
                         new_ap = self.bot.users_ap[str(ctx.author.id)] + 20
                         if new_ap > max_ap:
                             new_ap = max_ap
                         self.bot.users_ap[str(ctx.author.id)] = new_ap
                     elif item == "hot dog":
+                        await h.remove_items(speaker, self.bot, item.lower(), 1)
                         if self.bot.users_classes[str(ctx.author.id)] == "pacted" and await h.get_demon(ctx.author.id, self.bot) == "foop": # Buffed dot hogs
                             async with aiosqlite.connect('main.db') as conn:
                                 async with conn.execute(f"select * from users where id = '{ctx.author.id}';") as info:
@@ -132,6 +161,7 @@ class economy(commands.Cog):
                             self.bot.users_ap[str(ctx.author.id)] = new_ap
                             await h.add_coolness(ctx.author.id, 10)
                     elif item == "void":
+                        await h.remove_items(speaker, self.bot, item.lower(), 1)
                         await ctx.send("👁️ | You 👍︎⚐︎☠︎💧︎🕆︎💣︎☜︎ your delectable ✞︎□︎✋︎👎︎. Golly, that sure was 👎︎☜︎☹︎♓︎👍︎✋︎⚐︎⬧︎! (+20 AP | +20 Shatter)")
                         new_ap = self.bot.users_ap[str(ctx.author.id)] + 20
                         if new_ap > max_ap:
@@ -139,6 +169,7 @@ class economy(commands.Cog):
                         self.bot.users_ap[str(ctx.author.id)] = new_ap
                         await h.add_effect(ctx.author, self.bot, "shatter", 20)
                     elif item == "milk":
+                        await h.remove_items(speaker, self.bot, item.lower(), 1)
                         if speaker not in self.bot.user_status:
                             self.bot.user_status[speaker] = []
                             await ctx.send(f"🥛 | You drink a cold glass of milk. You don't feel any different.")
@@ -155,21 +186,29 @@ class economy(commands.Cog):
                             except IndexError:
                                 await ctx.send(f"🥛 | You drink a cold glass of milk. You don't feel any different.")
                     elif item == "jamba juice":
+                        await h.remove_items(speaker, self.bot, item.lower(), 1)
+                        must_remove = []
                         if speaker in self.bot.user_status:
                             for status in self.bot.user_status[speaker]:
                                 if status[0] in negative_effects:
-                                    await h.handle_stacks(self.bot, status, speaker, INFINITY)
-                                    await asyncio.sleep(0.1)
+                                    must_remove.append(status)
+                                    # we Can't remove it here
+
+                            for status in must_remove:
+                                await h.handle_stacks(self.bot, status, speaker, INFINITY)
+
                             await ctx.send("<:jambajuice:798725534472339516> | You drink a delicous jamba juice! You feel great! (Negative status effects cleansed).")
                         else:
                             await ctx.send("<:jambajuice:798725534472339516> | You drink a delicous jamba juice! ... but nothing happens.")
                     elif item == "snake oil": # Gives a random status effect
+                        await h.remove_items(speaker, self.bot, item.lower(), 1)
                         chosen_status = random.choice(list(h.effect_list.keys()))
                         amount = random.randint(1, 10)
 
                         await ctx.send(f"🐍 | You drink your delicious and useful snake oil! Wait, what the hell was in this stuff!? (+{amount} **{chosen_status.title()}**)")
                         await h.add_effect(ctx.author, self.bot, chosen_status, amount)
                     elif item == "nft": # 80% chance to gain gold, 20% chance to lose gold.
+                        await h.remove_items(speaker, self.bot, item.lower(), 1)
                         cog = self.bot.get_cog('trader')
                         if self.bot.users_classes[str(ctx.author.id)] in cog.trader_classes:
                             await ctx.send("Woah there buddy, as a Trader, you wouldn't lay a finger on NFT's, since they're a scam and all. Try selling them to someone instead!")
@@ -186,25 +225,79 @@ class economy(commands.Cog):
 
                             await h.add_coolness(ctx.author.id, -amount)
                     elif item == "map": # gives user a quest
+                        await h.remove_items(speaker, self.bot, item.lower(), 1)
                         xp_amount = random.randint(100, 2000)
                         await ctx.send(f"🗺️ | You search over your map... (+{xp_amount} XP)")
                         await h.xp_handler(ctx.author, ctx.message, self.bot, boost = xp_amount)
                         await h.fetch_random_quest(ctx.message, self.bot, override=True)
-                        
-    
-                    ####
-                    ####
+                    elif item == "scrap":
+                        await ctx.send("You... use your scrap? Yeah, you use your scrap. I guess you sort of just... bang the pieces together? It's really annoying. People tell you to stop. Hell, the scrap even breaks after you do that. Nice going, idiot. (-10 **Coolness**)")
+                        await h.add_coolness(ctx.author.id, -10)
+                    elif item == "boom bot":
+                        await h.remove_items(speaker, self.bot, item.lower(), 1)
+                        await ctx.send("🤖 | You release your boom bot into the wild... I wonder where it'll end up?")
+                        await asyncio.sleep(random.randint(15, 3600))
+                        def check(m: discord.Message):
+                            return m.author and m.author.id != ctx.author.id and m.guild.id == ctx.guild.id and ctx.author.id != self.bot.user.id and m.author.bot != True
+                            
+                        response_message = await self.bot.wait_for('message', check=check)
+                        target = response_message.author
+                        await response_message.channel.send(f"**💥[EXPLOSION!]💥 + 500 Coolness** | KABOOM!! **{ctx.author.mention}**'s Boom Bot rolls up and explodes on **{target.display_name}**. ")
+                        await h.add_coolness(ctx.author.id, 500)
+                    elif item == "gold spitter":
+                        await h.remove_items(speaker, self.bot, item.lower(), 1)
+
+                        personal_gold = random.randint(100,3000)
+                        others_gold = random.randint(10, 1000)
+
+                        await ctx.send(f"🤖 | You activate your gold spitter... woah, look out! The gold spitter spits **{personal_gold}** gold at you, and **{others_gold}** gold around the area!")
+                        await h.add_gold(ctx.author.id, personal_gold, self.bot)
                     
-                    new_amount = current_amount - 1
-                    
-                    if new_amount <= 0:
-                        async with aiosqlite.connect('main.db') as conn: # DELETE FROM table_name WHERE condition;
-                            await conn.execute(f"DELETE FROM inventory WHERE uid = {ctx.author.id} and item_name = '{item.lower()}'")
-                            await conn.commit()
-                    else:
-                        async with aiosqlite.connect('main.db') as conn:
-                            await conn.execute(f"update inventory set amount = {new_amount} where uid = {ctx.author.id} and item_name = '{item.lower()}';")
-                            await conn.commit()
+                        def check(m: discord.Message):
+                            return m.author and m.author.id != ctx.author.id and m.guild.id == ctx.guild.id and ctx.author.id != self.bot.user.id and m.author.bot != True
+
+                        response_message = await self.bot.wait_for('message', check=check)
+                        response_target = response_message.author
+
+                        await response_message.channel.send(f"**{response_target.display_name}** picks up the remaining **{others_gold} G** left behind by {ctx.author.display_name}!")
+                        await h.add_gold(response_target.id, others_gold, self.bot)
+                    elif item == "goober gobber":
+                        if target and target != ctx.author:
+                            if str(target.id) in self.bot.users_classes.keys():
+                                await ctx.send(f"🤖 | You activate your goober gobber. Oh, god! It goobs it's gobbers all over **{target.display_name}**! (+10 **Goobered**)")
+                                await h.remove_items(speaker, self.bot, item.lower(), 1)
+                                await h.add_effect(target, self.bot, "goobered", 10)
+                            else:
+                                await ctx.send(f"🤖 | You activate your goober gobber. Oh, god! It goobs it's gobbers all over **{target.display_name}**! But wait... they're immune, because they're classless! Curses!")
+                        else:
+                            await ctx.send("⚠️ | Hey there, this is a targeted item! Try mentioning a target after you use it! For example, `;use bomb @God#9876`")
+                    elif item == "fredster":
+                        await h.remove_items(speaker, self.bot, item.lower(), 1)
+                        await ctx.send("<:fredster:956297087253897226> | Holy shit! Is that a Fredster? Man, look at him go! Wow. Just wow.\n\nHonestly that was incredible. So incredible, in fact, you feel... inspired! | **(+25 Inspired)**")
+                        await h.add_effect(ctx.author, self.bot, "inspired", 25)
+                    elif item == "yoinker":
+                        await h.remove_items(speaker, self.bot, item.lower(), 1)
+                        if target and target != ctx.author:
+                            if str(target.id) in self.bot.users_classes.keys():
+                                try:
+                                    async with aiosqlite.connect('main.db') as conn:
+                                        async with conn.execute(f"select item_name from inventory where uid = {target.id};") as chan:
+                                            stuff = await chan.fetchall()
+
+                                    stolen_item = random.choice(stuff[0])
+                                    
+                                    await h.remove_items(target.id, self.bot, stolen_item, 1)
+                                    await h.alter_items(ctx.author.id, ctx, self.bot, stolen_item, change = 1)
+                                    await ctx.send(f"🤏 | Your yoinker reaches into **{target.display_name}**'s pocket, yoinking their **{stolen_item.title()}**! It's all yours now.")
+                                except IndexError:
+                                    await ctx.send(f"🤏 | Your yoinker attempts to yoink! But alas, **{target.display_name}** has no yoinkables to yoink yet! Better luck next time!")
+                            else:
+                                await ctx.send(f"🤏 | Your yoinker attempts to yoink! But alas, **{target.display_name}** has no yoinkables to yoink yet! Better luck next time!")
+                    elif item == "scrapbot":
+                        await h.remove_items(speaker, self.bot, item.lower(), 1)
+                        scrap_created = random.randint(5,20)
+                        await ctx.send(f"🤖 | Your scrapbot spits some more scrap out! Wait... if you used scrap to make the bot, where did it get more scrap from? Weird. **(+{scrap_created} Scrap)**")
+                        await h.alter_items(ctx.author.id, ctx, self.bot, "scrap", scrap_created)
                 else:
                     await ctx.send(f"You are not currently in posession of {item.title()}. Perhaps you made a typo?")
                

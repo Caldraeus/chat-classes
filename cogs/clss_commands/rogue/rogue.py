@@ -71,6 +71,12 @@ class rogue(commands.Cog):
 
         self.nomad_homes = {}
 
+        self.hooks_scav = [
+            "usr1 throws scrap metal at usr2's bdypart, impaling it! Owch!",
+            "usr1 trips usr2 then drops a boom bot on them. Kaboom!",
+            "usr1 slashes usr2 with a scrap sword. If that doesn't kill them, the tetanus will!"
+        ]
+
     @commands.command()
     @commands.guild_only()
     @commands.cooldown(2, 1, commands.BucketType.user)
@@ -170,6 +176,22 @@ class rogue(commands.Cog):
                             hook = "**✨[CRITICAL]✨** + 100 Coolness | " + hook + f"\n\n*🚩 | **{ctx.author.display_name}** claims this channel as their home!*"
                             self.nomad_homes[ctx.author] = ctx.channel
                         await h.add_coolness(ctx.author.id, 100)
+                        await ctx.send(hook)
+            elif self.bot.users_classes[str(ctx.author.id)] == "scavenger":
+                ap_works = await h.alter_ap(ctx.message, 1, self.bot)
+                if ap_works and await h.can_attack(ctx.author.id, target.id, ctx):
+                    crit_check = await h.crit_handler(self.bot, ctx.author, target, ctx.channel)
+                    body_part = random.choice(h.body_parts)
+                    hook = random.choice(self.hooks_scav)
+                    hook = hook.replace("usr1", f"**{ctx.author.display_name}**")
+                    hook = hook.replace("bdypart", body_part)
+                    hook = hook.replace("usr2", f"**{target.display_name}**")
+                    if crit_check == False:
+                        await ctx.send(hook)
+                    else:
+                        hook = "**✨[CRITICAL]✨** + 100 Coolness, + 1 *Scrap* | " + hook
+                        await h.add_coolness(ctx.author.id, 100)
+                        await h.alter_items(ctx.author.id, ctx, self.bot, "scrap", 1)
                         await ctx.send(hook)
                         
 # A setup function the every cog has

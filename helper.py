@@ -20,7 +20,8 @@ effect_list = {
     "defending" : "You are prepared for someone to strike! Anyone who attacks you fails, wasting their AP.",
     "wooyeah" : "**<a:wooyeah:804905363140247572>WOO YEAH<a:wooyeah:804905363140247572>IM ON A ROLL<a:wooyeah:804905363140247572>**",
     "shrouded" : "You're covered in some sort of shroud! It's harder for enemies to get a crit on you!",
-    "energized" : "You're powered up! Your next action will cost 0 AP!"
+    "energized" : "You're powered up! Your next action will cost 0 AP!",
+    "goobered" : "God, what is this stuff? Get it off! Every message you send reduces your AP by 2."
 }
 
 effects_positive = {
@@ -37,7 +38,8 @@ effects_negative = {
     "drunk",
     "burning",
     "poisoned",
-    "wooyeah"
+    "wooyeah",
+    "goobered"
 }
 
 base_classes = {
@@ -49,7 +51,7 @@ base_classes = {
 
 prefix = ';'
 
-unobtainable_achs = 1
+unobtainable_achs = 2
 
 with open('adjectives.txt') as f:
     sheep_names = [line.rstrip() for line in f]
@@ -83,6 +85,8 @@ async def find_origin(user_class):
     async with aiosqlite.connect('main.db') as conn:
         async with conn.execute(f"select class_name, preclass from classes;") as chan:
             clss = await chan.fetchall()
+    
+    path = [user_class.title()]
     origin = user_class
     wcase = 0
     b_classes = ["swordsman", "apprentice", "rogue", "archer"]
@@ -93,8 +97,10 @@ async def find_origin(user_class):
         for item in clss:
             if item[0] == origin:
                 origin = item[1]
+                path.append(origin)
 
-    return(origin)
+    path.reverse()
+    return(' ➔ '.join(path))
 
 async def reply_check(message):
     if message.reference:
@@ -193,7 +199,7 @@ async def crit_handler(bot, attacker_usr, defender_usr, channel, boost = 0):
     # NOTE: A critical is whenever the random number is equal to "1" (by default)
 
     # Check if channel is a nomad channel. If so, alter boost by -5.
-    if str(defender_id) in bot.users_classes:
+    if str(defender_id) in bot.users_classes.keys(): 
         if bot.users_classes[str(defender_id)] == "nomad":
             if channel in bot.get_cog('rogue').nomad_homes.values():
                 if bot.get_cog('rogue').nomad_homes[defender_usr] == channel: # ctx.author
@@ -262,7 +268,7 @@ async def crit_handler(bot, attacker_usr, defender_usr, channel, boost = 0):
     if crit <= crit_thresh:
         ########################################################################################
         # This is for classes that have "when someone gets a crit on you" effects. #############
-        if str(defender_id) in bot.users_classes:
+        if str(defender_id) in bot.users_classes.keys():
             if bot.users_classes[str(defender_id)] == "pacted":
                 if await get_demon(defender_id, bot) == "minehart":
                     async with aiosqlite.connect('main.db') as conn:
@@ -276,7 +282,7 @@ async def crit_handler(bot, attacker_usr, defender_usr, channel, boost = 0):
 
         ########################################################################################
         ########################################################################################
-                return True
+        return True
     else:
         return False
 
@@ -304,15 +310,24 @@ async def remove_items(uid, bot, item_name, amount = 1, exact_mode = False): # I
     async with aiosqlite.connect('main.db') as conn:
         async with conn.execute(f"select amount from inventory where uid = {uid} and item_name = '{item.lower()}'") as u_info:
             user_info = await u_info.fetchone()
-    current_amount = user_info[0]
+    try:
+        current_amount = user_info[0]
+    except TypeError:
+        return False
+    
     final_amount = current_amount - amount
     if exact_mode:
         if final_amount < 0:
             return False
         else:
-            async with aiosqlite.connect('main.db') as conn:
-                await conn.execute(f"update inventory set amount = {final_amount} where uid = {uid} and item_name = '{item.lower()}';")
-                await conn.commit()
+            if final_amount <= 0:
+                async with aiosqlite.connect('main.db') as conn: # DELETE FROM table_name WHERE condition;
+                    await conn.execute(f"DELETE FROM inventory WHERE uid = {uid} and item_name = '{item.lower()}'")
+                    await conn.commit()
+            else:
+                async with aiosqlite.connect('main.db') as conn:
+                    await conn.execute(f"update inventory set amount = {final_amount} where uid = {uid} and item_name = '{item.lower()}';")
+                    await conn.commit()
             return True
             
     else:
@@ -474,7 +489,6 @@ async def update_quest(message, quest_id, addition, bot, silent = False):
         for guy in questers:
             new_guy = guy.split(",")
             questers[questers.index(guy)] = new_guy # I don't want to comment this and I know I will regret this. 
-            # print(f"I am setting {new_guy} up to replace {guy}.")
 
         found = False
         for new_guy in questers: # Have to do this in a seperate loop to prevent a critical error.
@@ -516,7 +530,7 @@ async def update_quest(message, quest_id, addition, bot, silent = False):
                             await conn.commit() 
                             reward = f"+{quest_info[3]} Gold"
                         else:
-                            pass
+                            pass 
 
                         await conn.execute(f"update users set currently_questing = 0 where id = '{message.author.id}';")
                         await conn.commit()

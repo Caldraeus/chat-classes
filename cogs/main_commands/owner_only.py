@@ -101,6 +101,18 @@ class owner_only(commands.Cog):
         await ctx.send("Forcing daily reset. Check console log for errors.")
         self.bot.force_reset = True
 
+    @commands.command()
+    @commands.is_owner()
+    async def giveitem(self, ctx, target: discord.User, amount: int, *, item_name: str):
+        await h.alter_items(target.id, ctx, self.bot, item_name.lower(), amount)
+        await ctx.send(f"✅ | Gave {amount} `{item_name.title()}` to **{target.display_name}**")
+    
+    @commands.command()
+    @commands.is_owner()
+    async def giveach(self, ctx, target: discord.User, ach_id: int):
+        await ctx.send(f"Attempting to award achievement to `{target.display_name}`.")
+        await h.award_ach(ach_id, ctx.channel, target, self.bot, False)
+
 # A setup function the every cog has
 def setup(bot):
     bot.add_cog(owner_only(bot))

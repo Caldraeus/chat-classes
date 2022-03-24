@@ -174,7 +174,7 @@ class class_commands(commands.Cog):
         if origin == _class.lower():
             await ctx.send("That's an origin class, or doesn't exist!")
         else:
-            await ctx.send(f"Original Class: {origin.title()}")
+            await ctx.send(f"Class Progress: {origin.title()}")
 
 
 # A setup function the every cog has

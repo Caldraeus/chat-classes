@@ -33,6 +33,8 @@ class myriad(commands.Cog): #TODO: Implement faction race commands, and the abil
             '🔥' : [.5, .25, 0.125],
             '🔥' : [.5, .25, 0.125],
             '🔥' : [.5, .25, 0.125],
+            '🔥' : [.5, .25, 0.125],
+            '🔥' : [.5, .25, 0.125],
             '<a:wooyeah:804905363140247572>' : [2, 3, 5.5],
             '🍇' : [0.5, 0.3, 1.5],
             '🍇' : [0.5, 0.3, 1.5],
@@ -45,6 +47,8 @@ class myriad(commands.Cog): #TODO: Implement faction race commands, and the abil
             '🍆' : [0.0125, 0.00625, 0.003125],
             '🍆' : [0.0125, 0.00625, 0.003125],
             '🍆' : [0.0125, 0.00625, 0.003125],
+            '<:zombo:804914906012319754>' : [1, 0.5, 0.25],
+            '<:zombo:804914906012319754>' : [1, 0.5, 0.25],
             '<:zombo:804914906012319754>' : [1, 0.5, 0.25],
             '🍌' : [.5, 1,5],
             '🍌' : [.5, 1,5],
@@ -137,6 +141,7 @@ class myriad(commands.Cog): #TODO: Implement faction race commands, and the abil
 
 
             if list(results.keys())[0] == "<a:jackpot:804920508982099988>" and results['<a:jackpot:804920508982099988>'] == 3:
+                await h.award_ach(21, ctx.channel.id, ctx.author, self.bot, False)
                 await ctx.send(f"{ctx.author.mention}\n<:STEASnothing:517873442381627392>   **__SLOTS__** **\n-=[{slot_1}|{slot_2}|{slot_3}]=-\n---------------------**\n\nYou won the jackpot! Enjoy the {self.jackpot} G!")
                 await h.add_gold(ctx.author.id, self.jackpot, self.bot, debt_mode = False, purchase_mode = ctx, boost_null = True)
                 

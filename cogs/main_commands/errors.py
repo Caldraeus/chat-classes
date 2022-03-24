@@ -38,7 +38,7 @@ class CommandErrorHandler(commands.Cog):
             return
         
         # elif isinstance(error, KeyError):
-        #     return await ctx.send('🚫 | You are not that class! Run `;class` to see your commands!')
+        #     return await ctx.send('🚫 | You are not that class, or you have no profile! Run `;class` to see your commands!')
 
         elif isinstance(error, discord.ext.commands.errors.MissingPermissions):
             return await ctx.send("You do not have permission to run this command!")

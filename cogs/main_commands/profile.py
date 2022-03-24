@@ -34,7 +34,11 @@ class profile(commands.Cog):
             usr = target
         else:
             usr = ctx.author
-        effects = self.bot.user_status[usr.id]
+        try:
+            effects = self.bot.user_status[usr.id]
+        except KeyError:
+            self.bot.user_status[usr.id] = []
+            effects = self.bot.user_status[usr.id]
         if effects != []:
             profile = discord.Embed(title=f"{usr.display_name}'s Status Effects", colour=discord.Colour.from_rgb(255,105,180))
             for effect in effects:
@@ -152,11 +156,11 @@ class profile(commands.Cog):
                             final_list += f"\n**{ach_info[1]}**"
                     async with conn.execute("select count(*) from achievements;") as numcount:
                         num = await numcount.fetchone()
-                        num_not = h.unobtainable_achs
                         total_achievements = num[0]-h.unobtainable_achs # Self explanatory. We subtract the amount of "unobtainable" achievements.
                         """
                         Unobtainable Achievements
                         #15 - Beloved By...
+                        #20 - Bug Hunter
                         """
         if final_list != "":
             profile = discord.Embed(title=f"{target.display_name}'s Achievements", colour=discord.Colour.from_rgb(255,69,0), description=final_list)

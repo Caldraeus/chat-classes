@@ -274,6 +274,13 @@ async def handle_effects(message, bot): # List of effects in the readme
                     except:
                         await clone_hook.send(content="**I AM ON FIRE HELP MEEEEEEEEEEEEEEEE**", username=message.author.display_name, avatar_url=message.author.display_avatar.url)
 
+                break
+            elif status[0].lower() == "goobered":
+                ### HANDLE STACKS
+                await h.handle_stacks(bot, status, speaker)
+                ### APPLY EFFECT
+                await h.alter_ap(message, 2, bot)
+
 # A setup function the every cog has
 def setup(bot):
     bot.add_cog(utils(bot))
