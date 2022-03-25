@@ -330,68 +330,51 @@ class economy(commands.Cog):
     @commands.guild_only()
     async def daily(self, ctx): # ctx.author.id in self.bot.users_factions.keys()
         try:
+            daily_amount = 100
             faction_pts = 10
             # if self.bot.users_classes[str(ctx.author.id)] == "pacted" and await h.get_demon(ctx.author.id, self.bot) == "foop":
             if ctx.author.id in self.bot.claimed: # or ctx.author.id == 340222819680124929 or ctx.author.id == 740308712450818079:
                 await ctx.send("❌ | You've already claimed your daily gift this rollover! Use `;rollover` to check when you can claim again.")
             else:
-                if self.bot.users_classes[str(ctx.author.id)] == "pacted":
+                mss = ""
+
+                if self.bot.users_classes[str(ctx.author.id)] == "pacted": # Classes that directly alter the daily gold go first.
                     if await h.get_demon(ctx.author.id, self.bot) == "trokgroor":
                         async with aiosqlite.connect('main.db') as conn:
                             async with conn.execute(f"select * from users where id = '{ctx.author.id}';") as info:
                                 user = await info.fetchone()
                         level = user[8] - 19
-                        await h.add_gold(ctx.author.id, 100+(level*50), self.bot, True)
+                        daily_amount = daily_amount+(level*50)
                         if(ctx.author.id in self.bot.users_factions.keys()):
                             f_id = self.bot.users_factions[ctx.author.id]
                             if ctx.author.id in self.bot.server_boosters:
-                                await h.give_faction_points(ctx.author.id, f_id, faction_pts*2)
-                                await ctx.send(f"✅ | You and Trokgroor print {2*(100+(level*50))} gold!\n\n*(+{faction_pts*2} Faction Points!)*")
+                                mss += f"✅ | You and Trokgroor print {2*daily_amount} gold!"
                             else:
-                                await h.give_faction_points(ctx.author.id, f_id, faction_pts)
-                                await ctx.send(f"✅ | You and Trokgroor print {100+(level*50)} gold!\n\n*(+{faction_pts} Faction Points!)*")
-                        else:
-                            if ctx.author.id in self.bot.server_boosters:
-                                await ctx.send(f"✅ | You and Trokgroor print {2*(100+(level*50))} gold!")
-                            else:
-                                await ctx.send(f"✅ | You and Trokgroor print {100+(level*50)} gold!")
-                        self.bot.claimed.append(ctx.author.id)
-                    else:
-                        if(ctx.author.id in self.bot.users_factions.keys()):
-                            f_id = self.bot.users_factions[ctx.author.id]
-                            await h.add_gold(ctx.author.id, 100, self.bot, True)
-                            if ctx.author.id in self.bot.server_boosters:
-                                await h.give_faction_points(ctx.author.id, f_id, faction_pts*2)
-                                await ctx.send(f"✅ | You gained 200 gold!\n\n*(+{faction_pts*2} Faction Points!)*")
-                            else:
-                                await h.give_faction_points(ctx.author.id, f_id, faction_pts)
-                                await ctx.send(f"✅ | You gained 100 gold!\n\n*(+{faction_pts} Faction Points!)*")
-                            self.bot.claimed.append(ctx.author.id)
-                        else:
-                            await h.add_gold(ctx.author.id, 100, self.bot, True)
-                            if ctx.author.id in self.bot.server_boosters:
-                                await ctx.send("✅ | You gained 200 gold!")
-                            else:
-                                await ctx.send("✅ | You gained 100 gold!")
-                            self.bot.claimed.append(ctx.author.id)
+                                mss += f"✅ | You and Trokgroor print {daily_amount} gold!"
+                elif ctx.author.id in self.bot.server_boosters: # Our default gold thing goes last.
+                    mss += f"✅ | You gained {daily_amount*2} gold!"
                 else:
-                    if(ctx.author.id in self.bot.users_factions.keys()):
-                        f_id = self.bot.users_factions[ctx.author.id]
-                        await h.add_gold(ctx.author.id, 100, self.bot, True)
-                        if ctx.author.id in self.bot.server_boosters:
-                            await h.give_faction_points(ctx.author.id, f_id, faction_pts*2)
-                            await ctx.send(f"✅ | You gained 200 gold!\n\n*(+{faction_pts*2} Faction Points!)*")
-                        else:
-                            await h.give_faction_points(ctx.author.id, f_id, faction_pts)
-                            await ctx.send(f"✅ | You gained 100 gold!\n\n*(+{faction_pts} Faction Points!)*")
+                    mss += f"✅ | You gained {daily_amount} gold!"
+
+                if(ctx.author.id in self.bot.users_factions.keys()): # Faction points are their own thing.
+                    f_id = self.bot.users_factions[ctx.author.id]
+                    if ctx.author.id in self.bot.server_boosters:
+                        await h.give_faction_points(ctx.author.id, f_id, faction_pts*2)
+                        mss += f"\n\n*(+{faction_pts*2} Faction Points!)*"
                     else:
-                        await h.add_gold(ctx.author.id, 100, self.bot, True)
-                        if ctx.author.id in self.bot.server_boosters:
-                            await ctx.send("✅ | You gained 200 gold!")
-                        else:
-                            await ctx.send("✅ | You gained 100 gold!")
+                        await h.give_faction_points(ctx.author.id, f_id, faction_pts)
+                        mss += f"\n\n*(+{faction_pts} Faction Points!)*"
+
+                if self.bot.users_classes[str(ctx.author.id)] == "adventurer": # Additional daily rewards are calculated here.
+                    mss += "\n\n⚔️ | You also gain 10 AP, 25x Inspired, and 1x Jamba Juice!"
+                    await h.add_effect(ctx.author, self.bot, "inspired", 25)
+                    await h.alter_items(ctx.author.id, ctx, self.bot, "jamba juice", 1)
+                    self.bot.users_ap[str(ctx.author.id)] += 10
+                
+                await h.add_gold(ctx.author.id, daily_amount, self.bot)
                 self.bot.claimed.append(ctx.author.id)
-        except (TypeError, KeyError) as e:
+                await ctx.send(mss)
+        except (TypeError, KeyError):
             await ctx.send("❌ | You need to run `;start` first!")
         
     @commands.command()

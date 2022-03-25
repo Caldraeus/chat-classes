@@ -12,7 +12,6 @@ import aiohttp
 class class_commands(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
-    pass
 
     @commands.command()
     @commands.guild_only()
@@ -59,7 +58,9 @@ class class_commands(commands.Cog):
                     async with conn.execute(f"select * from classes where class_name = '{clss}';") as cinfo:
                         class_info = await cinfo.fetchall()
                         class_info = class_info[0]
-                        profile = discord.Embed(title=f"{clss.title()}'s Info", colour=discord.Colour.from_rgb(128, 128, 128), description=class_info[1])
+                        desc = class_info[1]
+                        desc = desc.replace(r'\n', '\n')
+                        profile = discord.Embed(title=f"{clss.title()}'s Info", colour=discord.Colour.from_rgb(128, 128, 128), description=desc)
                         profile.add_field(name="Previous Class", value=class_info[3], inline=False)
                         abilities = class_info[5].split("|")
                         final = ""
@@ -133,10 +134,10 @@ class class_commands(commands.Cog):
 
             profile = discord.Embed(title=f"🌟 CLASS-UP! 🌟", colour=discord.Colour.from_rgb(255, 165, 0))
             for potential_class in class_info:
-                if potential_class[4] != 0 and str(potential_class[4]) in user_ach: # It's an achievement locked class...
+                if potential_class[4] != 0 and str(potential_class[4]) in user_ach: # If it's locked, check if they have it, then add it
                     profile.add_field(name=potential_class[0].title(), value=potential_class[1], inline=False)
                     allowed_classes.append(potential_class[0].lower())
-                elif potential_class[4] == 0:
+                else:
                     profile.add_field(name=potential_class[0].title(), value=potential_class[1], inline=False)
                     allowed_classes.append(potential_class[0].lower())
 

@@ -14,7 +14,6 @@ from datetime import timedelta
 class help_commands(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
-    pass
 
     @commands.command()
     @commands.guild_only()

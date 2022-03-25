@@ -14,7 +14,6 @@ from io import BytesIO
 class profile(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
-    pass
 
     @commands.command()
     @commands.guild_only()
@@ -112,7 +111,6 @@ class profile(commands.Cog):
                 i += 1
                 total += 1
                 amount_skipped += 1
-                continue
 
         if user != None:
             if not in_top:

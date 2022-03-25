@@ -6,19 +6,15 @@ import discord
 from discord.ext import commands
 from discord.ext.commands.cooldowns import BucketType
 import helper as h
-import asyncio
 import aiosqlite
 import sys, traceback
 from os import listdir
 from os.path import isfile, join
 from discord.utils import find
-import aiohttp
-import random
 import os
 from datetime import datetime  
 from datetime import timedelta  
 from PIL import Image, ImageOps
-import requests
 from jishaku.functools import executor_function
 from io import BytesIO
 from fancy_text import fancy
