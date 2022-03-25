@@ -32,7 +32,6 @@ class hydromancer(commands.Cog):
         ]
 
         self.waterlevels = {}
-    pass
 
     @commands.command()
     @commands.guild_only()
