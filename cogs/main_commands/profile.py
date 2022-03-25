@@ -14,7 +14,6 @@ from io import BytesIO
 class profile(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
-    pass
 
     @commands.command()
     @commands.guild_only()
@@ -34,7 +33,11 @@ class profile(commands.Cog):
             usr = target
         else:
             usr = ctx.author
-        effects = self.bot.user_status[usr.id]
+        try:
+            effects = self.bot.user_status[usr.id]
+        except KeyError:
+            self.bot.user_status[usr.id] = []
+            effects = self.bot.user_status[usr.id]
         if effects != []:
             profile = discord.Embed(title=f"{usr.display_name}'s Status Effects", colour=discord.Colour.from_rgb(255,105,180))
             for effect in effects:
@@ -64,7 +67,7 @@ class profile(commands.Cog):
                     num += 1
             
             profile = discord.Embed(title=f"{ctx.author.display_name}'s Inventory", colour=discord.Colour.from_rgb(255,223,0), description=final_list)
-            profile.set_thumbnail(url=ctx.author.avatar_url)
+            profile.set_thumbnail(url=ctx.author.avatar.url)
 
             await ctx.send(embed=profile)
             
@@ -95,17 +98,19 @@ class profile(commands.Cog):
             elif user != None and user.id is ctx.message.author.id:
                 final+=f"**#{i+1 - amount_skipped} - {user.name} - {stuff[i][5]} Coolness**\n\n"
                 in_top = True
-                if i+1 == 1:
-                    await h.award_ach(13, ctx.message, self.bot)
-                    await h.award_ach(12, ctx.message, self.bot)
+
+                # Just some achievement handling
+                if i+1 == 1: 
+                    await h.award_ach(13, ctx.message.channel, ctx.author, self.bot)
+                    await h.award_ach(12, ctx.message.channel, ctx.author, self.bot)
                 else:
-                    await h.award_ach(12, ctx.message, self.bot)
+                    await h.award_ach(12, ctx.message.channel, ctx.author, self.bot)
+
                 i += 1
             elif user == None:
                 i += 1
                 total += 1
                 amount_skipped += 1
-                continue
 
         if user != None:
             if not in_top:
@@ -127,6 +132,9 @@ class profile(commands.Cog):
         
         await ctx.send(embed=profile)
 
+        if (await h.get_coolness(ctx.author.id) <= -1000):
+            await h.award_ach(19, ctx.message.channel, ctx.author, self.bot)
+
     @commands.command(aliases=["achs"])
     @commands.guild_only()
     async def achievements(self, ctx, target: discord.User = None):
@@ -146,15 +154,15 @@ class profile(commands.Cog):
                             final_list += f"\n**{ach_info[1]}**"
                     async with conn.execute("select count(*) from achievements;") as numcount:
                         num = await numcount.fetchone()
-                        num_not = h.unobtainable_achs
                         total_achievements = num[0]-h.unobtainable_achs # Self explanatory. We subtract the amount of "unobtainable" achievements.
                         """
                         Unobtainable Achievements
                         #15 - Beloved By...
+                        #20 - Bug Hunter
                         """
         if final_list != "":
             profile = discord.Embed(title=f"{target.display_name}'s Achievements", colour=discord.Colour.from_rgb(255,69,0), description=final_list)
-            profile.set_thumbnail(url=target.avatar_url)
+            profile.set_thumbnail(url=target.display_avatar.url)
             profile.add_field(name="Total", value=f"{user_ach} of {total_achievements} Unlocked ({int((user_ach/total_achievements)*100)}%)", inline=False)
             await ctx.send(embed=profile)
                     

@@ -8,11 +8,10 @@ import os
 import aiohttp
 import aiosqlite
 import asyncio
-from discord import Webhook, AsyncWebhookAdapter
+
 from asyncio.exceptions import TimeoutError
 import sqlite3
 from datetime import datetime
-from Fortuna import RelativeWeightedChoice
 
 class mining(commands.Cog): #TODO: Implement faction race commands, and the ability to set faction requirements.
     def __init__(self, bot):
@@ -115,7 +114,7 @@ class mining(commands.Cog): #TODO: Implement faction race commands, and the abil
         if current_amount != []:
             skill_stats = current_amount[0]
             profile = discord.Embed(title=f"{target.display_name}'s Skills", colour=discord.Colour.from_rgb(255,255,255), description="")
-            profile.set_thumbnail(url=target.avatar_url)
+            profile.set_thumbnail(url=target.display_avatar.url)
 
             profile.add_field(name=f"Mining Level : {skill_stats[1]}", value=f"{skill_stats[3]} / {h.max_xp_skills(int(skill_stats[1]))} XP")
             profile.add_field(name=f"Foraging Level : {skill_stats[2]}", value=f"{skill_stats[4]} / {h.max_xp_skills(int(skill_stats[2]))} XP")
@@ -163,7 +162,7 @@ class mining(commands.Cog): #TODO: Implement faction race commands, and the abil
                             while ctx.author.id in self.smelting:
                                 self.smelting.remove(ctx.author.id)
                             if material == "Experium":
-                                await h.xp_handler(ctx.message, self.bot, boost = amount)
+                                await h.xp_handler(ctx.author, ctx.message, self.bot, boost = amount)
                             else:
                                 await update_materials(ctx.author.id, new_material, amount, ctx)
                         else:
@@ -196,12 +195,12 @@ class mining(commands.Cog): #TODO: Implement faction race commands, and the abil
         
         if lists == 1:
             profile = discord.Embed(title=f"{ctx.author.display_name}'s Materials", colour=discord.Colour.from_rgb(95,71,47), description=final_list)
-            profile.set_thumbnail(url=ctx.author.avatar_url)
+            profile.set_thumbnail(url=ctx.author.display_avatar.url)
 
             await ctx.send(embed=profile)
         elif lists == 2:
             profile = discord.Embed(title=f"{ctx.author.display_name}'s Materials (Page 1)", colour=discord.Colour.from_rgb(95,71,47), description=final_list)
-            profile.set_thumbnail(url=ctx.author.avatar_url)
+            profile.set_thumbnail(url=ctx.author.display_avatar.url)
 
             await ctx.send(embed=profile)
 

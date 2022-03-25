@@ -107,7 +107,17 @@ class swordsman(commands.Cog):
             "usr1 summons a massive spirit blade, then slices usr2 into a thousand bits! Owie!",
             "usr1 drags usr2 into the spirit realm, cuts their limbs off, then leaves them behind. Brutal stuff, usr1. Brutal stuff."
         ]
-    pass
+
+        self.hooks_swash = [
+            "usr1 swings their cutlass directly into usr2's bdypart! Owch!",
+            "usr1 raids usr2's home, stabbing them in the process!",
+            "usr1 rams their pirate ship into usr2! How? I don't know!",
+            "usr1 throws sand into usr2's eye before slicing them in the bdypart!",
+            "usr1 smashes a bottle o' rum over usr2's head, then stabs them in the bdypart. Owch!",
+            "usr1 trips usr2 before plunging their cutlass into usr2's bdypart!",
+            "usr1's crew beats up usr2! Take that, usr2!",
+            "\"Yo ho, yo ho!\" usr1 sings as they stab usr2 in the bdypart. How poetic!"
+        ]
 
     @commands.command(aliases=['slice'])
     @commands.guild_only()
@@ -117,7 +127,7 @@ class swordsman(commands.Cog):
             if self.bot.users_classes[str(ctx.author.id)] == "swordsman":
                 ap_works = await h.alter_ap(ctx.message, 1, self.bot)
                 if ap_works and await h.can_attack(ctx.author.id, target.id, ctx):
-                    crit_check = await h.crit_handler(self.bot, ctx.author.id, target.id)
+                    crit_check = await h.crit_handler(self.bot, ctx.author, target, ctx.channel)
                     body_part = random.choice(h.body_parts)
                     hook = random.choice(self.hooks)
                     hook = hook.replace("usr1", f"**{ctx.author.display_name}**")
@@ -132,7 +142,7 @@ class swordsman(commands.Cog):
             elif self.bot.users_classes[str(ctx.author.id)] == "warrior":
                 ap_works = await h.alter_ap(ctx.message, 1, self.bot)
                 if ap_works and await h.can_attack(ctx.author.id, target.id, ctx):
-                    crit_check = await h.crit_handler(self.bot, ctx.author.id, target.id)
+                    crit_check = await h.crit_handler(self.bot, ctx.author, target, ctx.channel)
                     body_part = random.choice(h.body_parts)
                     hook = random.choice(self.hooks_w)
                     hook = hook.replace("usr1", f"**{ctx.author.display_name}**")
@@ -147,7 +157,7 @@ class swordsman(commands.Cog):
             elif self.bot.users_classes[str(ctx.author.id)] == "samurai":
                 ap_works = await h.alter_ap(ctx.message, 1, self.bot)
                 if ap_works and await h.can_attack(ctx.author.id, target.id, ctx):
-                    crit_check = await h.crit_handler(self.bot, ctx.author.id, target.id)
+                    crit_check = await h.crit_handler(self.bot, ctx.author, target, ctx.channel)
                     body_part = random.choice(h.body_parts)
                     hook = random.choice(self.hooks_s)
                     hook = hook.replace("usr1", f"**{ctx.author.display_name}**")
@@ -162,7 +172,7 @@ class swordsman(commands.Cog):
             elif self.bot.users_classes[str(ctx.author.id)] == "viking":
                 ap_works = await h.alter_ap(ctx.message, 1, self.bot)
                 if ap_works and await h.can_attack(ctx.author.id, target.id, ctx):
-                    crit_check = await h.crit_handler(self.bot, ctx.author.id, target.id)
+                    crit_check = await h.crit_handler(self.bot, ctx.author, target, ctx.channel)
                     body_part = random.choice(h.body_parts) 
                     hook = random.choice(self.hooks_v)
                     hook = hook.replace("usr1", f"**{ctx.author.display_name}**")
@@ -189,7 +199,7 @@ class swordsman(commands.Cog):
                     else:
                         ap_works = await h.alter_ap(ctx.message, 1, self.bot)
                     if ap_works and await h.can_attack(ctx.author.id, target.id, ctx):
-                        crit_check = await h.crit_handler(self.bot, ctx.author.id, target.id)
+                        crit_check = await h.crit_handler(self.bot, ctx.author, target, ctx.channel)
                         body_part = random.choice(h.body_parts) 
                         hook = random.choice(self.hooks_ss)
                         hook = hook.replace("usr1", f"**{ctx.author.display_name}**")
@@ -204,7 +214,7 @@ class swordsman(commands.Cog):
                 else:
                     ap_works = await h.alter_ap(ctx.message, 1, self.bot)
                     if ap_works and await h.can_attack(ctx.author.id, target.id, ctx):
-                        crit_check = await h.crit_handler(self.bot, ctx.author.id, target.id)
+                        crit_check = await h.crit_handler(self.bot, ctx.author, target, ctx.channel)
                         body_part = random.choice(h.body_parts) 
                         hook = random.choice(self.hooks_ss)
                         hook = hook.replace("usr1", f"**{ctx.author.display_name}**")
@@ -219,7 +229,7 @@ class swordsman(commands.Cog):
             elif self.bot.users_classes[str(ctx.author.id)] == "shogun":
                 ap_works = await h.alter_ap(ctx.message, 1, self.bot)
                 if ap_works and await h.can_attack(ctx.author.id, target.id, ctx):
-                    crit_check = await h.crit_handler(self.bot, ctx.author.id, target.id)
+                    crit_check = await h.crit_handler(self.bot, ctx.author, target, ctx.channel)
                     body_part = random.choice(h.body_parts)
                     hook = random.choice(self.hooks_shg)
                     hook = hook.replace("usr1", f"**{ctx.author.display_name}**")
@@ -248,7 +258,7 @@ class swordsman(commands.Cog):
             elif self.bot.users_classes[str(ctx.author.id)] == "master samurai":
                 ap_works = await h.alter_ap(ctx.message, 1, self.bot)
                 if ap_works and await h.can_attack(ctx.author.id, target.id, ctx):
-                    crit_check = await h.crit_handler(self.bot, ctx.author.id, target.id)
+                    crit_check = await h.crit_handler(self.bot, ctx.author, target, ctx.channel)
                     body_part = random.choice(h.body_parts)
                     hook = random.choice(self.hooks_s)
                     hook = hook.replace("usr1", f"**{ctx.author.display_name}**")
@@ -263,7 +273,7 @@ class swordsman(commands.Cog):
             elif self.bot.users_classes[str(ctx.author.id)] == "spirit blade":
                 ap_works = await h.alter_ap(ctx.message, 1, self.bot)
                 if ap_works and await h.can_attack(ctx.author.id, target.id, ctx):
-                    crit_check = await h.crit_handler(self.bot, ctx.author.id, target.id)
+                    crit_check = await h.crit_handler(self.bot, ctx.author, target, ctx.channel)
                     body_part = random.choice(h.body_parts)
                     hook = random.choice(self.hooks_sb)
                     hook = hook.replace("usr1", f"**{ctx.author.display_name}**")
@@ -276,6 +286,29 @@ class swordsman(commands.Cog):
                         await h.add_coolness(ctx.author.id, 100)
                         await ctx.send(hook)
                         await h.add_effect(ctx.author, self.bot, "shrouded", amount = 10)
+            elif self.bot.users_classes[str(ctx.author.id)] == "swashbuckler":
+                ap_works = await h.alter_ap(ctx.message, 1, self.bot)
+                if ap_works and await h.can_attack(ctx.author.id, target.id, ctx):
+                    crit_check = await h.crit_handler(self.bot, ctx.author, target, ctx.channel)
+                    body_part = random.choice(h.body_parts)
+                    hook = random.choice(self.hooks_swash)
+                    hook = hook.replace("usr1", f"**{ctx.author.display_name}**")
+                    hook = hook.replace("bdypart", body_part)
+                    hook = hook.replace("usr2", f"**{target.display_name}**")
+                    if crit_check == False:
+                        await ctx.send(hook)
+                    else:
+                        members = ctx.guild.members
+                        random.shuffle(members)
+                        members.remove(ctx.author) # Don't want people shooting themself
+                        
+                        try:
+                            hook = "**☠️[CRITICAL!]☠️** + 100 Coolness | " + hook + f"\n\nYour ship's cannons fire upon **{members[0].display_name}** and **{members[1].display_name}**, earning you an additional 50 coolness!"
+                        except:
+                            hook = "**☠️[CRITICAL!]☠️** + 100 Coolness | " + hook + f"\n\nYour ship's cannons don't fire..."
+                        
+                        await h.add_coolness(ctx.author.id, 150)
+                        await ctx.send(hook)
                 
                         
 # A setup function the every cog has

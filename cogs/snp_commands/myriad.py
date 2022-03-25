@@ -8,7 +8,6 @@ import os
 import aiohttp
 import aiosqlite
 import asyncio
-from discord import Webhook, AsyncWebhookAdapter
 from asyncio.exceptions import TimeoutError
 import sqlite3
 from datetime import datetime
@@ -27,30 +26,33 @@ class myriad(commands.Cog): #TODO: Implement faction race commands, and the abil
             '💀' : [0.05, 0.025, 0],
             '💀' : [0.05, 0.025, 0],
             '💀' : [0.05, 0.025, 0],
-            '💀' : [0.05, 0.025, 0],
-            '💀' : [0.05, 0.025, 0],
-            '💀' : [0.05, 0.025, 0],
-            '💀' : [0.05, 0.025, 0],
+            '🥓' : [1.5, 2, 3.5],
+            '🥓' : [1.5, 2, 3.5],
             '🥓' : [1.5, 2, 3.5],
             '🥓' : [1.5, 2, 3.5],
             '🔥' : [.5, .25, 0.125],
             '🔥' : [.5, .25, 0.125],
             '🔥' : [.5, .25, 0.125],
-            '<a:wooyeah:804905363140247572>' : [1.5, 3, 5.5],
+            '🔥' : [.5, .25, 0.125],
+            '🔥' : [.5, .25, 0.125],
+            '<a:wooyeah:804905363140247572>' : [2, 3, 5.5],
             '🍇' : [0.5, 0.3, 1.5],
             '🍇' : [0.5, 0.3, 1.5],
             '🍇' : [0.5, 0.3, 1.5],
             '🍇' : [0.5, 0.3, 1.5],
             '🍄' : [1, 1.5, 2.75],
             '🍋' : [1.75, 2, 2.25],
-            '<a:jackpot:804920508982099988>' : [0, 2, 'jackpot'],
+            '<a:jackpot:804920508982099988>' : [2, 4, 'jackpot'],
+            '<a:jackpot:804920508982099988>' : [2, 4, 'jackpot'],
             '🍆' : [0.0125, 0.00625, 0.003125],
             '🍆' : [0.0125, 0.00625, 0.003125],
             '🍆' : [0.0125, 0.00625, 0.003125],
             '<:zombo:804914906012319754>' : [1, 0.5, 0.25],
-            '🍌' : [.5,.5,5],
-            '🍌' : [.5,.5,5],
-            '🍌' : [.5,.5,5],
+            '<:zombo:804914906012319754>' : [1, 0.5, 0.25],
+            '<:zombo:804914906012319754>' : [1, 0.5, 0.25],
+            '🍌' : [.5, 1,5],
+            '🍌' : [.5, 1,5],
+            '🍌' : [.5, 1,5],
         }   
 
         self.jackpot = 100000
@@ -109,13 +111,13 @@ class myriad(commands.Cog): #TODO: Implement faction race commands, and the abil
 
             results = {}
 
-            rig_chance = random.randint(1,15)
+            rig_chance = random.randint(1,25)
 
             if self.force_jackpot == True:
                 self.force_jackpot = False
                 slot_1 = '<a:jackpot:804920508982099988>'
                 slot_2 = '<a:jackpot:804920508982099988>'
-                slot_3 = '<a:jackpot:804920508982099988>y'
+                slot_3 = '<a:jackpot:804920508982099988>'
             else:
                 if rig_chance != 1:
                     slot_1 = random.choice(slots)
@@ -139,6 +141,7 @@ class myriad(commands.Cog): #TODO: Implement faction race commands, and the abil
 
 
             if list(results.keys())[0] == "<a:jackpot:804920508982099988>" and results['<a:jackpot:804920508982099988>'] == 3:
+                await h.award_ach(21, ctx.channel.id, ctx.author, self.bot, False)
                 await ctx.send(f"{ctx.author.mention}\n<:STEASnothing:517873442381627392>   **__SLOTS__** **\n-=[{slot_1}|{slot_2}|{slot_3}]=-\n---------------------**\n\nYou won the jackpot! Enjoy the {self.jackpot} G!")
                 await h.add_gold(ctx.author.id, self.jackpot, self.bot, debt_mode = False, purchase_mode = ctx, boost_null = True)
                 
@@ -160,7 +163,7 @@ class myriad(commands.Cog): #TODO: Implement faction race commands, and the abil
                         payout_change = self.slot_values[item]
                         payout_change = payout_change[amount-1]
                         wager += wager*payout_change
-                        await h.add_effect(ctx.author, self.bot, "wooyeah", amount = amount*3)
+                        await h.add_effect(ctx.author, self.bot, "wooyeah", amount = amount*2)
                     if item != "<a:jackpot:804920508982099988>":
                         payout_change = self.slot_values[item]
                         payout_change = payout_change[amount-1]
@@ -295,8 +298,6 @@ class myriad(commands.Cog): #TODO: Implement faction race commands, and the abil
                     self.gambling.remove(ctx.author.id)
             except SyntaxError:
                 pass
-
-        
         
 # A setup function the every cog has
 def setup(bot):
@@ -330,14 +331,11 @@ def gen_fake_hand(start, deck, hand):
     if amount_remaining <= 10:
         hand.append(amount_remaining)
 
-
     else:
         if 10 in deck:
-            #deck.remove(10)
             hand.append(10)
         else:
             if 9 in deck:
-                #deck.remove(9)
                 deck.append(9)
     
     return hand

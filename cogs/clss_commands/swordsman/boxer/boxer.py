@@ -66,7 +66,7 @@ class boxer(commands.Cog):
                 if ap_works and await h.can_attack(ctx.author.id, target.id, ctx):
 
                     hook = random.choice(self.hooks)
-                    crit_check = await h.crit_handler(self.bot, ctx.author.id, target.id)
+                    crit_check = await h.crit_handler(self.bot, ctx.author, target, ctx.channel)
                     body_part = random.choice(h.body_parts)
                     hook = hook.replace("usr1", f"**{ctx.author.display_name}**")
                     hook = hook.replace("bdypart", body_part)
@@ -90,7 +90,7 @@ class boxer(commands.Cog):
                 if ap_works and await h.can_attack(ctx.author.id, target.id, ctx):
 
                     hook = random.choice(self.hooks_t)
-                    crit_check = await h.crit_handler(self.bot, ctx.author.id, target.id)
+                    crit_check = await h.crit_handler(self.bot, ctx.author, target, ctx.channel)
                     body_part = random.choice(h.body_parts)
                     hook = hook.replace("usr1", f"**{ctx.author.display_name}**")
                     hook = hook.replace("bdypart", body_part)
@@ -113,10 +113,10 @@ class boxer(commands.Cog):
                         combo = 0
 
                     if combo >= 10:
-                        await h.award_ach(17, ctx.message, self.bot)
+                        await h.award_ach(17, ctx.message.channel, ctx.author, self.bot)
 
                     hook = random.choice(self.hooks_ma)
-                    crit_check = await h.crit_handler(self.bot, ctx.author.id, target.id, boost = combo)
+                    crit_check = await h.crit_handler(self.bot, ctx.author, target, ctx.channel, boost = combo)
                     body_part = random.choice(h.body_parts)
                     hook = hook.replace("usr1", f"**{ctx.author.display_name}**")
                     hook = hook.replace("bdypart", body_part)

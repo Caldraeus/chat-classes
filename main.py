@@ -6,20 +6,15 @@ import discord
 from discord.ext import commands
 from discord.ext.commands.cooldowns import BucketType
 import helper as h
-import asyncio
 import aiosqlite
 import sys, traceback
 from os import listdir
 from os.path import isfile, join
 from discord.utils import find
-from discord import Webhook, AsyncWebhookAdapter
-import aiohttp
-import random
 import os
 from datetime import datetime  
 from datetime import timedelta  
 from PIL import Image, ImageOps
-import requests
 from jishaku.functools import executor_function
 from io import BytesIO
 from fancy_text import fancy
@@ -43,6 +38,8 @@ bot.reset_time = 0
 bot.claimed = []
 bot.users_factions = {}
 bot.tomorrow = bot.tomorrow = datetime.now().replace(hour=0, minute=0, second=0, microsecond=0) + timedelta(days=1)
+bot.pending_achievements = []
+bot.force_reset = False
 
 # custom achievement, and when data wipes, 10k starting gold
 
@@ -161,14 +158,6 @@ async def on_guild_remove(guild):
 async def invite_link(ctx):
     await ctx.send("https://discord.com/oauth2/authorize?client_id=713506775424565370&scope=bot&permissions=8")
 
-
-"""
-@bot.command()
-@commands.guild_only()
-async def test(ctx):
-    origin = await h.find_origin("shogun")
-    await ctx.send(f"You started as: {origin}")
-"""
 
 bot.run('NzEzNTA2Nzc1NDI0NTY1Mzcw.XshXTQ.5XwBZmS-Mf9vNnDSGyi0hWcmZG8') # Official Bot
 # bot.run('NzY3MTEyMzU4NjQ0MDIzMzI2.X4tLDg.Mer95w4E9L0HVHupQ7VYu0v3GCs') # Test Branch
