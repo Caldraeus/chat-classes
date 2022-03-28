@@ -64,7 +64,7 @@ class rogue(commands.Cog):
             "usr1 throws a cactus into usr2's bdypart. Rude.",
             "usr1 fights usr2 for a while before delivering the killing blow to their bdypart. Fatality!",
             "usr1 kicks some sand up at usr2 before stabbing them through the bdrpart. Rough.",
-            "usr1 drops a house on usr2. What? Isn't that what Nomad's do?",
+            "usr1 drops a house on usr2. What? Isn't that what Nomads do?",
             "usr1 throws their scimitar through usr2's bdypart. Owch!",
             "usr1 trips usr2, then plunges their scimitar into their bdypart."
         ]
@@ -74,7 +74,12 @@ class rogue(commands.Cog):
         self.hooks_scav = [
             "usr1 throws scrap metal at usr2's bdypart, impaling it! Owch!",
             "usr1 trips usr2 then drops a boom bot on them. Kaboom!",
-            "usr1 slashes usr2 with a scrap sword. If that doesn't kill them, the tetanus will!"
+            "usr1 slashes usr2 with a scrap sword. If that doesn't kill them, the tetanus will!",
+            "usr1 throws scrap through usr2, piercing their bdypart!",
+            "usr1 kicks usr2 into a pit of rusty spikes. Damn, that's gotta hurt.",
+            "usr1 throws a boom bot under usr2, blowing them sky high!",
+            "usr1 throws a bunch of scrap caltrops below usr2, then slices their legs off so they fall into it. Ow!",
+            "usr2 is walking down the street when all of a sudden, they see a Fredster! Encapsulated by the Fredster, they fail to notice usr1 sneaking up on them before it's too late! usr1 stabs them through the bdypart!"
         ]
 
     @commands.command()

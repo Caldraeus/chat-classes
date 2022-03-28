@@ -134,14 +134,16 @@ async def on_guild_channel_delete(channel):
 
 @bot.event
 async def on_guild_join(guild): # Warn the server owner that the bot does... a lot.
-    for channel in guild.text_channels:
-        if "bots" in channel.name or "general" in channel.name or "chat" in channel.name or "lobby" in channel.name or "main" in channel.name: # This is gross. Don't do this.
-            print(f"Keyword found in {channel.name}.")
-            chan = channel
-            break
-    if chan:
-        if chan.permissions_for(guild.me).send_messages:
-            await chan.send(f'Greetings, members of {guild.name}! Before this bot is active, the owner must understand that this bot messes with chat quite a bit. This includes sending messages, deleting messages, and creating (temporary!) channels. This bot will not destroy your server, I promise. I would only recommend this bot for small servers with friends/etc. For more information on managing this bot and what it does, use `;help` and read on how to disable the bot in specific channels.\n\nNow that that is all said and done, I will need the server owner ({guild.owner.mention}) to say `{h.prefix}enablecc`\n\nAdditionally, this bot makes use of nickname permissions, and it needs the highest role in a guild to operate. If you do not feel comfortable doing this, I understand, but you should recognise that this bot will have less functionality.\n\n__**PLEASE GIVE THIS BOT THE HIGHEST ROLE IN THE SERVER FOR IT TO WORK PROPERLY!**__\n\nThat is all!')
+    async with aiosqlite.connect('main.db') as conn:
+        async with conn.execute(f"select id from servers where id = '{guild.id}';") as servers:
+            server_id = await servers.fetchone()
+            if server_id:
+                print("Server ({server_id[0]}) is already enabled!")
+            else:
+                bot.servers.append(guild.id)
+                print("Fresh server")
+                await conn.execute(f"insert into servers values('{guild.id}', '')")
+                await conn.commit()
 
 @bot.event
 async def on_guild_remove(guild):

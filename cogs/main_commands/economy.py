@@ -238,7 +238,7 @@ class economy(commands.Cog):
                         await ctx.send("🤖 | You release your boom bot into the wild... I wonder where it'll end up?")
                         await asyncio.sleep(random.randint(15, 3600))
                         def check(m: discord.Message):
-                            return m.author and m.author.id != ctx.author.id and m.guild.id == ctx.guild.id and ctx.author.id != self.bot.user.id and m.author.bot != True
+                            return m.author and m.author.id != ctx.author.id and m.guild.id == ctx.guild.id and ctx.author.id != self.bot.user.id and m.author.bot != True and m.channel.id == ctx.channel.id
                             
                         response_message = await self.bot.wait_for('message', check=check)
                         target = response_message.author
@@ -332,7 +332,6 @@ class economy(commands.Cog):
         try:
             daily_amount = 100
             faction_pts = 10
-            # if self.bot.users_classes[str(ctx.author.id)] == "pacted" and await h.get_demon(ctx.author.id, self.bot) == "foop":
             if ctx.author.id in self.bot.claimed: # or ctx.author.id == 340222819680124929 or ctx.author.id == 740308712450818079:
                 await ctx.send("❌ | You've already claimed your daily gift this rollover! Use `;rollover` to check when you can claim again.")
             else:

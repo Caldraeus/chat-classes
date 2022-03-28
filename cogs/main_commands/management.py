@@ -11,24 +11,7 @@ import aiosqlite
 class management(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
-    pass
 
-    @commands.command(aliases=['enable'])
-    @commands.guild_only()
-    async def enablecc(self, ctx): # Enables the bot
-        if ctx.author.id == ctx.guild.owner.id or ctx.author.id == self.bot.owner_id:
-            async with aiosqlite.connect('main.db') as conn:
-                async with conn.execute(f"select id from servers where id = '{ctx.guild.id}';") as servers:
-                    server_id = await servers.fetchone()
-                    if server_id:
-                        await ctx.send(f"Your server ({server_id[0]}) is already enabled!")
-                    else:
-                        self.bot.servers.append(ctx.message.guild.id)
-                        print("Fresh server")
-                        await conn.execute(f"insert into servers values('{ctx.guild.id}', '')")
-                        await conn.commit()
-                        await ctx.send(f"Chat Classes has been enabled on this server! Use `{h.prefix}safezone` to disable a channel for that bot, and `{h.prefix}classzone` to re-enable a channel.")
-    
     @commands.command()
     @commands.guild_only()
     @commands.has_permissions(manage_channels=True)
