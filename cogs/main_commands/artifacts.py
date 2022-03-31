@@ -15,7 +15,6 @@ class artifacts(commands.Cog):
         self.bot = bot
         self.active = []
         self.used = []
-    pass
 
     @commands.command()
     @commands.guild_only() # Each artifact in game has a unique quest attributed to it. Theses unique quests are coded here.
@@ -37,7 +36,7 @@ class artifacts(commands.Cog):
                         if quest[1] != 0: # If the user has a quest...
                             quest_id = quest[1] # Setting this as a variable to close the first connection.
 
-            if ctx.author.id not in self.active and quest[1] == 18:
+            if ctx.author.id not in self.active and quest_id == 18:
                 self.active.append(ctx.author.id)
                 async with aiosqlite.connect('unique.db') as conn:
                     async with conn.execute(f"select artifact_id from artifacts where owner_id = 0;") as info:

@@ -119,6 +119,17 @@ class swordsman(commands.Cog):
             "\"Yo ho, yo ho!\" usr1 sings as they stab usr2 in the bdypart. How poetic!"
         ]
 
+        self.hooks_adv = [
+            "usr1 drinks a healing potion, then throws the bottle at usr2 before piercing their bdypart with their sword!",
+            "usr1 rushes at usr2, parrying their first strike, then slicing them in the bdypart.",
+            "usr1 heroically protects their friend before turning and slicing usr2's bdypart off! Nice job!",
+            "usr1 kicks usr2 into a wall, then plunges their sword into usr2's bdypart!",
+            "usr1 jumps up before slamming their sword into usr2! Owch!",
+            "usr1 blocks usr2 with their sword before slashing them in the bdypart!",
+            "usr1 runs at usr2 and engages in combat with them! After a minute, usr1 finally emerges victorious!",
+            "usr1 equips their Amulet of Health before running at usr2, slicing them in the bdypart!"
+        ]
+
     @commands.command(aliases=['slice'])
     @commands.guild_only()
     @commands.cooldown(2, 1, commands.BucketType.user)
@@ -308,6 +319,21 @@ class swordsman(commands.Cog):
                             hook = "**☠️[CRITICAL!]☠️** + 100 Coolness | " + hook + f"\n\nYour ship's cannons don't fire..."
                         
                         await h.add_coolness(ctx.author.id, 150)
+                        await ctx.send(hook)
+            elif self.bot.users_classes[str(ctx.author.id)] == "adventurer":
+                ap_works = await h.alter_ap(ctx.message, 1, self.bot)
+                if ap_works and await h.can_attack(ctx.author.id, target.id, ctx):
+                    crit_check = await h.crit_handler(self.bot, ctx.author, target, ctx.channel)
+                    body_part = random.choice(h.body_parts)
+                    hook = random.choice(self.hooks_adv)
+                    hook = hook.replace("usr1", f"**{ctx.author.display_name}**")
+                    hook = hook.replace("bdypart", body_part)
+                    hook = hook.replace("usr2", f"**{target.display_name}**")
+                    if crit_check == False:
+                        await ctx.send(hook)
+                    else:
+                        hook = "**✨[CRITICAL]✨** + 100 Coolness | " + hook
+                        await h.add_coolness(ctx.author.id, 100)
                         await ctx.send(hook)
                 
                         

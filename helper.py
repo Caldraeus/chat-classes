@@ -200,10 +200,11 @@ async def crit_handler(bot, attacker_usr, defender_usr, channel, boost = 0):
 
     # Check if channel is a nomad channel. If so, alter boost by -5.
     if str(defender_id) in bot.users_classes.keys(): 
-        if bot.users_classes[str(defender_id)] == "nomad":
-            if channel in bot.get_cog('rogue').nomad_homes.values():
-                if bot.get_cog('rogue').nomad_homes[defender_usr] == channel: # ctx.author
-                    boost -= 5
+        if bot.users_classes[str(defender_id)] == "nomad" and channel in bot.get_cog('rogue').nomad_homes.values() and bot.get_cog('rogue').nomad_homes[defender_usr] == channel:
+            boost -= 5
+        elif bot.users_classes[str(defender_id)] == "wanderer" and defender_id in bot.get_cog('rogue').wanderer_chan.keys() and bot.get_cog('rogue').wanderer_chan[defender_id] == channel.id:
+            boost -= 15
+
 
     ### Now we check for the rest of the stuff # # # # # # # # # # # # # # # # # # # # # # #                                                                        #
     if boost > 0:                                                                          #
@@ -826,13 +827,16 @@ async def genprof(uid, aps, bot): # Generates the user profile
             profile.set_footer(text=f"Global Coolness Ranking: {await genrank(uid.id)} | Faction: {fac_info[7]}", icon_url="")
             profile.add_field(name="Class & Level", value=f'{user[1].title()} ║ Level {user[8]}', inline=False)
             profile.set_image(url=fac_info[5])
-        else:
-            pass
 
     profile.add_field(name="Coolness", value=user[5])
     profile.add_field(name="Gold", value=user[3])
     profile.add_field(name="Achievements", value=f"{user_ach} of {total_achievements} Unlocked ({int((user_ach/total_achievements)*100)}%)", inline=False)
-    profile.add_field(name="Experience", value=f"{user[2]} / {max_xp(user[8])} ({int((user[2]/max_xp(user[8]))*100)}%)", inline=False)
+    
+    if user[2] == max_xp(user[8]):
+        profile.add_field(name="Experience", value=f"{user[2]} / {max_xp(user[8])} ({int((user[2]/max_xp(user[8]))*100)}%) (Run `;classup`!)", inline=False)
+    else:
+        profile.add_field(name="Experience", value=f"{user[2]} / {max_xp(user[8])} ({int((user[2]/max_xp(user[8]))*100)}%)", inline=False)
+    
     profile.add_field(name="Completed Quests", value=user[9], inline=False)
     profile.add_field(name="Action Points", value=aps[str(uid.id)], inline=False)
     # profile.add_field(name=) Put equipment here eventually

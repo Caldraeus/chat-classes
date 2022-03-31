@@ -11,7 +11,6 @@ import aiosqlite
 class owner_only(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
-    pass
     
     @commands.command()
     @commands.is_owner()
@@ -60,7 +59,7 @@ class owner_only(commands.Cog):
     @commands.guild_only()
     @commands.is_owner()
     async def fquest(self, ctx, target: discord.User = None):
-        if target: # message, bot, uid=None, override=False
+        if target: 
             await h.fetch_random_quest(ctx.message, self.bot, target, override=True)
         else:
             await h.fetch_random_quest(ctx.message, self.bot, override=True)
@@ -112,6 +111,14 @@ class owner_only(commands.Cog):
     async def giveach(self, ctx, target: discord.User, ach_id: int):
         await ctx.send(f"Attempting to award achievement to `{target.display_name}`.")
         await h.award_ach(ach_id, ctx.channel, target, self.bot, False)
+
+    @commands.command()
+    @commands.is_owner()
+    @commands.has_permissions(administrator=True)
+    async def purge(self, ctx, limit: int):
+            await ctx.channel.purge(limit=limit+1)
+            mss = await ctx.send('Cleared by {}'.format(ctx.author.mention))
+            await mss.delete(delay=30)
 
 # A setup function the every cog has
 def setup(bot):

@@ -11,7 +11,6 @@ import aiosqlite
 class secret(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
-    pass
 
     @commands.command(aliases=["code"])
     @commands.guild_only()

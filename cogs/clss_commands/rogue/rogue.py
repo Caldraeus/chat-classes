@@ -63,12 +63,13 @@ class rogue(commands.Cog):
             "usr1 kicks usr2 into a cactus. Owch!",
             "usr1 throws a cactus into usr2's bdypart. Rude.",
             "usr1 fights usr2 for a while before delivering the killing blow to their bdypart. Fatality!",
-            "usr1 kicks some sand up at usr2 before stabbing them through the bdrpart. Rough.",
+            "usr1 kicks some sand up at usr2 before stabbing them through the bdypart. Rough.",
             "usr1 drops a house on usr2. What? Isn't that what Nomads do?",
             "usr1 throws their scimitar through usr2's bdypart. Owch!",
             "usr1 trips usr2, then plunges their scimitar into their bdypart."
         ]
 
+        # Homes for the Nomad class.
         self.nomad_homes = {}
 
         self.hooks_scav = [
@@ -80,6 +81,12 @@ class rogue(commands.Cog):
             "usr1 throws a boom bot under usr2, blowing them sky high!",
             "usr1 throws a bunch of scrap caltrops below usr2, then slices their legs off so they fall into it. Ow!",
             "usr2 is walking down the street when all of a sudden, they see a Fredster! Encapsulated by the Fredster, they fail to notice usr1 sneaking up on them before it's too late! usr1 stabs them through the bdypart!"
+        ]
+
+        self.wanderer_chan = {}
+
+        self.hooks_wander = [
+            "usr1 throws a knife into usr2, then kicks it deeper with a dropkick. Ouch!"
         ]
 
     @commands.command()
@@ -197,6 +204,21 @@ class rogue(commands.Cog):
                         hook = "**✨[CRITICAL]✨** + 100 Coolness, + 1 *Scrap* | " + hook
                         await h.add_coolness(ctx.author.id, 100)
                         await h.alter_items(ctx.author.id, ctx, self.bot, "scrap", 1)
+                        await ctx.send(hook)
+            elif self.bot.users_classes[str(ctx.author.id)] == "wanderer":
+                ap_works = await h.alter_ap(ctx.message, 1, self.bot)
+                if ap_works and await h.can_attack(ctx.author.id, target.id, ctx):
+                    crit_check = await h.crit_handler(self.bot, ctx.author, target, ctx.channel)
+                    body_part = random.choice(h.body_parts)
+                    hook = random.choice(self.hooks_wander)
+                    hook = hook.replace("usr1", f"**{ctx.author.display_name}**")
+                    hook = hook.replace("bdypart", body_part)
+                    hook = hook.replace("usr2", f"**{target.display_name}**")
+                    if crit_check == False:
+                        await ctx.send(hook)
+                    else:
+                        hook = "**✨[CRITICAL]✨** + 100 Coolness | " + hook
+                        await h.add_coolness(ctx.author.id, 100)
                         await ctx.send(hook)
                         
 # A setup function the every cog has

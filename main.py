@@ -138,7 +138,7 @@ async def on_guild_join(guild): # Warn the server owner that the bot does... a l
         async with conn.execute(f"select id from servers where id = '{guild.id}';") as servers:
             server_id = await servers.fetchone()
             if server_id:
-                print("Server ({server_id[0]}) is already enabled!")
+                print(f"Server ({server_id[0]}) is already enabled!")
             else:
                 bot.servers.append(guild.id)
                 print("Fresh server")

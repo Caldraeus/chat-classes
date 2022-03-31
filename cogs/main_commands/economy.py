@@ -31,6 +31,7 @@ class economy(commands.Cog):
             "map": 175
         }
 
+        # Items that only a trader can buy.
         self.items_trader = {
             "snake oil",
             "nft",
@@ -47,6 +48,7 @@ class economy(commands.Cog):
             "scrapbot" : 0,
             "yoinker" : 0
         }
+
 
     @commands.command()
     @commands.guild_only()

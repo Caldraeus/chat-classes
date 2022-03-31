@@ -83,8 +83,6 @@ class utils(commands.Cog): #TODO: Implement faction race commands, and the abili
             
             
             print("\n\n\n----------------Daily reset has occurred----------------\n\n\n")
-        else:
-            pass
         
         context = await self.bot.get_context(message)
 
@@ -93,6 +91,22 @@ class utils(commands.Cog): #TODO: Implement faction race commands, and the abili
                 await handle_effects(message,self.bot) 
         except:
             pass
+
+        # Update Wanderer most recent channel.
+        auid = message.author.id
+
+        usr_class = None
+        
+        if(str(message.author.id) in self.bot.users_classes.keys()):
+            usr_class = self.bot.users_classes[str(message.author.id)]
+
+        if usr_class == "wanderer":
+            cog = self.bot.get_cog('rogue')
+
+            # 1. Check if they already exist in the cog, and if so, if it's time to change it. Or, if they aren't in the keys, set this to the channel.
+            if (auid in cog.wanderer_chan.keys() and cog.wanderer_chan[auid] != message.channel.id) or auid not in cog.wanderer_chan.keys():
+                cog.wanderer_chan[auid] = message.channel.id
+            
 
         if str(message.author.id) in self.bot.registered_users:
             await h.fetch_random_quest(message,self.bot)
