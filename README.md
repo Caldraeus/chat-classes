@@ -10,3 +10,6 @@ That's all that needs to be installed if I recall correctly.
 
 Code is currently on a vultr VPS.
 
+---
+# 9/20/22 UPDATE
+This bot is now public! It is old, and likely won't work, but I have moved on to a new project. Enjoy and good luck if you try to revive this.
