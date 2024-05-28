@@ -1,4 +1,4 @@
-import grequests
+from curses import nocbreak
 import math
 import discord
 from discord.ext import commands
@@ -6,7 +6,6 @@ from discord.ext.commands.cooldowns import BucketType
 import aiosqlite
 import asyncio
 import random
-from discord import Webhook, AsyncWebhookAdapter
 import aiohttp
 from PIL import Image
 
@@ -20,7 +19,27 @@ effect_list = {
     "inspired" : "You're amazing! Good job! Considerably raises your critical chance.",
     "defending" : "You are prepared for someone to strike! Anyone who attacks you fails, wasting their AP.",
     "wooyeah" : "**<a:wooyeah:804905363140247572>WOO YEAH<a:wooyeah:804905363140247572>IM ON A ROLL<a:wooyeah:804905363140247572>**",
-    "shrouded" : "You're covered in some sort of shroud! It's harder for enemies to get a crit on you!"
+    "shrouded" : "You're covered in some sort of shroud! It's harder for enemies to get a crit on you!",
+    "energized" : "You're powered up! Your next action will cost 0 AP!",
+    "goobered" : "God, what is this stuff? Get it off! Every message you send reduces your AP by 2."
+}
+
+effects_positive = {
+    "confidence",
+    "inspired",
+    "defending",
+    "shrouded",
+    "energized"
+}
+
+effects_negative = {
+    "shatter",
+    "polymorph",
+    "drunk",
+    "burning",
+    "poisoned",
+    "wooyeah",
+    "goobered"
 }
 
 base_classes = {
@@ -32,7 +51,7 @@ base_classes = {
 
 prefix = ';'
 
-unobtainable_achs = 1
+unobtainable_achs = 2
 
 with open('adjectives.txt') as f:
     sheep_names = [line.rstrip() for line in f]
@@ -66,6 +85,8 @@ async def find_origin(user_class):
     async with aiosqlite.connect('main.db') as conn:
         async with conn.execute(f"select class_name, preclass from classes;") as chan:
             clss = await chan.fetchall()
+    
+    path = [user_class.title()]
     origin = user_class
     wcase = 0
     b_classes = ["swordsman", "apprentice", "rogue", "archer"]
@@ -76,14 +97,24 @@ async def find_origin(user_class):
         for item in clss:
             if item[0] == origin:
                 origin = item[1]
+                path.append(origin)
 
-    return(origin)
+    path.reverse()
+    return(' ➔ '.join(path))
 
 async def reply_check(message):
     if message.reference:
         return True
     else:
         return False
+
+async def handle_stacks(bot, status, user_id, amount_removed = 1):
+    ### HANDLE STACKS
+    remaining_stacks = status[1]-amount_removed
+    if remaining_stacks <= 0:
+        bot.user_status[user_id].remove(status)
+    else:
+        status[1] -= amount_removed
 
 async def can_attack(user, target, ctx): # NOTE: Remember that you can't alter AP of those who have no profile in CC... Also, target may not always exist
     bot = ctx.bot
@@ -92,12 +123,7 @@ async def can_attack(user, target, ctx): # NOTE: Remember that you can't alter A
     user_effects = bot.user_status[user]
     for status in user_effects: 
         if status[0].lower() == "poisoned":
-            ### HANDLE STACKS
-            remaining_stacks = status[1]-1
-            if remaining_stacks <= 0:
-                bot.user_status[user].remove(status)
-            else:
-                status[1] -= 1
+            await handle_stacks(bot, status, user)
             ### APPLY EFFECT
             uid = str(user)
             balance = (bot.users_ap[uid] - 2)
@@ -147,7 +173,7 @@ async def can_attack(user, target, ctx): # NOTE: Remember that you can't alter A
                     await conn.commit()
             await ctx.send("**[BLOCKED] | **" + hook)
         except:
-            await ctx.send("Your attempt to attack fails as their sellsword protects them, stabbing you instead!")
+            await ctx.send("**[BLOCKED] | **Your attempt to attack fails as their sellsword protects them, stabbing you instead!")
         return False
 
     if target not in bot.user_status:
@@ -155,12 +181,7 @@ async def can_attack(user, target, ctx): # NOTE: Remember that you can't alter A
     user_effects = bot.user_status[target]
     for status in user_effects: 
         if status[0].lower() == "defending":
-            ### HANDLE STACKS
-            remaining_stacks = status[1]-1
-            if remaining_stacks <= 0:
-                bot.user_status[user].remove(status.lower())
-            else:
-                status[1] -= 1
+            await handle_stacks(bot, status, target)
             ### APPLY EFFECT
             await ctx.send("You attempt to attack, but you cannot penetrate their defenses! Your attack fails!")
             return False
@@ -168,38 +189,59 @@ async def can_attack(user, target, ctx): # NOTE: Remember that you can't alter A
 
     return True
 
-async def crit_handler(bot, attacker, defender, boost = None): 
+async def crit_handler(bot, attacker_usr, defender_usr, channel, boost = 0): 
+    defender_id = defender_usr.id
+    attacker_id = attacker_usr.id
     # Values needed for later ############################################################ #
     crit_thresh = 1                # The number needed to roll below to get a critical     #
     crit_max = 20                  # The maximum nuber that the critical will be rolled on #
     ########################################################################################
+    # NOTE: A critical is whenever the random number is equal to "1" (by default)
+
+    # Check if channel is a nomad channel. If so, alter boost by -5.
+    if str(defender_id) in bot.users_classes.keys(): 
+        if bot.users_classes[str(defender_id)] == "nomad" and channel in bot.get_cog('rogue').nomad_homes.values() and bot.get_cog('rogue').nomad_homes[defender_usr] == channel:
+            boost -= 5
+        elif bot.users_classes[str(defender_id)] == "wanderer" and defender_id in bot.get_cog('rogue').wanderer_chan.keys() and bot.get_cog('rogue').wanderer_chan[defender_id] == channel.id:
+            boost -= 15
+
+
+    ### Now we check for the rest of the stuff # # # # # # # # # # # # # # # # # # # # # # #                                                                        #
+    if boost > 0:                                                                          #
+        crit_thresh += boost                                                               #
+    else:                                                                                  #
+        crit_max += boost                                                                  #
+    ## # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+    ########################################################################################
     # We will now check for the person being attacked's status effects, to see if they have#
     # some sort of protective status effect.                                               #
     ########################################################################################
-    
-    speaker = defender
+
+    speaker = defender_id
     force_crit = None
     if speaker in bot.user_status:
         user_effects = bot.user_status[speaker]
         for status in user_effects: # We go through each status affecting the user [NOT ALL APPLY TO ON-MESSAGE EVENTS. THEREFORE, WE NEED IF STATEMENTS]. These are applied in order
-            if status[0].lower() == "shrouded":
+            if status[0].lower() == "shrouded": # Increase the critical threshold, then see if a crit was scored. If one wasn't, decrease user stacks.
                 crit_max += 10
                 force_crit = random.randint(1,crit_max) 
                 ### HANDLE STACKS
                 if not(force_crit <= crit_thresh):
-                    remaining_stacks = status[1]-1
-                    if remaining_stacks <= 0:
-                        bot.user_status[speaker].remove(status)
-                    else:
-                        status[1] -= 1
-    ### Now we check for the rest of the stuff                                             #
-    if boost:                                                                              #
-        if boost > 0:                                                                      #
-            crit_thresh += boost                                                           #
-        else:                                                                              #
-            crit_max += boost                                                              #
-    ###                                                                                    #
-    if force_crit != None:
+                    await handle_stacks(bot, status, speaker)
+
+    speaker = defender_id
+    force_crit = None
+    if speaker in bot.user_status:
+        user_effects = bot.user_status[speaker]
+        for status in user_effects: # We go through each status affecting the user [NOT ALL APPLY TO ON-MESSAGE EVENTS. THEREFORE, WE NEED IF STATEMENTS]. These are applied in order
+            if status[0].lower() == "shrouded": # Increase the critical threshold, then see if a crit was scored. If one wasn't, decrease user stacks.
+                crit_max += 10
+                force_crit = random.randint(1,crit_max) 
+                ### HANDLE STACKS
+                if not(force_crit <= crit_thresh):
+                    await handle_stacks(bot, status, speaker)
+
+    if force_crit != None:                       # For shrouded and similar effects, we check for crit early.
         crit = force_crit
     else:
         crit = random.randint(1,crit_max)        # The rolled critical chance              #
@@ -208,7 +250,7 @@ async def crit_handler(bot, attacker, defender, boost = None):
     ###################################################################################### #
     # Getting user status effects to check for critical-altering ones ### 
     # THESE ARE FOR POSITIVE EFFECTS #
-    speaker = attacker
+    speaker = attacker_id
     if speaker in bot.user_status:
         user_effects = bot.user_status[speaker]
         for status in user_effects: # We go through each status affecting the user [NOT ALL APPLY TO ON-MESSAGE EVENTS. THEREFORE, WE NEED IF STATEMENTS]. These are applied in order
@@ -216,36 +258,28 @@ async def crit_handler(bot, attacker, defender, boost = None):
                 crit_thresh += 4
                 ### HANDLE STACKS
                 if crit <= crit_thresh:
-                    remaining_stacks = status[1]-1
-                    if remaining_stacks <= 0:
-                        bot.user_status[speaker].remove(status)
-                    else:
-                        status[1] -= 1
+                    await handle_stacks(bot, status, speaker)
             elif status[0].lower() == "inspired":
                 crit_thresh += 8
                 ### HANDLE STACKS
                 if crit <= crit_thresh:
-                    remaining_stacks = status[1]-1
-                    if remaining_stacks <= 0:
-                        bot.user_status[speaker].remove(status)
-                    else:
-                        status[1] -= 1
+                    await handle_stacks(bot, status, speaker)
     # End Status Effect Check ############################################
     ######################################################################
     if crit <= crit_thresh:
         ########################################################################################
         # This is for classes that have "when someone gets a crit on you" effects. #############
-        if str(defender) in bot.users_classes:
-            if bot.users_classes[str(defender)] == "pacted":
-                if await get_demon(defender, bot) == "minehart":
+        if str(defender_id) in bot.users_classes.keys():
+            if bot.users_classes[str(defender_id)] == "pacted":
+                if await get_demon(defender_id, bot) == "minehart":
                     async with aiosqlite.connect('main.db') as conn:
-                        async with conn.execute(f"select * from users where id = '{defender}';") as info:
+                        async with conn.execute(f"select * from users where id = '{defender_id}';") as info:
                             user = await info.fetchone()
                     level = user[8] - 19
 
                     amount = 2*level    
                     cog = bot.get_cog('pacted')
-                    cog.minehart[defender] = cog.minehart[defender] + amount
+                    cog.minehart[defender_id] = cog.minehart[defender_id] + amount
 
         ########################################################################################
         ########################################################################################
@@ -272,6 +306,41 @@ async def give_faction_points(contributor = None, f_id = None, amount = 0):
         await conn.execute(f"update factions set faction_points = {faction_points} where faction_id = {f_id};")
         await conn.commit()
 
+async def remove_items(uid, bot, item_name, amount = 1, exact_mode = False): # If "exact_mode" is on, this becomes a return function that will return true if it sucessfully removes EXACTLY X items, false if it cannot.
+    item = item_name.lower()
+    async with aiosqlite.connect('main.db') as conn:
+        async with conn.execute(f"select amount from inventory where uid = {uid} and item_name = '{item.lower()}'") as u_info:
+            user_info = await u_info.fetchone()
+    try:
+        current_amount = user_info[0]
+    except TypeError:
+        return False
+    
+    final_amount = current_amount - amount
+    if exact_mode:
+        if final_amount < 0:
+            return False
+        else:
+            if final_amount <= 0:
+                async with aiosqlite.connect('main.db') as conn: # DELETE FROM table_name WHERE condition;
+                    await conn.execute(f"DELETE FROM inventory WHERE uid = {uid} and item_name = '{item.lower()}'")
+                    await conn.commit()
+            else:
+                async with aiosqlite.connect('main.db') as conn:
+                    await conn.execute(f"update inventory set amount = {final_amount} where uid = {uid} and item_name = '{item.lower()}';")
+                    await conn.commit()
+            return True
+            
+    else:
+        if final_amount <= 0:
+            async with aiosqlite.connect('main.db') as conn: # DELETE FROM table_name WHERE condition;
+                await conn.execute(f"DELETE FROM inventory WHERE uid = {uid} and item_name = '{item.lower()}'")
+                await conn.commit()
+        else:
+            async with aiosqlite.connect('main.db') as conn:
+                await conn.execute(f"update inventory set amount = {final_amount} where uid = {uid} and item_name = '{item.lower()}';")
+                await conn.commit()
+
 async def alter_items(uid, ctx, bot, item, change = 1, cost = 0):
     item = item.lower()
     async with aiosqlite.connect('main.db') as conn:
@@ -281,7 +350,7 @@ async def alter_items(uid, ctx, bot, item, change = 1, cost = 0):
     gold = user_info[0]
     
     async with aiosqlite.connect('main.db') as conn:
-        async with conn.execute(f"select item_name, amount from inventory where uid = '{ctx.author.id}'") as u_info:
+        async with conn.execute(f"select item_name, amount from inventory where uid = '{uid}'") as u_info:
             user_info = await u_info.fetchall()
 
     inv = user_info
@@ -298,7 +367,7 @@ async def alter_items(uid, ctx, bot, item, change = 1, cost = 0):
             indx = items.index(item.lower())
             item_amount = int(inv[indx][1]) + change
             if item_amount >= 10:
-                await award_ach(14, ctx.message, bot)
+                await award_ach(14, ctx.message.channel, ctx.author, bot) 
 
             async with aiosqlite.connect('main.db') as conn:
                 await conn.execute(f"update inventory set amount = {item_amount} where uid = {uid} and item_name = '{item.lower()}';")
@@ -306,7 +375,7 @@ async def alter_items(uid, ctx, bot, item, change = 1, cost = 0):
         
         elif item not in items:
             async with aiosqlite.connect('main.db') as conn:
-                await conn.execute(f"insert into inventory values({ctx.author.id}, '{item.lower()}', {change});")
+                await conn.execute(f"insert into inventory values({uid}, '{item.lower()}', {change});")
                 await conn.commit()
             
         async with aiosqlite.connect('main.db') as conn:
@@ -315,8 +384,16 @@ async def alter_items(uid, ctx, bot, item, change = 1, cost = 0):
         if cost > 0:
             await ctx.send(f"✅ | Purchase complete! Your gold balance is now {gold-cost}.")
 
-async def alter_ap(message, ap, bot):
+async def alter_ap(message, ap, bot): # Used to remove AP from users.
     if str(message.author.id) in bot.registered_users:
+        speaker = message.author.id
+        if speaker in bot.user_status:
+            user_effects = bot.user_status[speaker]
+            for status in user_effects: 
+                if status[0].lower() == "energized": # Cost no AP to do their next action.
+                    await handle_stacks(bot, status, message.author.id)
+                    return True
+                    
         uid = str(message.author.id)
         balance = (bot.users_ap[uid] - ap)
         if balance >= 0:
@@ -326,15 +403,14 @@ async def alter_ap(message, ap, bot):
             await message.channel.send("You don't have enough AP to do that! Buy some refreshers from the shop, do some quests, or wait until rollover!")
             return False
 
-async def xp_handler(message, bot, boost = 0):
-    testing = False
+async def xp_handler(target, message, bot, boost = 0):
     if boost:
         num = 4
         xp_amount = boost
         
     else: 
         num = random.randint(1,4)
-        if message.author.id in bot.server_boosters or message.author.id == 217288785803608074:
+        if target.id in bot.server_boosters or target.id == 217288785803608074:
             xp_amount = round(1.75*(random.randint(5,50)))
         else:
             xp_amount = random.randint(5,100)
@@ -343,35 +419,35 @@ async def xp_handler(message, bot, boost = 0):
             xp_amount *= 2
 
     if num == 4:
-        if str(message.author.id) in bot.registered_users:
+        if str(target.id) in bot.registered_users:
             async with aiosqlite.connect('main.db') as conn:
-                async with conn.execute(f"select exp, level from users where id = '{message.author.id}';") as profile:
+                async with conn.execute(f"select exp, level from users where id = '{target.id}';") as profile:
                     prof = await profile.fetchone()
             xp = prof[0] + xp_amount
             current_lvl = prof[1]
             if xp >= max_xp(current_lvl) and ((prof[1]+1) % 10 != 0):
                 async with aiosqlite.connect('main.db') as conn:
-                    await conn.execute(f"update users set exp = 0 where id = '{message.author.id}'")
-                    await conn.execute(f"update users set level = {current_lvl + 1} where id = '{message.author.id}'")
+                    await conn.execute(f"update users set exp = 0 where id = '{target.id}'")
+                    await conn.execute(f"update users set level = {current_lvl + 1} where id = '{target.id}'")
                     await conn.commit()
                 embed = discord.Embed(title=f"✨ Level up! ✨", colour=discord.Colour.from_rgb(255, 204, 153), description=f'You are now level {prof[1]+1}! Good job!')
-                embed.set_thumbnail(url=message.author.avatar_url)
+                embed.set_thumbnail(url=message.author.display_avatar.url)
                 notif = await message.channel.send(content=message.author.mention, embed=embed)
                 await notif.delete(delay=10)
             elif xp >= max_xp(current_lvl) and ((prof[1]+1) % 10 == 0):
                 async with aiosqlite.connect('main.db') as conn:
-                    await conn.execute(f"update users set exp = {max_xp(current_lvl)} where id = '{message.author.id}'")
+                    await conn.execute(f"update users set exp = {max_xp(current_lvl)} where id = '{target.id}'")
                     await conn.commit()
-                if message.author.id not in bot.notified:
-                    bot.notified.append(message.author.id)
+                if target.id not in bot.notified:
+                    bot.notified.append(target.id)
                     embed = discord.Embed(title=f"✨ Level up! ✨", colour=discord.Colour.from_rgb(255, 204, 153), description=f'You can now level up to {prof[1]+1}! Good job!')
-                    embed.set_thumbnail(url=message.author.avatar_url)
+                    embed.set_thumbnail(url=message.author.display_avatar.url)
                     embed.set_footer(text=f"A class up is available! Run {prefix}classup when you are ready.", icon_url="https://lh3.googleusercontent.com/proxy/OrYbJO2bKqGtVPcWnue8XK0SRnHoC-h8VHKNTw9JoVk-k_mke8bcurTQgoKd70H_kgr9AR2CQH-GRgckkZqXbRbdf-CZgjac")
                     notif = await message.channel.send(content=f'{message.author.mention}', embed=embed)
                     await notif.delete(delay=10)    
             else:
                 async with aiosqlite.connect('main.db') as conn:
-                    await conn.execute(f"update users set exp = {xp} where id = '{message.author.id}'")
+                    await conn.execute(f"update users set exp = {xp} where id = '{target.id}'")
                     await conn.commit()
                     
 
@@ -414,7 +490,6 @@ async def update_quest(message, quest_id, addition, bot, silent = False):
         for guy in questers:
             new_guy = guy.split(",")
             questers[questers.index(guy)] = new_guy # I don't want to comment this and I know I will regret this. 
-            # print(f"I am setting {new_guy} up to replace {guy}.")
 
         found = False
         for new_guy in questers: # Have to do this in a seperate loop to prevent a critical error.
@@ -456,7 +531,7 @@ async def update_quest(message, quest_id, addition, bot, silent = False):
                             await conn.commit() 
                             reward = f"+{quest_info[3]} Gold"
                         else:
-                            pass
+                            pass 
 
                         await conn.execute(f"update users set currently_questing = 0 where id = '{message.author.id}';")
                         await conn.commit()
@@ -527,10 +602,6 @@ async def update_quest(message, quest_id, addition, bot, silent = False):
             embed = discord.Embed(title=f"Quest Failed!", colour=discord.Colour.from_rgb(166, 148, 255), description=f'**{quest_info[6]}**\n*{quest_info[1]}*')
             embed.set_thumbnail(url=quest_info[4])
             await chan.send(content=message.author.mention, embed=embed)
-                        
-                
-
-
 
 ###################################################################
 ###################################################################
@@ -594,7 +665,7 @@ async def txt_achievement_handler(content, uid, message_obj, bot): # This is goi
     # Above determines which achievement has been obtained. Below takes that id and sends the embed as well as awarding the achievement.
     
     if ach_id != 0 and ach_id not in unlocked:
-        await award_ach(ach_id, message_obj, bot)
+        await award_ach(ach_id, message_obj.channel, message_obj.author, bot)
 
 
 async def add_coolness(uid, amount):
@@ -603,8 +674,9 @@ async def add_coolness(uid, amount):
             coolness = await current_amount.fetchone()
             await conn.execute(f"update users set coolness = '{coolness[0]+amount}' where id = '{uid}';")
             await conn.commit()
+    
 
-async def add_gold(uid, amount, bot, debt_mode = False, purchase_mode = None, boost_null = False):
+async def add_gold(uid, amount, bot, debt_mode = False, purchase_mode = None, boost_null = False): # Purchase mode isn't a bool, it's a context object.
     async with aiosqlite.connect('main.db') as conn:
         async with conn.execute(f"select gold from users where id = '{uid}';") as current_amount:
             gold = await current_amount.fetchone()
@@ -623,8 +695,20 @@ async def add_gold(uid, amount, bot, debt_mode = False, purchase_mode = None, bo
             await conn.execute(f"update users set gold = '{final}' where id = '{uid}';")
             await conn.commit()
 
-async def award_ach(ach_id, message, bot):
-    uid = message.author.id
+async def get_gold(uid):
+    async with aiosqlite.connect('main.db') as conn:
+        async with conn.execute(f"select gold from users where id = '{uid}';") as current_amount:
+            gold = await current_amount.fetchone()
+    return gold[0]
+
+async def get_coolness(uid):
+    async with aiosqlite.connect('main.db') as conn:
+        async with conn.execute(f"select coolness from users where id = '{uid}';") as current_amount:
+            coolness = await current_amount.fetchone()
+    return coolness[0]
+
+async def award_ach(ach_id, channel, user, bot, delete_notif = True):
+    uid = user.id
     unlocked = bot.registered_users[str(uid)]
     if ach_id not in unlocked:
         async with aiosqlite.connect('main.db') as conn:
@@ -642,7 +726,6 @@ async def award_ach(ach_id, message, bot):
             embed.set_thumbnail(url=ach_info[3])
             amount = ach_info[4]
             embed.set_footer(text=f"+{amount} Coolness", icon_url="")
-            # await asyncio.sleep(random.randint(30,100))
             async with conn.execute(f"select coolness from users where id = '{uid}';") as current_amount: # Can't run the function for this due to overloading the db
                 coolness = await current_amount.fetchone()
                 await conn.execute(f"update users set coolness = '{coolness[0]+amount}' where id = '{uid}';")
@@ -657,13 +740,17 @@ async def award_ach(ach_id, message, bot):
                         
                         bot.registered_users[guy[0]] = unlocked
 
-            mss = await message.channel.send(content=message.author.mention, embed=embed)
-            await mss.delete(delay=10)
+            if channel == None: # Create a new pending notification. This shouldn't cause multiple to appear, because we actually give them achievement, then just wait to notify them until they speak.
+                bot.pending_achievements[user] = embed
+            else:
+                mss = await channel.send(content=user.mention, embed=embed)
+                if delete_notif:
+                    await mss.delete(delay=10)
             
-async def fetch_random_quest(message, bot, uid=None, override=False):
+async def fetch_random_quest(message, bot, user=None, override=False): # This code is from 2019.
     # Random quest encounter chance time!
-    if uid:
-        uid = str(uid.id)
+    if user:
+        uid = str(user.id)
     else:
         uid = str(message.author.id)
     if uid in bot.registered_users:
@@ -692,6 +779,9 @@ async def fetch_random_quest(message, bot, uid=None, override=False):
                             embed.set_footer(text=f"Reward: {quest_info[2].title()} ({quest_info[3]})", icon_url="")
                             notif = await message.channel.send(content=message.author.mention, embed=embed)
                             await notif.delete(delay=5)
+                            return True
+                        elif override == True:
+                            await message.channel.send("You already have a quest!")
 
 #########################################################
 #########################################################
@@ -699,7 +789,7 @@ async def fetch_random_quest(message, bot, uid=None, override=False):
 #########################################################
 #########################################################
 
-async def genprof(uid, aps, bot):
+async def genprof(uid, aps, bot): # Generates the user profile
     person = uid
     async with aiosqlite.connect('main.db') as conn:
         async with conn.execute("select count(*) from achievements;") as numcount:
@@ -710,7 +800,7 @@ async def genprof(uid, aps, bot):
             user = await info.fetchone()
 
     profile = discord.Embed(title=f"{uid.display_name}'s Profile", colour=discord.Colour(0x6eaf0b), description="")
-    profile.set_thumbnail(url=uid.avatar_url)
+    profile.set_thumbnail(url=uid.display_avatar.url)
     ###
     user_ach = user[6].split("|")
     user_ach = len(user_ach)-1
@@ -733,19 +823,20 @@ async def genprof(uid, aps, bot):
 
             color = discord.Colour.from_rgb(r, g, b)
             profile = discord.Embed(title=f"{uid.display_name}'s Profile", colour=color, description="")
-            profile.set_thumbnail(url=uid.avatar_url)
+            profile.set_thumbnail(url=uid.display_avatar.url)
             profile.set_footer(text=f"Global Coolness Ranking: {await genrank(uid.id)} | Faction: {fac_info[7]}", icon_url="")
             profile.add_field(name="Class & Level", value=f'{user[1].title()} ║ Level {user[8]}', inline=False)
             profile.set_image(url=fac_info[5])
-        else:
-            pass
-
-
 
     profile.add_field(name="Coolness", value=user[5])
     profile.add_field(name="Gold", value=user[3])
     profile.add_field(name="Achievements", value=f"{user_ach} of {total_achievements} Unlocked ({int((user_ach/total_achievements)*100)}%)", inline=False)
-    profile.add_field(name="Experience", value=f"{user[2]} / {max_xp(user[8])} ({int((user[2]/max_xp(user[8]))*100)}%)", inline=False)
+    
+    if user[2] == max_xp(user[8]):
+        profile.add_field(name="Experience", value=f"{user[2]} / {max_xp(user[8])} ({int((user[2]/max_xp(user[8]))*100)}%) (Run `;classup`!)", inline=False)
+    else:
+        profile.add_field(name="Experience", value=f"{user[2]} / {max_xp(user[8])} ({int((user[2]/max_xp(user[8]))*100)}%)", inline=False)
+    
     profile.add_field(name="Completed Quests", value=user[9], inline=False)
     profile.add_field(name="Action Points", value=aps[str(uid.id)], inline=False)
     # profile.add_field(name=) Put equipment here eventually

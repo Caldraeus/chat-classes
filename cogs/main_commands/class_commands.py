@@ -7,13 +7,11 @@ import math
 import os
 import aiohttp
 import aiosqlite
-from discord import Webhook, AsyncWebhookAdapter
 import aiohttp
 
 class class_commands(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
-    pass
 
     @commands.command()
     @commands.guild_only()
@@ -60,7 +58,9 @@ class class_commands(commands.Cog):
                     async with conn.execute(f"select * from classes where class_name = '{clss}';") as cinfo:
                         class_info = await cinfo.fetchall()
                         class_info = class_info[0]
-                        profile = discord.Embed(title=f"{clss.title()}'s Info", colour=discord.Colour.from_rgb(128, 128, 128), description=class_info[1])
+                        desc = class_info[1]
+                        desc = desc.replace(r'\n', '\n')
+                        profile = discord.Embed(title=f"{clss.title()}'s Info", colour=discord.Colour.from_rgb(128, 128, 128), description=desc)
                         profile.add_field(name="Previous Class", value=class_info[3], inline=False)
                         abilities = class_info[5].split("|")
                         final = ""
@@ -88,13 +88,13 @@ class class_commands(commands.Cog):
             for potential_class in class_info:
                 classes.append(potential_class)
                 prestige_achs = [16]
-                prestige_levels = ['𝐈', '𝐈𝐈', "𝐈𝐈𝐈", "𝐈𝐕"] # 𝐈𝐕 𝐈𝐕𝐗
+                prestige_levels = ['𝐈', '𝐈𝐈', "𝐈𝐈𝐈", "𝐈𝐕"] # 𝐈𝐕𝐗
                 if potential_class[4] != 0 and potential_class[4] not in prestige_achs: # It's an achievement locked class, and not a prestige class
-                    profile.add_field(name=f"🔒 | {potential_class[0].title()}", value=potential_class[1], inline=False)
+                    profile.add_field(name=f"🔒 | {potential_class[0].title()}", value=potential_class[1].replace(r'\n', '\n'), inline=False)
                 if potential_class[4] != 0 and potential_class[4] in prestige_achs: # It's a prestige class...
-                    profile.add_field(name=f"**[ {prestige_levels[prestige_achs.index(potential_class[4])]} ]** | {potential_class[0].title()}", value=potential_class[1], inline=False)
+                    profile.add_field(name=f"**[ {prestige_levels[prestige_achs.index(potential_class[4])]} ]** | {potential_class[0].title()}", value=potential_class[1].replace(r'\n', '\n'), inline=False)
                 elif potential_class[4] == 0:
-                    profile.add_field(name=potential_class[0].title(), value=potential_class[1], inline=False)
+                    profile.add_field(name=potential_class[0].title(), value=potential_class[1].replace(r'\n', '\n'), inline=False)
 
             if classes != []:
                 await ctx.send(embed=profile)
@@ -134,11 +134,11 @@ class class_commands(commands.Cog):
 
             profile = discord.Embed(title=f"🌟 CLASS-UP! 🌟", colour=discord.Colour.from_rgb(255, 165, 0))
             for potential_class in class_info:
-                if potential_class[4] != 0 and str(potential_class[4]) in user_ach: # It's an achievement locked class...
-                    profile.add_field(name=potential_class[0].title(), value=potential_class[1], inline=False)
+                if potential_class[4] != 0 and str(potential_class[4]) in user_ach: # If it's locked, check if they have it, then add it
+                    profile.add_field(name=potential_class[0].title(), value=potential_class[1].replace(r'\n', '\n'), inline=False)
                     allowed_classes.append(potential_class[0].lower())
-                elif potential_class[4] == 0:
-                    profile.add_field(name=potential_class[0].title(), value=potential_class[1], inline=False)
+                else:
+                    profile.add_field(name=potential_class[0].title(), value=potential_class[1].replace(r'\n', '\n'), inline=False)
                     allowed_classes.append(potential_class[0].lower())
 
             await ctx.send(embed=profile)
@@ -168,6 +168,14 @@ class class_commands(commands.Cog):
         else:
             await ctx.send("Sorry, you can't change classes yet! Come back when you're higher level.")
 
+    @commands.command()
+    @commands.guild_only()
+    async def origin(self, ctx, *, _class):
+        origin = await h.find_origin(_class.lower())
+        if origin == _class.lower():
+            await ctx.send("That's an origin class, or doesn't exist!")
+        else:
+            await ctx.send(f"Class Progress: {origin.title()}")
 
 
 # A setup function the every cog has

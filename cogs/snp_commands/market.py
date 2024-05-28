@@ -8,7 +8,6 @@ import os
 import aiohttp
 import aiosqlite
 import asyncio
-from discord import Webhook, AsyncWebhookAdapter
 from asyncio.exceptions import TimeoutError
 import json
 
@@ -35,15 +34,6 @@ class market(commands.Cog):
         async def predicate(ctx):
             return ctx.channel.id and ctx.channel.id == chan
         return commands.check(predicate)
-
-    @commands.command()
-    @commands.guild_only()
-    @is_in_guild(732632186204979281)
-    async def trade(self, ctx, target: discord.Member = None):
-        if target and target != ctx.author and (str(target.id) in list(self.bot.registered_users.keys())):
-            await ctx.send("Valid trade target")
-        else:
-            await ctx.send("Invalid trading target! You must target a user registered in the bot.")
 
     @commands.command()
     @commands.guild_only()

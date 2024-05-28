@@ -162,7 +162,7 @@ class apprentice(commands.Cog):
             if self.bot.users_classes[str(ctx.author.id)] == "apprentice":
                 ap_works = await h.alter_ap(ctx.message, 1, self.bot)
                 if ap_works and await h.can_attack(ctx.author.id, target.id, ctx):
-                    crit_check = await h.crit_handler(self.bot, ctx.author.id, target.id)
+                    crit_check = await h.crit_handler(self.bot, ctx.author, target, ctx.channel)
                     body_part = random.choice(h.body_parts)
                     hook = random.choice(self.hooks)
                     hook = hook.replace("usr1", f"**{ctx.author.display_name}**")
@@ -177,7 +177,7 @@ class apprentice(commands.Cog):
             elif self.bot.users_classes[str(ctx.author.id)] == "dark mage":
                 ap_works = await h.alter_ap(ctx.message, 1, self.bot)
                 if ap_works and await h.can_attack(ctx.author.id, target.id, ctx):
-                    crit_check = await h.crit_handler(self.bot, ctx.author.id, target.id)
+                    crit_check = await h.crit_handler(self.bot, ctx.author, target, ctx.channel)
                     body_part = random.choice(h.body_parts)
                     hook = random.choice(self.hooks_dm)
                     hook = hook.replace("usr1", f"**{ctx.author.display_name}**")
@@ -192,7 +192,7 @@ class apprentice(commands.Cog):
             elif self.bot.users_classes[str(ctx.author.id)] == "cryomancer":
                 ap_works = await h.alter_ap(ctx.message, 1, self.bot)
                 if ap_works and await h.can_attack(ctx.author.id, target.id, ctx):
-                    crit_check = await h.crit_handler(self.bot, ctx.author.id, target.id)
+                    crit_check = await h.crit_handler(self.bot, ctx.author, target, ctx.channel)
                     body_part = random.choice(h.body_parts)
                     hook = random.choice(self.hooks_cryo)
                     hook = hook.replace("usr1", f"**{ctx.author.display_name}**")
@@ -219,7 +219,7 @@ class apprentice(commands.Cog):
             elif self.bot.users_classes[str(ctx.author.id)] == "fogwalker":
                 ap_works = await h.alter_ap(ctx.message, 1, self.bot)
                 if ap_works and await h.can_attack(ctx.author.id, target.id, ctx):
-                    crit_check = await h.crit_handler(self.bot, ctx.author.id, target.id)
+                    crit_check = await h.crit_handler(self.bot, ctx.author, target, ctx.channel)
                     body_part = random.choice(h.body_parts)
                     hook = random.choice(self.hooks_fog)
                     hook = hook.replace("usr1", f"**{ctx.author.display_name}**")
@@ -244,7 +244,7 @@ class apprentice(commands.Cog):
             elif self.bot.users_classes[str(ctx.author.id)] == "psychic":
                 ap_works = await h.alter_ap(ctx.message, 1, self.bot)
                 if ap_works and await h.can_attack(ctx.author.id, target.id, ctx):
-                    crit_check = await h.crit_handler(self.bot, ctx.author.id, target.id)
+                    crit_check = await h.crit_handler(self.bot, ctx.author, target, ctx.channel)
                     body_part = random.choice(h.body_parts)
                     hook = random.choice(self.hooks_psychic)
                     hook = hook.replace("usr1", f"**{ctx.author.display_name}**")
@@ -260,7 +260,7 @@ class apprentice(commands.Cog):
             elif self.bot.users_classes[str(ctx.author.id)] == "sorcerer":
                 ap_works = await h.alter_ap(ctx.message, 1, self.bot)
                 if ap_works and await h.can_attack(ctx.author.id, target.id, ctx):
-                    crit_check = await h.crit_handler(self.bot, ctx.author.id, target.id)
+                    crit_check = await h.crit_handler(self.bot, ctx.author, target, ctx.channel)
                     body_part = random.choice(h.body_parts)
                     hook = random.choice(self.hooks_sorc)
                     hook = hook.replace("usr1", f"**{ctx.author.display_name}**")
@@ -282,7 +282,7 @@ class apprentice(commands.Cog):
             elif self.bot.users_classes[str(ctx.author.id)] == "toxinmancer":
                 ap_works = await h.alter_ap(ctx.message, 1, self.bot)
                 if ap_works and await h.can_attack(ctx.author.id, target.id, ctx):
-                    crit_check = await h.crit_handler(self.bot, ctx.author.id, target.id)
+                    crit_check = await h.crit_handler(self.bot, ctx.author, target, ctx.channel)
                     body_part = random.choice(h.body_parts)
                     hook = random.choice(self.hooks_toxin)
                     hook = hook.replace("usr1", f"**{ctx.author.display_name}**")
@@ -298,7 +298,7 @@ class apprentice(commands.Cog):
             elif self.bot.users_classes[str(ctx.author.id)] == "soulcrusher":
                 ap_works = await h.alter_ap(ctx.message, 1, self.bot)
                 if ap_works and await h.can_attack(ctx.author.id, target.id, ctx):
-                    crit_check = await h.crit_handler(self.bot, ctx.author.id, target.id)
+                    crit_check = await h.crit_handler(self.bot, ctx.author, target, ctx.channel)
                     body_part = random.choice(h.body_parts)
                     hook = random.choice(self.hooks_crusher)
                     hook = hook.replace("usr1", f"**{ctx.author.display_name}**")
@@ -337,7 +337,7 @@ class apprentice(commands.Cog):
                                 user = await info.fetchone()
                         level = user[8] - 19
 
-                    crit_check = await h.crit_handler(self.bot, ctx.author.id, target.id)
+                    crit_check = await h.crit_handler(self.bot, ctx.author, target, ctx.channel)
                     body_part = random.choice(h.body_parts)
                     hook = random.choice(self.hooks_pact)
                     hook = hook.replace("usr1", f"**{ctx.author.display_name}**")

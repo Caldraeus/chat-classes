@@ -5,10 +5,8 @@ from discord.ext.commands.cooldowns import BucketType
 import random
 import math
 import os
-import aiohttp
 import aiosqlite
 import asyncio
-from discord import Webhook, AsyncWebhookAdapter
 from asyncio.exceptions import TimeoutError
 import sqlite3
 from datetime import datetime
@@ -62,7 +60,7 @@ class factions(commands.Cog): #TODO: Implement faction race commands, and the ab
     pass
 
     @commands.command()
-    @commands.guild_only() # Each artifact in game has a unique quest attributed to it. Theses unique quests are coded here.
+    @commands.guild_only()
     @commands.is_owner()
     async def cfa(self, ctx):
         print(self.factions)
@@ -410,7 +408,6 @@ async def update_materials(uid, material, amount_added, chan = None):
                     async with aiosqlite.connect('snp.db') as conn:
                         await conn.execute(f"update materials set amount = {current_amount+amount_added[index]} where uid = {uid} and item_name = '{mat}'")
                         await conn.commit()
-
 
 # A setup function the every cog has
 def setup(bot):

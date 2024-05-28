@@ -11,7 +11,6 @@ import aiosqlite
 class owner_only(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
-    pass
     
     @commands.command()
     @commands.is_owner()
@@ -60,18 +59,10 @@ class owner_only(commands.Cog):
     @commands.guild_only()
     @commands.is_owner()
     async def fquest(self, ctx, target: discord.User = None):
-        if target: # message, bot, uid=None, override=False
+        if target: 
             await h.fetch_random_quest(ctx.message, self.bot, target, override=True)
         else:
             await h.fetch_random_quest(ctx.message, self.bot, override=True)
-    
-    @commands.command()
-    @commands.is_owner()
-    async def release(self, ctx, version, *, notes):
-        channel = self.bot.get_channel(734108098129821757)
-        embed = discord.Embed(title=f"❗ Version {version} Released! ❗", colour=discord.Colour.from_rgb(255,0,0), description=notes)
-        mss = await channel.send(content="╱╲╱╲╱╲╱╲╱╲╱╲╱╲╱╲╱╲\n\n<@&738883975954563132>\n\n", embed=embed)
-        await mss.publish()
 
     @commands.command()
     @commands.is_owner()
@@ -91,11 +82,43 @@ class owner_only(commands.Cog):
 
     @commands.command()
     @commands.is_owner()
+    async def givegold(self, ctx, target: discord.User, amount: int):
+        await h.add_gold(target.id, amount, self.bot, boost_null=True)
+        await ctx.send(f"✅ | Granted {amount} G to user {target.display_name}.")
+
+    @commands.command()
+    @commands.is_owner()
     async def setcoolness(self, ctx, target: discord.User, coolness):
         async with aiosqlite.connect('main.db') as conn:
             await conn.execute(f"update users set coolness = {coolness} where id = '{target.id}'")
             await conn.commit()
         await ctx.send("✅ | Targets coolness has been altered with [0] errors.")
+
+    @commands.command()
+    @commands.is_owner()
+    async def reset(self, ctx):
+        await ctx.send("Forcing daily reset. Check console log for errors.")
+        self.bot.force_reset = True
+
+    @commands.command()
+    @commands.is_owner()
+    async def giveitem(self, ctx, target: discord.User, amount: int, *, item_name: str):
+        await h.alter_items(target.id, ctx, self.bot, item_name.lower(), amount)
+        await ctx.send(f"✅ | Gave {amount} `{item_name.title()}` to **{target.display_name}**")
+    
+    @commands.command()
+    @commands.is_owner()
+    async def giveach(self, ctx, target: discord.User, ach_id: int):
+        await ctx.send(f"Attempting to award achievement to `{target.display_name}`.")
+        await h.award_ach(ach_id, ctx.channel, target, self.bot, False)
+
+    @commands.command()
+    @commands.is_owner()
+    @commands.has_permissions(administrator=True)
+    async def purge(self, ctx, limit: int):
+            await ctx.channel.purge(limit=limit+1)
+            mss = await ctx.send('Cleared by {}'.format(ctx.author.mention))
+            await mss.delete(delay=30)
 
 # A setup function the every cog has
 def setup(bot):

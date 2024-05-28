@@ -1,3 +1,4 @@
+from xml.dom.minidom import Attr
 import discord
 from discord.ext import commands
 import helper as h
@@ -8,15 +9,12 @@ import os
 import aiohttp
 import aiosqlite
 import asyncio
-from discord import Webhook, AsyncWebhookAdapter
 from asyncio.exceptions import TimeoutError
 import sqlite3
 from datetime import datetime
 import json
 from datetime import datetime  
 from datetime import timedelta  
-from PIL import Image, ImageOps
-import requests
 from jishaku.functools import executor_function
 from io import BytesIO
 from fancy_text import fancy
@@ -38,7 +36,8 @@ class utils(commands.Cog): #TODO: Implement faction race commands, and the abili
             self.bot.reset_time = difference
 
 
-        if datetime.now().replace(hour=0, minute=0, second=0, microsecond=0) >= self.bot.tomorrow:
+        if datetime.now().replace(hour=0, minute=0, second=0, microsecond=0) >= self.bot.tomorrow or self.bot.force_reset == True:
+            self.bot.force_reset = False
             self.bot.tomorrow = datetime.now().replace(hour=0, minute=0, second=0, microsecond=0) + timedelta(days=1) 
 
             # First, we update our homies.
@@ -78,18 +77,36 @@ class utils(commands.Cog): #TODO: Implement faction race commands, and the abili
             cog = self.bot.get_cog('artifacts')
             cog.used = []
             
+            # We reset any other class-specific things.
+            cog = self.bot.get_cog('rogue')
+            cog.nomad_homes = {}
+            
             
             print("\n\n\n----------------Daily reset has occurred----------------\n\n\n")
-        else:
-            pass
         
         context = await self.bot.get_context(message)
 
         try:
             if context.command == None and str(message.channel.id) not in self.bot.banned_channels:
-                await handle_effects(message,self.bot)
+                await handle_effects(message,self.bot) 
         except:
             pass
+
+        # Update Wanderer most recent channel.
+        auid = message.author.id
+
+        usr_class = None
+        
+        if(str(message.author.id) in self.bot.users_classes.keys()):
+            usr_class = self.bot.users_classes[str(message.author.id)]
+
+        if usr_class == "wanderer":
+            cog = self.bot.get_cog('rogue')
+
+            # 1. Check if they already exist in the cog, and if so, if it's time to change it. Or, if they aren't in the keys, set this to the channel.
+            if (auid in cog.wanderer_chan.keys() and cog.wanderer_chan[auid] != message.channel.id) or auid not in cog.wanderer_chan.keys():
+                cog.wanderer_chan[auid] = message.channel.id
+            
 
         if str(message.author.id) in self.bot.registered_users:
             await h.fetch_random_quest(message,self.bot)
@@ -98,16 +115,16 @@ class utils(commands.Cog): #TODO: Implement faction race commands, and the abili
             await asyncio.sleep(.1)
             await h.txt_achievement_handler(message.content.lower(), message.author.id, message,self.bot)
             await asyncio.sleep(.1)
-            await h.xp_handler(message,self.bot)
-
-@executor_function # makes sync int
-def shatter_image(url):
-    with Image.open(requests.get(url, stream=True).raw) as im:
-        im = ImageOps.mirror(im)
-        buff = BytesIO()
-        im.save(buff, 'png')
-    buff.seek(0)
-    return buff
+            await h.xp_handler(message.author, message, self.bot)
+            
+            try:
+                for person in self.bot.pending_achievements.keys():
+                    if person.id == message.author.id: # Pending achievement
+                        mss = await message.channel.send(content=message.author.mention, embed=self.bot.pending_achievements[person])
+                        del self.bot.pending_achievements[person]
+                        await mss.delete(delay=10)
+            except AttributeError:
+                pass
 
 
 async def handle_effects(message, bot): # List of effects in the readme
@@ -118,11 +135,7 @@ async def handle_effects(message, bot): # List of effects in the readme
             if status[0].lower() == "shatter":
                 ### HANDLE STACKS
                 if len(message.content.split(" ")) != 1:
-                    remaining_stacks = status[1]-1
-                    if remaining_stacks <= 0:
-                        bot.user_status[speaker].remove(status)
-                    else:
-                        status[1] -= 1
+                    await h.handle_stacks(bot, status, speaker)
                 ### APPLY EFFECT
                 mad_content = " "
                 if message.content != "":
@@ -133,30 +146,18 @@ async def handle_effects(message, bot): # List of effects in the readme
                         mad_content = mad_content.join(content)
                         if mad_content != message.content or all(x==content[0] for x in content) == True:
                             break
-                if message.attachments != []:
-                    if len(message.attachments) == 1:
-                        buff = await shatter_image(url=message.attachments[0].url)
-                        buff = discord.File(fp=buff, filename='fucked_image.png')
-                    else:
-                        buff = None
-                else:
-                    buff = None
 
                 await message.delete()
                 async with aiohttp.ClientSession() as session:
                     url = await h.webhook_safe_check(message.channel)
-                    clone_hook = Webhook.from_url(url, adapter=AsyncWebhookAdapter(session))
-                    await clone_hook.send(content=mad_content, username=message.author.display_name, avatar_url=message.author.avatar_url, file=buff)
+                    clone_hook = discord.Webhook.from_url(url, session=session)
+                    await clone_hook.send(content=mad_content, username=message.author.display_name, avatar_url=message.author.display_avatar.url)
                 break
                 
                     
             elif status[0].lower() == "polymorph":
                 ### HANDLE STACKS
-                remaining_stacks = status[1]-1
-                if remaining_stacks <= 0:
-                    bot.user_status[speaker].remove(status)
-                else:
-                    status[1] -= 1
+                await h.handle_stacks(bot, status, speaker)
                 ### APPLY EFFECT
                 
                 urls = [
@@ -194,7 +195,7 @@ async def handle_effects(message, bot): # List of effects in the readme
                 await message.delete()
                 async with aiohttp.ClientSession() as session:
                     url = await h.webhook_safe_check(message.channel)
-                    clone_hook = Webhook.from_url(url, adapter=AsyncWebhookAdapter(session))
+                    clone_hook = discord.Webhook.from_url(url, session=session)
                     
                     try:
                         await clone_hook.send(content=sheep_content.capitalize(), username=sheep_name, avatar_url=chosen_url)
@@ -205,11 +206,7 @@ async def handle_effects(message, bot): # List of effects in the readme
                 chance = random.randint(1,5)
                 if chance == 5:
                     ### HANDLE STACKS
-                    remaining_stacks = status[1]-1
-                    if remaining_stacks <= 0:
-                        bot.user_status[speaker].remove(status)
-                    else:
-                        status[1] -= 1
+                    await h.handle_stacks(bot, status, speaker)
                     ### APPLY EFFECT
                     chosen_effect = random.randint(1,4)
                     
@@ -217,8 +214,8 @@ async def handle_effects(message, bot): # List of effects in the readme
                         await message.delete()
                         async with aiohttp.ClientSession() as session:
                             url = await h.webhook_safe_check(message.channel)
-                            clone_hook = Webhook.from_url(url, adapter=AsyncWebhookAdapter(session))
-                            await clone_hook.send(content=message.content + " -hic-", username=message.author.display_name, avatar_url=message.author.avatar_url)
+                            clone_hook = discord.Webhook.from_url(url, session=session)
+                            await clone_hook.send(content=message.content + " -hic-", username=message.author.display_name, avatar_url=message.author.display_avatar.url)
                         break
                     elif chosen_effect == 2:
                         await message.channel.send(f'*{message.author.display_name} vomits all over the floor.*')
@@ -233,33 +230,25 @@ async def handle_effects(message, bot): # List of effects in the readme
                         await message.delete()
                         async with aiohttp.ClientSession() as session:
                             url = await h.webhook_safe_check(message.channel)
-                            clone_hook = Webhook.from_url(url, adapter=AsyncWebhookAdapter(session))
-                            await clone_hook.send(content="-hic- " + message.content + " -hic-", username=message.author.display_name, avatar_url=message.author.avatar_url)
+                            clone_hook = discord.Webhook.from_url(url, session=session)
+                            await clone_hook.send(content="-hic- " + message.content + " -hic-", username=message.author.display_name, avatar_url=message.author.display_avatar.url)
                     break
             elif status[0].lower() == "wooyeah":
                 ### HANDLE STACKS
-                remaining_stacks = status[1]-1
-                if remaining_stacks <= 0:
-                    bot.user_status[speaker].remove(status)
-                else:
-                    status[1] -= 1
+                await h.handle_stacks(bot, status, speaker)
                 ### APPLY EFFECT
                 async with aiohttp.ClientSession() as session:
                     url = await h.webhook_safe_check(message.channel)
-                    clone_hook = Webhook.from_url(url, adapter=AsyncWebhookAdapter(session))
+                    clone_hook = discord.Webhook.from_url(url, session=session)
                     try:
-                        await clone_hook.send(content=fancy.bold(message.content), username=message.author.display_name, avatar_url=message.author.avatar_url)
+                        await clone_hook.send(content=fancy.bold(message.content), username=message.author.display_name, avatar_url=message.author.display_avatar.url)
                     except:
-                        await clone_hook.send(content="wooyeah", username=message.author.display_name, avatar_url=message.author.avatar_url)
+                        await clone_hook.send(content="wooyeah", username=message.author.display_name, avatar_url=message.author.display_avatar.url)
                     await message.delete()
                     break
             elif status[0].lower() == "burning":
                 ### HANDLE STACKS
-                remaining_stacks = status[1]-1
-                if remaining_stacks <= 0:
-                    bot.user_status[speaker].remove(status)
-                else:
-                    status[1] -= 1
+                await h.handle_stacks(bot, status, speaker)
                 ### APPLY EFFECT
 
                 fstring = "🔥 "
@@ -293,12 +282,19 @@ async def handle_effects(message, bot): # List of effects in the readme
                 await message.delete()
                 async with aiohttp.ClientSession() as session:
                     url = await h.webhook_safe_check(message.channel)
-                    clone_hook = Webhook.from_url(url, adapter=AsyncWebhookAdapter(session))
+                    clone_hook = discord.Webhook.from_url(url, session=session)
                     try:
-                        await clone_hook.send(content=fstring, username=message.author.display_name, avatar_url=message.author.avatar_url)
+                        await clone_hook.send(content=fstring, username=message.author.display_name, avatar_url=message.author.display_avatar.url)
                     except:
-                        await clone_hook.send(content="**I AM ON FIRE HELP MEEEEEEEEEEEEEEEE**", username=message.author.display_name, avatar_url=message.author.avatar_url)
-                    break
+                        await clone_hook.send(content="**I AM ON FIRE HELP MEEEEEEEEEEEEEEEE**", username=message.author.display_name, avatar_url=message.author.display_avatar.url)
+
+                break
+            elif status[0].lower() == "goobered":
+                ### HANDLE STACKS
+                await h.handle_stacks(bot, status, speaker)
+                ### APPLY EFFECT
+                await h.alter_ap(message, 2, bot)
+
 # A setup function the every cog has
 def setup(bot):
     bot.add_cog(utils(bot))

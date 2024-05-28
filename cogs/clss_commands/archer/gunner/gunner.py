@@ -39,7 +39,7 @@ class gunner(commands.Cog):
             if self.bot.users_classes[str(ctx.author.id)] == "gunner":
                 ap_works = await h.alter_ap(ctx.message, 1, self.bot)
                 if ap_works and await h.can_attack(ctx.author.id, target.id, ctx):
-                    crit_check = await h.crit_handler(self.bot, ctx.author.id, target.id)
+                    crit_check = await h.crit_handler(self.bot, ctx.author, target, ctx.channel)
                     body_part = random.choice(h.body_parts)
                     hook = random.choice(self.hooks)
                     hook = hook.replace("usr1", f"**{ctx.author.display_name}**")

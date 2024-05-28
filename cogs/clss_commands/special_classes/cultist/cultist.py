@@ -7,7 +7,6 @@ import math
 import os
 import aiosqlite
 import asyncio
-from discord import Webhook, AsyncWebhookAdapter
 import aiohttp
 
 class cultist(commands.Cog): # self.qualified_name
@@ -77,10 +76,10 @@ class cultist(commands.Cog): # self.qualified_name
                         await asyncio.sleep(3)
                         await ctx.send("**...AS HIS HIGHNESS, LORD GREYMUUL OF THE SEVENTH SANCTUM, ARISES!**")
                         await asyncio.sleep(3)
-                        async with aiohttp.ClientSession() as session:
+                        async with aiohttp.ClientSession() as session: # discord.SyncWebhook.from_url
                             # testhook = await ctx.channel.create_webhook(name="Test")
                             url = await h.webhook_safe_check(ctx.channel)
-                            hook = Webhook.from_url(url, adapter=AsyncWebhookAdapter(session))
+                            hook = discord.Webhook.from_url(url, session=session)
                             await hook.send(content="**WHO DARES RAISE ME FROM MY SLUMBER?**", username="Lord Greymuul, King of Demons", avatar_url="https://store-images.microsoft.com/image/apps.37024.13510798884682687.3563fce5-fc8b-4f80-b38f-f4e9de7d37f5.c9f36a6c-08d0-46aa-9911-0492259e6df3?mode=scale&q=90&h=300&w=300")
                             await asyncio.sleep(6.5)
                             await hook.send(content="**SILENCE! LEST YOU WISH TO BE TORN TO SHREDS.**", username="Lord Greymuul, King of Demons", avatar_url="https://store-images.microsoft.com/image/apps.37024.13510798884682687.3563fce5-fc8b-4f80-b38f-f4e9de7d37f5.c9f36a6c-08d0-46aa-9911-0492259e6df3?mode=scale&q=90&h=300&w=300")
@@ -101,7 +100,7 @@ class cultist(commands.Cog): # self.qualified_name
                         await asyncio.sleep(3)
                         async with aiohttp.ClientSession() as session:
                             url = await h.webhook_safe_check(ctx.channel)
-                            hook = Webhook.from_url(url, adapter=AsyncWebhookAdapter(session))
+                            hook = discord.Webhook.from_url(url, session=session)
                             await hook.send(content="*Ahhh.... Hello there...*", username="Xoth, The Barterer", avatar_url="https://i.pinimg.com/600x315/84/1c/fb/841cfb6504c3c7677bfc8d722b4e7234.jpg")
                             await asyncio.sleep(5)
                             chosen_cultist = ctx.message.guild.get_member(random.choice(self.involved[ctx.guild.id]))
@@ -150,7 +149,7 @@ class cultist(commands.Cog): # self.qualified_name
                         await asyncio.sleep(3)
                         async with aiohttp.ClientSession() as session:
                             url = await h.webhook_safe_check(ctx.channel)
-                            hook = Webhook.from_url(url, adapter=AsyncWebhookAdapter(session))
+                            hook = discord.Webhook.from_url(url, session=session)
                             await hook.send(content=f"**KILLLLLLL MEEEEEEEE!!!!**", username="THE HOTDOG DEMON", avatar_url="https://images-cdn.9gag.com/photo/aO7e1BN_700b.jpg")
                             await asyncio.sleep(5)
                             await hook.send(content=f"**WHY WAS I CREATED? WHAT KIND OF SICK JOKE IS MY LIFE?! AAAAAAAAAAAAAAAAAAAAAAAAAAAA!!!**", username="THE HOTDOG DEMON", avatar_url="https://images-cdn.9gag.com/photo/aO7e1BN_700b.jpg")
@@ -173,7 +172,7 @@ class cultist(commands.Cog): # self.qualified_name
                         await asyncio.sleep(4)
                         async with aiohttp.ClientSession() as session:
                             url = await h.webhook_safe_check(ctx.channel)
-                            hook = Webhook.from_url(url, adapter=AsyncWebhookAdapter(session))
+                            hook = discord.Webhook.from_url(url, session=session)
                             await hook.send(content=f"*Ahhhhhh.... wellllllcome....*", username="Maxeena, The Riddle Demon", avatar_url="https://i.pinimg.com/736x/3e/9e/6f/3e9e6f85b636bb178f7ad4228d9c3b80.jpg")
                             await asyncio.sleep(5)
                             await hook.send(content=f"*It seemsssssss that you have fallen into my web....*", username="Maxeena, The Riddle Demon", avatar_url="https://i.pinimg.com/736x/3e/9e/6f/3e9e6f85b636bb178f7ad4228d9c3b80.jpg")

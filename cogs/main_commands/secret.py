@@ -11,12 +11,11 @@ import aiosqlite
 class secret(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
-    pass
 
     @commands.command(aliases=["code"])
     @commands.guild_only()
     async def coding(self, ctx):
-        await h.award_ach(9, ctx.message, self.bot)
+        await h.award_ach(9, ctx.message.channel, ctx.author,  self.bot)
         await ctx.message.delete()
         embed = discord.Embed(title="", colour=discord.Colour(0x2dc3e1), description="")
 
@@ -26,21 +25,21 @@ class secret(commands.Cog):
     @commands.command()
     @commands.guild_only()
     async def whom(self, ctx):
-        await h.award_ach(9, ctx.message, self.bot)
+        await h.award_ach(9, ctx.message.channel, ctx.author,  self.bot)
         await ctx.message.delete()
         await ctx.send("https://youtu.be/UNPP0IND5u8")
 
     @commands.command()
     @commands.guild_only()
     async def baby(self, ctx):
-        await h.award_ach(9, ctx.message, self.bot)
+        await h.award_ach(9, ctx.message.channel, ctx.author,  self.bot)
         await ctx.message.delete()
         await ctx.send("https://www.youtube.com/watch?v=i-la2O4Ej28")
 
     @commands.command()
     @commands.guild_only()
     async def god(self, ctx):
-        await h.award_ach(9, ctx.message, self.bot)
+        await h.award_ach(9, ctx.message.channel, ctx.author,  self.bot)
         await ctx.message.delete()
         embed = discord.Embed(title="", colour=discord.Colour(0x2dc3e1), description="")
 
